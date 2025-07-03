@@ -1,0 +1,389 @@
+import React, { useState, useEffect } from "react";
+import { format } from "date-fns";
+// For PDF export. Ensure these are loaded, e.g., in your public/index.html
+// <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+// <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+// --- SVG Icons (replaces react-icons) ---
+const FaPrint = () => (<svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"></path><path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z"></path></svg>);
+const FaFilePdf = () => (<svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M128 0C92.7 0 64 28.7 64 64v384c0 35.3 28.7 64 64 64h256c35.3 0 64-28.7 64-64V160H256c-17.7 0-32-14.3-32-32V0H128zM384 0V128h128L384 0zM200 256c0-8.8 7.2-16 16-16h30.1c21.4 0 38.9 17.5 38.9 38.9v0c0 21.4-17.5 38.9-38.9 38.9H216c-8.8 0-16-7.2-16-16v-45.8zm64 16.9c0-8.2-6.7-14.9-14.9-14.9H232v29.8h17.1c8.2 0 14.9-6.7 14.9-14.9zM328 240c8.8 0 16 7.2 16 16v64c0 8.8-7.2 16-16 16s-16-7.2-16-16V256c0-8.8 7.2-16 16-16zm32 96c0-8.8 7.2-16 16-16h16c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16h-16c-8.8 0-16-7.2-16-16v-32z"></path></svg>);
+const FaSave = () => (<svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M433.941 129.941l-83.882-83.882A48 48 0 0 0 316.118 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V163.882a48 48 0 0 0-14.059-33.941zM224 416c-35.346 0-64-28.654-64-64 0-35.346 28.654-64 64-64s64 28.654 64 64c0 35.346-28.654 64-64 64zm96-304.52V212c0 6.627-5.373 12-12 12H76c-6.627 0-12-5.373-12-12V108c0-6.627 5.373-12 12-12h228.52c3.183 0 6.235 1.264 8.485 3.515l3.48 3.48A11.996 11.996 0 0 1 320 111.48z"></path></svg>);
+const FaEdit = () => (<svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 384H88v40z"></path></svg>);
+const FaQrcode = () => (<svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M0 80C0 53.5 21.5 32 48 32h96c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V80zM64 96v64h64V96H64zm192-64h96c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48h-96c-26.5 0-48-21.5-48-48V80c0-26.5 21.5-32 48-32zm48 64v64h64V96h-64zM48 288h96c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48v-96c0-26.5 21.5-48 48-48zm16 48v64h64v-64H64zm192 160v-32h-32v-32h-32v-32h64v-32h32v96h-32zm-32-64h-32v32h32v-32zm64-32h32v32h-32v-32zm-64-64h32v32h-32v-32zm64 0h32v32h-32v-32zm32-32h32v32h-32v-32zm-32-32h32v32h-32v-32zm-32 0h-32v32h32v-32zm-32-32h-32v32h32v-32zm0 0V192h-32v32h-32v32h-32v32h-32v32h32v32h32v-32h32v-32h32v-32h32v-32h32v-32h-32z"></path></svg>);
+const FaWhatsapp = () => (<svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.8 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"></path></svg>);
+const FaUpload = () => (<svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M296 384h-80c-13.3 0-24-10.7-24-24V192h-87.7c-17.8 0-26.7-21.5-14.1-34.1L242.3 5.7c7.5-7.5 19.8-7.5 27.3 0l152.2 152.2c12.6 12.6 3.7 34.1-14.1 34.1H320v168c0 13.3-10.7 24-24 24zm216-8v112c0 13.3-10.7 24-24 24H24c-13.3 0-24-10.7-24-24V376c0-13.3 10.7-24 24-24h136v8c0 30.9 25.1 56 56 56h80c30.9 0 56-25.1 56-56v-8h136c13.3 0 24 10.7 24 24zm-124 88c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20zm64 0c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20z"></path></svg>);
+
+
+const VehicleQuotation = () => {
+  // --- Static Data ---
+  const carMakers = ["Toyota", "Honda", "Ford", "BMW", "Mercedes", "Audi"];
+  const carModelsByMaker = {
+    Toyota: ["Camry", "Corolla", "Land Cruiser", "Hilux", "RAV4"],
+    Honda: ["Accord", "Civic", "CR-V", "Pilot"],
+    Ford: ["Mustang", "F-150", "Explorer", "Focus"],
+    BMW: ["3 Series", "5 Series", "X5", "X7"],
+    Mercedes: ["C-Class", "E-Class", "S-Class", "GLE"],
+    Audi: ["A4", "A6", "Q5", "Q7"],
+  };
+  const exteriorColors = ["أبيض", "أسود", "فضي", "رمادي", "أحمر", "أزرق"];
+  const interiorColors = ["أسود", "بيج", "بني", "رمادي"];
+
+  // --- State Management ---
+  const [formData, setFormData] = useState({
+    customerTitle: "السادة/ ",
+    customerName: "",
+    customerEmail: "",
+    customerPhone: "",
+    carMaker: "",
+    carModel: "",
+    exteriorColor: "",
+    interiorColor: "",
+    quantity: 1,
+    basePrice: 0,
+    vatRate: 15,
+    issueDate: format(new Date(), "yyyy-MM-dd"),
+    deadlineDate: format(new Date(Date.now() + 15 * 24 * 60 * 60 * 1000), "yyyy-MM-dd"),
+    platePrice: 0,
+    specifications: "",
+    includeTax: false,
+    salesRepName: "",
+    salesRepPhone: "",
+    salesRepEmail: "",
+    stampImage: null,
+    signatureImage: null,
+    isWarrantied: false,
+    isRiyadhDelivery: false,
+    includesPlatesAndTax: false,
+    // Internal values for display
+    totalPrice: 0,
+    _display: { subTotal: 0, vat: 0 }
+  });
+
+  const [availableModels, setAvailableModels] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [errors, setErrors] = useState({});
+
+  // --- Effects ---
+  // Recalculate total price whenever relevant form data changes.
+  useEffect(() => {
+    const calculateTotal = () => {
+      const basePriceInput = parseFloat(formData.basePrice) || 0;
+      const quantity = parseInt(formData.quantity) || 1;
+      const platePrice = parseFloat(formData.platePrice) || 0;
+      const vatRate = parseFloat(formData.vatRate) || 15;
+
+      let priceBeforeTax = basePriceInput;
+
+      // If the input price includes tax, calculate the original base price.
+      if (formData.includesPlatesAndTax) {
+          priceBeforeTax = basePriceInput / (1 + vatRate / 100);
+      }
+
+      const subTotal = priceBeforeTax * quantity;
+      const vatAmount = subTotal * (vatRate / 100);
+      const finalTotal = subTotal + vatAmount + platePrice;
+
+      setFormData(prev => ({
+        ...prev,
+        totalPrice: finalTotal,
+        _display: { subTotal: subTotal, vat: vatAmount }
+      }));
+    };
+    calculateTotal();
+  }, [formData.basePrice, formData.quantity, formData.platePrice, formData.includesPlatesAndTax, formData.vatRate]);
+
+  // --- Handlers ---
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    const val = type === 'checkbox' ? checked : value;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: val
+    }));
+    if (name !== 'carMaker') {
+        validateField(name, val);
+    }
+  };
+  
+  // Handle car maker change to update the available models dropdown
+  const handleMakerChange = (e) => {
+    const maker = e.target.value;
+    setFormData(prev => ({
+      ...prev,
+      carMaker: maker,
+      carModel: "" // Reset model selection
+    }));
+    setAvailableModels(carModelsByMaker[maker] || []);
+  };
+
+  const validateField = (name, value) => {
+    let newErrors = { ...errors };
+    // Basic validation logic
+    if (String(value).trim() === "") {
+      newErrors[name] = "هذا الحقل مطلوب";
+    } else {
+      delete newErrors[name];
+    }
+    setErrors(newErrors);
+  };
+
+  const handleFileUpload = (event, type) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({
+          ...prev,
+          [type]: reader.result
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
+  // --- Action Functions ---
+  const handlePrint = () => window.print();
+  
+  const handleSave = () => console.log("Saving data:", formData);
+
+  const handleExportPDF = () => {
+    // Ensure jsPDF and html2canvas are loaded (e.g., from a CDN)
+    if (typeof window.jspdf === 'undefined' || typeof window.html2canvas === 'undefined') {
+        console.error("PDF generation libraries not loaded!");
+        // You could set an error state here to show a message in the UI
+        return;
+    }
+    const { jsPDF } = window.jspdf;
+    const html2canvas = window.html2canvas;
+
+    const input = document.getElementById('quotation-sheet');
+    if (!input) return;
+
+    // Temporarily hide non-printable elements for a cleaner PDF
+    const elementsToHide = input.querySelectorAll('.print-hidden');
+    elementsToHide.forEach(el => el.style.visibility = 'hidden');
+
+    html2canvas(input, { scale: 2, useCORS: true, logging: false })
+      .then((canvas) => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const imgRatio = canvas.width / canvas.height;
+        let imgWidth = pdfWidth;
+        let imgHeight = pdfWidth / imgRatio;
+
+        if (imgHeight > pdfHeight) {
+            imgHeight = pdfHeight;
+            imgWidth = imgHeight * imgRatio;
+        }
+        
+        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+        pdf.save(`quotation-${formData.customerName || 'quote'}.pdf`);
+        
+        // Restore visibility of hidden elements
+        elementsToHide.forEach(el => el.style.visibility = 'visible');
+      }).catch(err => {
+        console.error("PDF generation failed:", err);
+        elementsToHide.forEach(el => el.style.visibility = 'visible');
+      });
+  };
+
+  const handleWhatsAppShare = () => {
+    const message = `عرض سعر مركبة\nالعميل: ${formData.customerName}\nالسيارة: ${formData.carMaker} ${formData.carModel}\nالسعر الإجمالي: ${formData.totalPrice.toFixed(2)} ريال سعودي`;
+    const whatsappUrl = `https://wa.me/${formData.salesRepPhone}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, "_blank");
+  };
+  
+  // --- Number to Arabic Words (replaces tafgeet-js) ---
+  const numberToArabicWords = (number) => {
+    if (number === null || isNaN(number)) return "";
+    let num = parseInt(number, 10);
+    if (num === 0) return "صفر ريال سعودي فقط لا غير";
+
+    const ones = ["", "واحد", "اثنان", "ثلاثة", "أربعة", "خمسة", "ستة", "سبعة", "ثمانية", "تسعة"];
+    const tens = ["", "عشرة", "عشرون", "ثلاثون", "أربعون", "خمسون", "ستون", "سبعون", "ثمانون", "تسعون"];
+    const hundreds = ["", "مئة", "مئتان", "ثلاثمائة", "أربعمائة", "خمسمائة", "ستمائة", "سبعمائة", "ثمانمائة", "تسعمائة"];
+    const thousands = ["", "ألف", "ألفان", "آلاف"];
+    const millions = ["", "مليون", "مليونان", "ملايين"];
+
+    let words = [];
+    let remaining = num;
+
+    const processGroup = (groupNum, single, dual, plural) => {
+        if (groupNum === 0) return [];
+        let groupWords = [];
+        if (groupNum >= 100) {
+            groupWords.push(hundreds[Math.floor(groupNum / 100)]);
+            groupNum %= 100;
+        }
+        if (groupNum >= 10) {
+            if (groupNum >= 11 && groupNum <= 19) {
+                if(groupNum === 11) groupWords.push("أحد عشر");
+                else if(groupNum === 12) groupWords.push("اثنا عشر");
+                else groupWords.push(ones[groupNum % 10] + " " + tens[1]);
+            } else {
+                const unit = ones[groupNum % 10];
+                const ten = tens[Math.floor(groupNum / 10)];
+                if (unit && ten) groupWords.push(unit + " و" + ten);
+                else if (unit) groupWords.push(unit);
+                else if (ten) groupWords.push(ten);
+            }
+        } else if (groupNum > 0) {
+            groupWords.push(ones[groupNum]);
+        }
+        return groupWords;
+    };
+
+    let millionsPart = Math.floor(remaining / 1000000);
+    remaining %= 1000000;
+    if (millionsPart > 0) {
+        words.push(...processGroup(millionsPart));
+        if (millionsPart === 1) words.push(millions[1]);
+        else if (millionsPart === 2) words.push(millions[2]);
+        else if (millionsPart >= 3 && millionsPart <= 10) words.push(millions[3]);
+        else words.push(millions[1]);
+    }
+
+    let thousandsPart = Math.floor(remaining / 1000);
+    remaining %= 1000;
+    if (thousandsPart > 0) {
+        if (words.length > 0) words.push("و");
+        if (thousandsPart === 1) words.push(thousands[1]);
+        else if (thousandsPart === 2) words.push(thousands[2]);
+        else {
+            words.push(...processGroup(thousandsPart));
+            if (thousandsPart >= 3 && thousandsPart <= 10) words.push(thousands[3]);
+            else words.push(thousands[1]);
+        }
+    }
+
+    if (remaining > 0) {
+        if (words.length > 0) words.push("و");
+        words.push(...processGroup(remaining));
+    }
+
+    let result = words.join(" ");
+    // Handle fractions (Halalas)
+    const fractionalPart = Math.round((number - num) * 100);
+    if (fractionalPart > 0) {
+        result += " ريال سعودي و" + processGroup(fractionalPart).join(" ") + " هللة";
+    } else {
+        result += " ريال سعودي";
+    }
+    
+    return result + " فقط لا غير";
+  };
+
+
+  return (
+    <div className="min-h-screen bg-gray-200 p-4 print:p-0 font-sans" dir="rtl">
+      <div id="quotation-sheet" className="w-[21cm] min-h-[29.7cm] mx-auto bg-white shadow-2xl print:shadow-none p-8">
+        {/* Header */}
+        <header className="flex justify-between items-start mb-8 pb-4 border-b">
+          <div className="flex items-center gap-4">
+            <img src="https://placehold.co/200x80/003366/FFFFFF?text=شعار+الشركة" alt="Company Logo" className="h-16 object-contain" />
+            <div className="p-1 bg-gray-100 rounded-md print-hidden">
+              <FaQrcode size={60} className="text-gray-700"/>
+            </div>
+          </div>
+          <div className="text-right">
+            <h1 className="text-3xl font-bold text-gray-800 mb-1">عرض سعر مركبة</h1>
+            <p className="text-gray-500">رقم العرض: QT-{new Date().getFullYear()}-{String(Math.floor(Math.random() * 10000)).padStart(4, '0')}</p>
+          </div>
+        </header>
+
+        {/* Action Buttons (Hidden on Print) */}
+        <div className="mb-6 flex flex-wrap gap-2 print-hidden">
+            <input type="text" placeholder="بحث..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="flex-1 rounded-md border-gray-300 shadow-sm"/>
+            <button className="px-4 py-2 bg-blue-600 text-white rounded-md flex items-center gap-2 hover:bg-blue-700 transition-colors"><FaEdit /> بحث</button>
+            <button onClick={handlePrint} className="px-4 py-2 bg-gray-600 text-white rounded-md flex items-center gap-2 hover:bg-gray-700 transition-colors"><FaPrint /> طباعة</button>
+            <button onClick={handleSave} className="px-4 py-2 bg-green-600 text-white rounded-md flex items-center gap-2 hover:bg-green-700 transition-colors"><FaSave /> حفظ</button>
+            <button onClick={handleExportPDF} className="px-4 py-2 bg-red-600 text-white rounded-md flex items-center gap-2 hover:bg-red-700 transition-colors"><FaFilePdf /> تصدير PDF</button>
+            <button onClick={handleWhatsAppShare} className="px-4 py-2 bg-green-500 text-white rounded-md flex items-center gap-2 hover:bg-green-600 transition-colors"><FaWhatsapp /> مشاركة واتساب</button>
+        </div>
+
+        {/* Customer and Dates */}
+        <section className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700">مقدم إلى</label>
+                <input type="text" name="customerName" value={formData.customerName} onChange={handleInputChange} placeholder="اسم العميل" className="mt-1 w-full rounded-md border-gray-300 shadow-sm" />
+            </div>
+            <div>
+                <label className="block text-sm font-medium text-gray-700">تاريخ الإصدار</label>
+                <input type="date" name="issueDate" value={formData.issueDate} onChange={handleInputChange} className="mt-1 w-full rounded-md border-gray-300 shadow-sm" />
+            </div>
+        </section>
+
+        {/* Vehicle Details Table */}
+        <section className="mb-8">
+            <h2 className="text-xl font-semibold text-gray-800 mb-3 border-b pb-2">تفاصيل المركبة</h2>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div><label className="text-sm font-medium text-gray-700">الشركة المصنعة</label><select name="carMaker" value={formData.carMaker} onChange={handleMakerChange} className="mt-1 w-full rounded-md border-gray-300 shadow-sm"><option value="">اختر...</option>{carMakers.map(m => <option key={m} value={m}>{m}</option>)}</select></div>
+                <div><label className="text-sm font-medium text-gray-700">الموديل</label><select name="carModel" value={formData.carModel} onChange={handleInputChange} className="mt-1 w-full rounded-md border-gray-300 shadow-sm" disabled={!formData.carMaker}><option value="">اختر...</option>{availableModels.map(m => <option key={m} value={m}>{m}</option>)}</select></div>
+                <div><label className="text-sm font-medium text-gray-700">اللون الخارجي</label><select name="exteriorColor" value={formData.exteriorColor} onChange={handleInputChange} className="mt-1 w-full rounded-md border-gray-300 shadow-sm"><option value="">اختر...</option>{exteriorColors.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
+                <div><label className="text-sm font-medium text-gray-700">اللون الداخلي</label><select name="interiorColor" value={formData.interiorColor} onChange={handleInputChange} className="mt-1 w-full rounded-md border-gray-300 shadow-sm"><option value="">اختر...</option>{interiorColors.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
+            </div>
+            <div className="mt-4">
+                <label className="text-sm font-medium text-gray-700">المواصفات الإضافية</label>
+                <textarea name="specifications" value={formData.specifications} onChange={handleInputChange} placeholder="مثال: فتحة سقف، شاشة ملاحة..." className="mt-1 w-full rounded-md border-gray-300 shadow-sm h-20"></textarea>
+            </div>
+        </section>
+
+        {/* Pricing Details */}
+        <section className="mb-8">
+            <h2 className="text-xl font-semibold text-gray-800 mb-3 border-b pb-2">التسعير</h2>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                <div><label className="text-sm font-medium text-gray-700">سعر المركبة</label><input type="number" name="basePrice" value={formData.basePrice} onChange={handleInputChange} className="mt-1 w-full rounded-md border-gray-300 shadow-sm" /></div>
+                <div><label className="text-sm font-medium text-gray-700">سعر اللوحات</label><input type="number" name="platePrice" value={formData.platePrice} onChange={handleInputChange} className="mt-1 w-full rounded-md border-gray-300 shadow-sm" /></div>
+                <div><label className="text-sm font-medium text-gray-700">الكمية</label><input type="number" name="quantity" value={formData.quantity} onChange={handleInputChange} className="mt-1 w-full rounded-md border-gray-300 shadow-sm" /></div>
+                <div className="print-hidden"><label className="flex items-center gap-2"><input type="checkbox" name="includesPlatesAndTax" checked={formData.includesPlatesAndTax} onChange={handleInputChange} className="rounded border-gray-300 shadow-sm"/><span>السعر شامل الضريبة</span></label></div>
+            </div>
+
+            <div className="mt-6 flex justify-end">
+              <div className="w-full md:w-1/2">
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="flex justify-between py-1"><span className="text-gray-600">المجموع الفرعي:</span><span className="font-semibold">{formData._display.subTotal.toFixed(2)} ريال</span></div>
+                  <div className="flex justify-between py-1"><span className="text-gray-600">ضريبة القيمة المضافة ({formData.vatRate}%):</span><span className="font-semibold">{formData._display.vat.toFixed(2)} ريال</span></div>
+                  <div className="flex justify-between py-1"><span className="text-gray-600">رسوم اللوحات:</span><span className="font-semibold">{parseFloat(formData.platePrice).toFixed(2)} ريال</span></div>
+                  <div className="flex justify-between py-2 mt-2 border-t-2 border-gray-300"><span className="text-lg font-bold text-gray-800">الإجمالي:</span><span className="text-lg font-bold text-blue-600">{formData.totalPrice.toFixed(2)} ريال</span></div>
+                </div>
+                <p className="text-sm text-gray-700 mt-2 text-center bg-yellow-100 p-2 rounded-md">{numberToArabicWords(formData.totalPrice)}</p>
+              </div>
+            </div>
+        </section>
+
+        {/* Sales Rep and Signature */}
+        <footer className="mt-12 pt-8 border-t-2 border-dashed">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">مندوب المبيعات</h3>
+                    <input type="text" name="salesRepName" value={formData.salesRepName} onChange={handleInputChange} placeholder="اسم المندوب" className="mt-1 w-full rounded-md border-gray-300 shadow-sm mb-2" />
+                    <input type="text" name="salesRepPhone" value={formData.salesRepPhone} onChange={handleInputChange} placeholder="رقم الجوال" className="mt-1 w-full rounded-md border-gray-300 shadow-sm" />
+                </div>
+                <div className="flex justify-between">
+                    <div className="text-center">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">الختم</label>
+                        <div className="w-32 h-32 border-2 border-dashed rounded-md flex items-center justify-center bg-gray-50">
+                            {formData.stampImage ? <img src={formData.stampImage} alt="Stamp" className="max-w-full max-h-full" /> : <span className="text-xs text-gray-400">الختم الرسمي</span>}
+                        </div>
+                    </div>
+                    <div className="text-center">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">التوقيع</label>
+                        <div className="w-32 h-32 border-2 border-dashed rounded-md flex items-center justify-center bg-gray-50">
+                            {formData.signatureImage ? <img src={formData.signatureImage} alt="Signature" className="max-w-full max-h-full" /> : <span className="text-xs text-gray-400">التوقيع</span>}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div className="text-center text-xs text-gray-500 mt-8">
+                <p>شركة السيارات المتحدة | س.ت: 1234567890 | الرقم الضريبي: 123456789012345</p>
+                <p>العنوان: الرياض، المملكة العربية السعودية | العرض ساري لمدة 15 يوماً من تاريخه</p>
+            </div>
+        </footer>
+      </div>
+    </div>
+  );
+};
+
+export default VehicleQuotation;
