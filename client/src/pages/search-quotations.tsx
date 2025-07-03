@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, QrCode, Eye, Edit, Trash2, Calendar, User, Car, DollarSign } from "lucide-react";
+import { Search, QrCode, Eye, Edit, Trash2, Calendar, User, Car, DollarSign, ArrowLeft } from "lucide-react";
+import { Link } from "wouter";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 
@@ -106,6 +107,14 @@ export default function SearchQuotations() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
+          <div className="flex items-center gap-4 mb-4">
+            <Link href="/">
+              <Button variant="outline" size="sm" className="flex items-center gap-2">
+                <ArrowLeft className="w-4 h-4" />
+                العودة للقائمة الرئيسية
+              </Button>
+            </Link>
+          </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             البحث في عروض الأسعار
           </h1>

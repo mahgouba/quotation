@@ -8,7 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Edit, Plus, Car, Users, Building, UserCheck, Filter } from "lucide-react";
+import { Trash2, Edit, Plus, Car, Users, Building, UserCheck, Filter, ArrowLeft } from "lucide-react";
+import { Link } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { toast } from "@/hooks/use-toast";
@@ -194,6 +195,14 @@ export default function DataManagement() {
     <div className="min-h-screen bg-gray-50 p-4">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
+          <div className="flex items-center gap-4 mb-4">
+            <Link href="/">
+              <Button variant="outline" size="sm" className="flex items-center gap-2">
+                <ArrowLeft className="w-4 h-4" />
+                العودة للقائمة الرئيسية
+              </Button>
+            </Link>
+          </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">إدارة البيانات</h1>
           <p className="text-gray-600">إدارة شاملة لجميع بيانات النظام</p>
         </div>
