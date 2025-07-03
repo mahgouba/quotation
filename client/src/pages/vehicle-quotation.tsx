@@ -515,7 +515,7 @@ const VehicleQuotation = () => {
                   البحث
                 </Button>
               </Link>
-              <Link href="/management">
+              <Link href="/data-management">
                 <Button variant="ghost" size="sm" className="flex items-center gap-2">
                   <Database className="h-4 w-4" />
                   إدارة البيانات

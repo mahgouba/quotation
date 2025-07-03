@@ -181,7 +181,7 @@ export default function DataManagement() {
     }
     addSalesRepMutation.mutate({
       ...salesRepForm,
-      companyId: salesRepForm.companyId ? parseInt(salesRepForm.companyId) : null
+      companyId: salesRepForm.companyId && salesRepForm.companyId !== "none" ? parseInt(salesRepForm.companyId) : null
     });
   };
 
@@ -479,7 +479,7 @@ export default function DataManagement() {
                           <SelectValue placeholder="اختر الشركة" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">بدون شركة</SelectItem>
+                          <SelectItem value="none">بدون شركة</SelectItem>
                           {companies.map((company: Company) => (
                             <SelectItem key={company.id} value={company.id.toString()}>{company.name}</SelectItem>
                           ))}
