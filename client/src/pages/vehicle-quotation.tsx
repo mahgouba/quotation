@@ -32,7 +32,8 @@ import {
   Search,
   Home,
   Database,
-  Palette
+  Palette,
+  Eye
 } from "lucide-react";
 
 // SVG Icons
@@ -568,21 +569,8 @@ const VehicleQuotation = () => {
 
   const handlePreviewPDF = () => {
     try {
-      // Prepare data for PDF generation
-      const pdfData = {
-        ...formData,
-        totalInWords: numberToArabicWords(formData.totalPrice),
-        carYear: formData.carYear || new Date().getFullYear().toString(),
-        specifications: vehicleSpecs?.specifications || formData.detailedSpecs || '',
-      };
-
-      // Generate PDF using advanced templating
-      const pdf = generateCustomPDF(pdfData, selectedTemplate.id);
-      
-      // Open PDF in new window for preview
-      const pdfBlob = pdf.output('blob');
-      const pdfUrl = URL.createObjectURL(pdfBlob);
-      window.open(pdfUrl, '_blank');
+      // Use export PDF function for preview
+      handleExportPDF();
       
       toast({
         title: "معاينة PDF",
@@ -779,16 +767,70 @@ const VehicleQuotation = () => {
               <FaWhatsapp className="ml-2" />
               <span>واتساب</span>
             </Button>
-            <Button 
-              onClick={() => {
-                console.log("Template selector button clicked, current state:", showTemplateSelector);
-                setShowTemplateSelector(!showTemplateSelector);
-              }} 
-              className="bg-purple-600 hover:bg-purple-700 text-white"
-            >
-              <Palette className="ml-2 h-4 w-4" />
-              <span>قوالب PDF</span>
-            </Button>
+            <div className="relative">
+              <Button 
+                onClick={() => {
+                  setShowTemplateSelector(!showTemplateSelector);
+                }} 
+                className="bg-purple-600 hover:bg-purple-700 text-white"
+              >
+                <Palette className="ml-2 h-4 w-4" />
+                <span>قوالب PDF</span>
+              </Button>
+              
+              {showTemplateSelector && (
+                <div className="absolute top-full mt-2 right-0 bg-white border rounded-lg shadow-lg p-4 z-[1000] w-80">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-semibold">اختر قالب PDF</h3>
+                    <Button
+                      onClick={() => setShowTemplateSelector(false)}
+                      variant="ghost"
+                      size="sm"
+                      className="p-1"
+                    >
+                      ×
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {defaultTemplates.map((template) => (
+                      <Button
+                        key={template.id}
+                        onClick={() => {
+                          setSelectedTemplate(template);
+                          setShowTemplateSelector(false);
+                          toast({
+                            title: "تم اختيار القالب",
+                            description: template.name,
+                          });
+                        }}
+                        variant={selectedTemplate.id === template.id ? "default" : "outline"}
+                        className="h-auto p-3"
+                      >
+                        <div className="text-center">
+                          <div 
+                            className="w-12 h-8 rounded mb-2 mx-auto border"
+                            style={{ backgroundColor: template.colors.primary }}
+                          />
+                          <div className="text-xs">{template.name}</div>
+                        </div>
+                      </Button>
+                    ))}
+                  </div>
+                  <div className="mt-3 pt-3 border-t">
+                    <Button
+                      onClick={() => {
+                        handlePreviewPDF();
+                        setShowTemplateSelector(false);
+                      }}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      <FileText className="ml-2 h-4 w-4" />
+                      معاينة PDF
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -1010,20 +1052,7 @@ const VehicleQuotation = () => {
               </CardContent>
             </Card>
 
-            {/* Template Selector */}
-            {showTemplateSelector && (
-              <div className="w-full">
-                <div className="mb-4 p-4 bg-purple-50 rounded-lg border border-purple-200">
-                  <h3 className="text-lg font-semibold text-purple-800 mb-2">اختيار قالب PDF</h3>
-                  <p className="text-sm text-purple-600">اختر من القوالب المتاحة أو خصص القالب الخاص بك</p>
-                </div>
-                <TemplateSelector
-                  selectedTemplate={selectedTemplate}
-                  onTemplateChange={setSelectedTemplate}
-                  onPreview={handlePreviewPDF}
-                />
-              </div>
-            )}
+
 
 
 

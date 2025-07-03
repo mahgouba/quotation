@@ -191,9 +191,7 @@ export class PDFTemplateEngine {
     if (this.template.elements.showWatermark) {
       // Set background with watermark effect
       this.doc.setFillColor(...this.hexToRgb(this.template.colors.primary));
-      this.doc.setGlobalAlpha(0.1);
       this.doc.rect(0, 0, this.pageWidth, this.pageHeight, 'F');
-      this.doc.setGlobalAlpha(1.0);
     }
   }
 
