@@ -233,10 +233,12 @@ export default function VehicleManagement() {
   });
 
   const handleAddSpec = () => {
-    if (!newSpec.make || !newSpec.model || !newSpec.year || !newSpec.engine) {
+    console.log("handleAddSpec called with data:", newSpec);
+    
+    if (!newSpec.make || !newSpec.model || !newSpec.year) {
       toast({
         title: "بيانات ناقصة",
-        description: "يرجى إدخال الماركة والموديل والسنة والمحرك",
+        description: "يرجى إدخال الماركة والموديل والسنة على الأقل",
         variant: "destructive",
       });
       return;
@@ -270,10 +272,11 @@ export default function VehicleManagement() {
       make: newSpec.make,
       model: newSpec.model,
       year: newSpec.year,
-      engine: newSpec.engine,
+      engine: newSpec.engine || 'محرك قياسي',
       specifications: specificationsText || 'مواصفات أساسية'
     };
 
+    console.log("About to send spec data:", specData);
     addSpecMutation.mutate(specData);
   };
 
