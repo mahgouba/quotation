@@ -50,21 +50,18 @@ export default function DataManagement() {
   const queryClient = useQueryClient();
 
   // Vehicle Specifications
-  const { data: vehicleSpecs = [], isLoading: isLoadingSpecs } = useQuery({
+  const { data: vehicleSpecs = [] as VehicleSpec[], isLoading: isLoadingSpecs } = useQuery<VehicleSpec[]>({
     queryKey: ['/api/vehicle-specs'],
-    queryFn: () => apiRequest('/api/vehicle-specs'),
   });
 
   // Sales Representatives
-  const { data: salesReps = [], isLoading: isLoadingSalesReps } = useQuery({
+  const { data: salesReps = [] as SalesRepresentative[], isLoading: isLoadingSalesReps } = useQuery<SalesRepresentative[]>({
     queryKey: ['/api/sales-representatives'],
-    queryFn: () => apiRequest('/api/sales-representatives'),
   });
 
   // Companies
-  const { data: companies = [], isLoading: isLoadingCompanies } = useQuery({
+  const { data: companies = [] as Company[], isLoading: isLoadingCompanies } = useQuery<Company[]>({
     queryKey: ['/api/companies'],
-    queryFn: () => apiRequest('/api/companies'),
   });
 
   // Vehicle Spec Form
@@ -97,10 +94,7 @@ export default function DataManagement() {
   // Mutations
   const addSpecMutation = useMutation({
     mutationFn: async (specData: VehicleSpec) => {
-      return await apiRequest('/api/vehicle-specs', {
-        method: 'POST',
-        body: JSON.stringify(specData)
-      });
+      return await apiRequest('/api/vehicle-specs', 'POST', specData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/vehicle-specs'] });
@@ -111,10 +105,7 @@ export default function DataManagement() {
 
   const addSalesRepMutation = useMutation({
     mutationFn: async (salesRepData: any) => {
-      return await apiRequest('/api/sales-representatives', {
-        method: 'POST',
-        body: JSON.stringify(salesRepData)
-      });
+      return await apiRequest('/api/sales-representatives', 'POST', salesRepData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/sales-representatives'] });
@@ -125,10 +116,7 @@ export default function DataManagement() {
 
   const addCompanyMutation = useMutation({
     mutationFn: async (companyData: any) => {
-      return await apiRequest('/api/companies', {
-        method: 'POST',
-        body: JSON.stringify(companyData)
-      });
+      return await apiRequest('/api/companies', 'POST', companyData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/companies'] });
@@ -139,9 +127,7 @@ export default function DataManagement() {
 
   const deleteSalesRepMutation = useMutation({
     mutationFn: async (id: number) => {
-      return await apiRequest(`/api/sales-representatives/${id}`, {
-        method: 'DELETE'
-      });
+      return await apiRequest(`/api/sales-representatives/${id}`, 'DELETE');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/sales-representatives'] });
@@ -158,7 +144,7 @@ export default function DataManagement() {
   });
 
   const availableYears = Array.from(new Set(vehicleSpecs.map((spec: VehicleSpec) => spec.year)))
-    .sort((a: unknown, b: unknown) => Number(b) - Number(a));
+    .sort((a: number, b: number) => b - a);
 
   const handleSpecSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -322,7 +308,7 @@ export default function DataManagement() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">جميع الماركات</SelectItem>
-                        {Array.from(new Set(vehicleSpecs.map((spec: VehicleSpec) => spec.make))).map((make: string) => (
+                        {Array.from(new Set(vehicleSpecs.map(spec => spec.make))).map(make => (
                           <SelectItem key={make} value={make}>{make}</SelectItem>
                         ))}
                       </SelectContent>
@@ -338,9 +324,9 @@ export default function DataManagement() {
                         <SelectItem value="all">جميع الموديلات</SelectItem>
                         {Array.from(new Set(
                           vehicleSpecs
-                            .filter((spec: VehicleSpec) => !selectedMake || selectedMake === "all" || spec.make === selectedMake)
-                            .map((spec: VehicleSpec) => spec.model)
-                        )).map((model: string) => (
+                            .filter(spec => !selectedMake || selectedMake === "all" || spec.make === selectedMake)
+                            .map(spec => spec.model)
+                        )).map(model => (
                           <SelectItem key={model} value={model}>{model}</SelectItem>
                         ))}
                       </SelectContent>
@@ -354,8 +340,8 @@ export default function DataManagement() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">جميع السنوات</SelectItem>
-                        {availableYears.map((year: unknown) => (
-                          <SelectItem key={year as number} value={year!.toString()}>{year as number}</SelectItem>
+                        {availableYears.map(year => (
+                          <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -364,13 +350,13 @@ export default function DataManagement() {
                     <div className="grid grid-cols-3 gap-4 text-center">
                       <div>
                         <div className="text-2xl font-bold text-blue-600">
-                          {Array.from(new Set(vehicleSpecs.map((spec: VehicleSpec) => spec.make))).length}
+                          {Array.from(new Set(vehicleSpecs.map(spec => spec.make))).length}
                         </div>
                         <div className="text-sm text-gray-600">ماركة</div>
                       </div>
                       <div>
                         <div className="text-2xl font-bold text-green-600">
-                          {Array.from(new Set(vehicleSpecs.map((spec: VehicleSpec) => `${spec.make}-${spec.model}`))).length}
+                          {Array.from(new Set(vehicleSpecs.map(spec => `${spec.make}-${spec.model}`))).length}
                         </div>
                         <div className="text-sm text-gray-600">موديل</div>
                       </div>
@@ -480,7 +466,7 @@ export default function DataManagement() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="none">بدون شركة</SelectItem>
-                          {companies.map((company: Company) => (
+                          {companies.map(company => (
                             <SelectItem key={company.id} value={company.id.toString()}>{company.name}</SelectItem>
                           ))}
                         </SelectContent>
@@ -531,14 +517,14 @@ export default function DataManagement() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {salesReps.map((rep: SalesRepresentative) => (
+                      {salesReps.map(rep => (
                         <TableRow key={rep.id}>
                           <TableCell className="font-medium">{rep.name}</TableCell>
                           <TableCell>{rep.email || "غير محدد"}</TableCell>
                           <TableCell>{rep.phone || "غير محدد"}</TableCell>
                           <TableCell>
                             {rep.companyId ? (
-                              companies.find((c: Company) => c.id === rep.companyId)?.name || "شركة غير موجودة"
+                              companies.find(c => c.id === rep.companyId)?.name || "شركة غير موجودة"
                             ) : (
                               "بدون شركة"
                             )}
@@ -658,7 +644,7 @@ export default function DataManagement() {
                     </div>
                     <div className="text-center">
                       <div className="text-3xl font-bold text-green-600">
-                        {salesReps.filter((rep: SalesRepresentative) => rep.companyId).length}
+                        {salesReps.filter(rep => rep.companyId).length}
                       </div>
                       <div className="text-sm text-gray-600">مندوبين لديهم شركات</div>
                     </div>
@@ -687,7 +673,7 @@ export default function DataManagement() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {companies.map((company: Company) => (
+                      {companies.map(company => (
                         <TableRow key={company.id}>
                           <TableCell className="font-medium">{company.name}</TableCell>
                           <TableCell>{company.address || "غير محدد"}</TableCell>
