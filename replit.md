@@ -96,6 +96,15 @@ This is a full-stack vehicle quotation system built with React and Express. The 
 ```
 Changelog:
 - July 03, 2025. Initial setup
+- July 03, 2025. Enhanced quotation system with:
+  * Professional A4-style layout with action buttons in separate header section
+  * PDF header with company logo, QR code, and company information
+  * Enhanced WhatsApp integration with custom phone number input
+  * PDF export directly downloads and can be shared via WhatsApp
+  * Company information management (name, address, phone, email, logo)
+  * QR code generation for quotation details
+  * Improved file upload interface with click-to-upload functionality
+  * Real-time price calculations with Arabic number-to-words conversion
 ```
 
 ## User Preferences

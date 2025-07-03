@@ -99,10 +99,16 @@ const VehicleQuotation = () => {
     salesRepEmail: "",
     stampImage: null as string | null,
     signatureImage: null as string | null,
+    companyLogo: null as string | null,
     isWarrantied: false,
     isRiyadhDelivery: false,
     includesPlatesAndTax: false,
     totalPrice: 0,
+    whatsappNumber: "",
+    companyName: "اسم الشركة",
+    companyAddress: "عنوان الشركة",
+    companyPhone: "رقم هاتف الشركة",
+    companyEmail: "البريد الإلكتروني للشركة",
     _display: { subTotal: 0, vat: 0 }
   });
 
@@ -174,8 +180,17 @@ const VehicleQuotation = () => {
     }
   };
 
+  // QR Code generation function
+  const generateQRCode = (text: string) => {
+    // Simple QR code using a web service (you could replace with a proper QR library)
+    return `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(text)}`;
+  };
+
   // Action Functions
-  const handlePrint = () => window.print();
+  const handlePrint = () => {
+    // Generate PDF first, then print it
+    handleExportPDF();
+  };
   
   const handleSave = () => console.log("Saving data:", formData);
 
@@ -219,9 +234,27 @@ const VehicleQuotation = () => {
   };
 
   const handleWhatsAppShare = () => {
-    const message = `عرض سعر مركبة\nالعميل: ${formData.customerName}\nالسيارة: ${formData.carMaker} ${formData.carModel}\nالسعر الإجمالي: ${formData.totalPrice.toFixed(2)} ريال سعودي`;
-    const whatsappUrl = `https://wa.me/${formData.salesRepPhone}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, "_blank");
+    if (!formData.whatsappNumber) {
+      alert("يرجى إدخال رقم الواتساب أولاً");
+      return;
+    }
+
+    // First generate and download PDF
+    handleExportPDF();
+    
+    // Then prepare WhatsApp message
+    const message = `عرض سعر مركبة\n\nالعميل: ${formData.customerName}\nالسيارة: ${formData.carMaker} ${formData.carModel}\nالسعر الإجمالي: ${formData.totalPrice.toFixed(2)} ريال سعودي\n\nتم إرفاق ملف PDF مع التفاصيل الكاملة.`;
+    
+    const cleanNumber = formData.whatsappNumber.replace(/\D/g, '');
+    const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
+    
+    // Show instructions to user
+    setTimeout(() => {
+      const confirmed = confirm(`سيتم فتح الواتساب. يرجى إرفاق ملف PDF الذي تم تنزيله مع الرسالة.\n\nالرقم المرسل إليه: ${cleanNumber}\n\nهل تريد المتابعة؟`);
+      if (confirmed) {
+        window.open(whatsappUrl, "_blank");
+      }
+    }, 1000);
   };
 
   // Arabic Number to Words
@@ -547,6 +580,78 @@ const VehicleQuotation = () => {
               </CardContent>
             </Card>
 
+            {/* Company Information */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Upload className="mr-3 h-5 w-5 text-primary" />
+                  بيانات الشركة
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="companyName">اسم الشركة</Label>
+                  <Input
+                    id="companyName"
+                    value={formData.companyName}
+                    onChange={(e) => handleInputChange('companyName', e.target.value)}
+                    placeholder="أدخل اسم الشركة"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="companyAddress">عنوان الشركة</Label>
+                  <Input
+                    id="companyAddress"
+                    value={formData.companyAddress}
+                    onChange={(e) => handleInputChange('companyAddress', e.target.value)}
+                    placeholder="أدخل عنوان الشركة"
+                  />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="companyPhone">هاتف الشركة</Label>
+                    <Input
+                      id="companyPhone"
+                      value={formData.companyPhone}
+                      onChange={(e) => handleInputChange('companyPhone', e.target.value)}
+                      placeholder="رقم هاتف الشركة"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="companyEmail">بريد الشركة</Label>
+                    <Input
+                      id="companyEmail"
+                      value={formData.companyEmail}
+                      onChange={(e) => handleInputChange('companyEmail', e.target.value)}
+                      placeholder="البريد الإلكتروني للشركة"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label htmlFor="companyLogoUpload">لوجو الشركة</Label>
+                  <div 
+                    className="border-2 border-dashed border-input rounded-lg p-4 text-center hover:border-primary transition-colors cursor-pointer"
+                    onClick={() => document.getElementById('companyLogoUpload')?.click()}
+                  >
+                    <Upload className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+                    <p className="text-muted-foreground">اسحب ملف اللوجو هنا أو انقر للتحديد</p>
+                    <input
+                      id="companyLogoUpload"
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={(e) => handleFileUpload(e, 'companyLogo')}
+                    />
+                  </div>
+                  {formData.companyLogo && (
+                    <div className="mt-2">
+                      <img src={formData.companyLogo} alt="لوجو الشركة" className="h-16 mx-auto" />
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
             {/* File Upload */}
             <Card>
               <CardHeader>
@@ -558,7 +663,10 @@ const VehicleQuotation = () => {
               <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="stampUpload">ختم الشركة</Label>
-                  <div className="border-2 border-dashed border-input rounded-lg p-4 text-center hover:border-primary transition-colors cursor-pointer">
+                  <div 
+                    className="border-2 border-dashed border-input rounded-lg p-4 text-center hover:border-primary transition-colors cursor-pointer"
+                    onClick={() => document.getElementById('stampUpload')?.click()}
+                  >
                     <Upload className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
                     <p className="text-muted-foreground">اسحب الملف هنا أو انقر للتحديد</p>
                     <input
@@ -569,10 +677,18 @@ const VehicleQuotation = () => {
                       onChange={(e) => handleFileUpload(e, 'stampImage')}
                     />
                   </div>
+                  {formData.stampImage && (
+                    <div className="mt-2">
+                      <img src={formData.stampImage} alt="ختم الشركة" className="h-16 mx-auto" />
+                    </div>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="signatureUpload">توقيع المندوب</Label>
-                  <div className="border-2 border-dashed border-input rounded-lg p-4 text-center hover:border-primary transition-colors cursor-pointer">
+                  <div 
+                    className="border-2 border-dashed border-input rounded-lg p-4 text-center hover:border-primary transition-colors cursor-pointer"
+                    onClick={() => document.getElementById('signatureUpload')?.click()}
+                  >
                     <Upload className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
                     <p className="text-muted-foreground">اسحب الملف هنا أو انقر للتحديد</p>
                     <input
@@ -583,6 +699,36 @@ const VehicleQuotation = () => {
                       onChange={(e) => handleFileUpload(e, 'signatureImage')}
                     />
                   </div>
+                  {formData.signatureImage && (
+                    <div className="mt-2">
+                      <img src={formData.signatureImage} alt="توقيع المندوب" className="h-16 mx-auto" />
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* WhatsApp Settings */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <FaWhatsapp className="mr-3 h-5 w-5 text-green-500" />
+                  إعدادات الواتساب
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div>
+                  <Label htmlFor="whatsappNumber">رقم الواتساب للإرسال</Label>
+                  <Input
+                    id="whatsappNumber"
+                    type="tel"
+                    value={formData.whatsappNumber}
+                    onChange={(e) => handleInputChange('whatsappNumber', e.target.value)}
+                    placeholder="966xxxxxxxxx (بدون +)"
+                  />
+                  <p className="text-sm text-muted-foreground mt-1">
+                    أدخل رقم الواتساب الذي تريد إرسال عرض السعر إليه (مع رمز الدولة)
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -688,9 +834,43 @@ const VehicleQuotation = () => {
         {/* Quotation Sheet */}
         <Card id="quotation-sheet" className="mt-8 print:shadow-none print:bg-white">
           <CardContent className="p-8">
-            <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold text-foreground mb-2">عرض سعر مركبة</h1>
-              <p className="text-muted-foreground">Vehicle Quotation</p>
+            {/* Header with Company Info, Logo and QR Code */}
+            <div className="flex justify-between items-start mb-8 pb-6 border-b-2 border-primary">
+              {/* Company Logo */}
+              <div className="flex-shrink-0">
+                {formData.companyLogo ? (
+                  <img src={formData.companyLogo} alt="لوجو الشركة" className="h-20 w-auto" />
+                ) : (
+                  <div className="h-20 w-20 bg-primary-50 border-2 border-dashed border-primary rounded-lg flex items-center justify-center">
+                    <span className="text-xs text-primary">لوجو الشركة</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Company Information */}
+              <div className="text-center flex-grow mx-8">
+                <h1 className="text-3xl font-bold text-foreground mb-2">{formData.companyName}</h1>
+                <div className="space-y-1 text-muted-foreground">
+                  <p>{formData.companyAddress}</p>
+                  <p>هاتف: {formData.companyPhone} | بريد: {formData.companyEmail}</p>
+                </div>
+                <div className="mt-4">
+                  <h2 className="text-2xl font-bold text-primary">عرض سعر مركبة</h2>
+                  <p className="text-muted-foreground">Vehicle Quotation</p>
+                </div>
+              </div>
+
+              {/* QR Code */}
+              <div className="flex-shrink-0 text-center">
+                <div className="border-2 border-gray-300 p-2 rounded-lg">
+                  <img 
+                    src={generateQRCode(`عرض سعر مركبة - العميل: ${formData.customerName} - السيارة: ${formData.carMaker} ${formData.carModel} - السعر: ${formData.totalPrice.toFixed(2)} ريال`)}
+                    alt="QR Code"
+                    className="w-20 h-20"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">رمز QR</p>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
