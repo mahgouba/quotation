@@ -4,7 +4,8 @@ import { storage } from "./storage";
 import { 
   insertCompanySchema, insertCustomerSchema, 
   insertVehicleSchema, insertQuotationSchema,
-  insertSalesRepresentativeSchema 
+  insertSalesRepresentativeSchema,
+  insertVehicleSpecificationSchema
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -405,6 +406,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching models:", error);
       res.status(500).json({ error: "Failed to fetch models" });
+    }
+  });
+
+  // Vehicle Specifications routes
+  app.get("/api/vehicle-specs", async (req, res) => {
+    try {
+      console.log("=== Vehicle Specs Route Called ===");
+      const specs = await storage.getVehicleSpecifications();
+      console.log("Raw database result:", JSON.stringify(specs, null, 2));
+      res.json(specs);
+    } catch (error) {
+      console.error("Error fetching vehicle specs:", error);
+      res.status(500).json({ error: "Failed to fetch vehicle specifications" });
+    }
+  });
+
+  app.get("/api/vehicle-specs/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const spec = await storage.getVehicleSpecification(id);
+      if (!spec) {
+        return res.status(404).json({ error: "Vehicle specification not found" });
+      }
+      res.json(spec);
+    } catch (error) {
+      console.error("Error fetching vehicle spec:", error);
+      res.status(500).json({ error: "Failed to fetch vehicle specification" });
+    }
+  });
+
+  app.post("/api/vehicle-specs", async (req, res) => {
+    try {
+      const specData = insertVehicleSpecificationSchema.parse(req.body);
+      const spec = await storage.createVehicleSpecification(specData);
+      res.status(201).json(spec);
+    } catch (error) {
+      console.error("Error creating vehicle spec:", error);
+      res.status(400).json({ error: "Invalid vehicle specification data" });
+    }
+  });
+
+  app.put("/api/vehicle-specs/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const specData = insertVehicleSpecificationSchema.partial().parse(req.body);
+      const spec = await storage.updateVehicleSpecification(id, specData);
+      if (!spec) {
+        return res.status(404).json({ error: "Vehicle specification not found" });
+      }
+      res.json(spec);
+    } catch (error) {
+      console.error("Error updating vehicle spec:", error);
+      res.status(400).json({ error: "Invalid vehicle specification data" });
+    }
+  });
+
+  app.delete("/api/vehicle-specs/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteVehicleSpecification(id);
+      if (!success) {
+        return res.status(404).json({ error: "Vehicle specification not found" });
+      }
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting vehicle spec:", error);
+      res.status(500).json({ error: "Failed to delete vehicle specification" });
     }
   });
 

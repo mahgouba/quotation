@@ -1,11 +1,12 @@
 import { 
-  users, companies, customers, vehicles, quotations, salesRepresentatives,
+  users, companies, customers, vehicles, quotations, salesRepresentatives, vehicleSpecifications,
   type User, type InsertUser,
   type Company, type InsertCompany,
   type Customer, type InsertCustomer,
   type Vehicle, type InsertVehicle,
   type Quotation, type InsertQuotation,
-  type SalesRepresentative, type InsertSalesRepresentative
+  type SalesRepresentative, type InsertSalesRepresentative,
+  type VehicleSpecification, type InsertVehicleSpecification
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -49,6 +50,13 @@ export interface IStorage {
   getQuotations(): Promise<Quotation[]>;
   getQuotationsByCustomer(customerId: number): Promise<Quotation[]>;
   deleteQuotation(id: number): Promise<boolean>;
+  
+  // Vehicle Specification methods
+  getVehicleSpecification(id: number): Promise<VehicleSpecification | undefined>;
+  createVehicleSpecification(spec: InsertVehicleSpecification): Promise<VehicleSpecification>;
+  updateVehicleSpecification(id: number, spec: Partial<InsertVehicleSpecification>): Promise<VehicleSpecification | undefined>;
+  getVehicleSpecifications(): Promise<VehicleSpecification[]>;
+  deleteVehicleSpecification(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -224,6 +232,47 @@ export class DatabaseStorage implements IStorage {
 
   async deleteQuotation(id: number): Promise<boolean> {
     const result = await db.delete(quotations).where(eq(quotations.id, id));
+    return (result.rowCount || 0) > 0;
+  }
+
+  // Vehicle Specification methods
+  async getVehicleSpecification(id: number): Promise<VehicleSpecification | undefined> {
+    const [spec] = await db.select().from(vehicleSpecifications).where(eq(vehicleSpecifications.id, id));
+    return spec || undefined;
+  }
+
+  async createVehicleSpecification(spec: InsertVehicleSpecification): Promise<VehicleSpecification> {
+    const [newSpec] = await db
+      .insert(vehicleSpecifications)
+      .values(spec)
+      .returning();
+    return newSpec;
+  }
+
+  async updateVehicleSpecification(id: number, spec: Partial<InsertVehicleSpecification>): Promise<VehicleSpecification | undefined> {
+    const [updatedSpec] = await db
+      .update(vehicleSpecifications)
+      .set({ ...spec, updatedAt: new Date() })
+      .where(eq(vehicleSpecifications.id, id))
+      .returning();
+    return updatedSpec || undefined;
+  }
+
+  async getVehicleSpecifications(): Promise<VehicleSpecification[]> {
+    console.log("=== DatabaseStorage.getVehicleSpecifications called ===");
+    try {
+      const result = await db.select().from(vehicleSpecifications);
+      console.log("Database query result:", result);
+      console.log("Result length:", result.length);
+      return result;
+    } catch (error) {
+      console.error("Database error in getVehicleSpecifications:", error);
+      throw error;
+    }
+  }
+
+  async deleteVehicleSpecification(id: number): Promise<boolean> {
+    const result = await db.delete(vehicleSpecifications).where(eq(vehicleSpecifications.id, id));
     return (result.rowCount || 0) > 0;
   }
 }
