@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
@@ -70,11 +70,31 @@ const FaUpload = ({ className }: { className?: string }) => (
   </svg>
 );
 
+// Interface for database vehicle specifications
+interface DatabaseVehicleSpec {
+  id: number;
+  make: string;
+  model: string;
+  year: number;
+  engine: string;
+  specifications: string;
+}
+
 const VehicleQuotation = () => {
   // Static Data - Using Arabic names from vehicle specifications database
   const carMakers = getAvailableMakes();
   const exteriorColors = ["أبيض", "أسود", "فضي", "رمادي", "أحمر", "أزرق"];
   const interiorColors = ["أسود", "بيج", "بني", "رمادي"];
+
+  // Fetch vehicle specifications from database
+  const { data: databaseSpecs = [] } = useQuery<DatabaseVehicleSpec[]>({
+    queryKey: ['/api/vehicle-specs'],
+    queryFn: async () => {
+      const response = await fetch('/api/vehicle-specs');
+      if (!response.ok) throw new Error('Failed to fetch vehicle specs');
+      return response.json();
+    }
+  });
 
   // State Management
   const [formData, setFormData] = useState({
@@ -155,6 +175,32 @@ const VehicleQuotation = () => {
     },
   });
 
+  // Helper functions for database specs
+  const getAvailableMakesFromDB = () => {
+    const makes = Array.from(new Set(databaseSpecs.map(spec => spec.make)));
+    return makes.length > 0 ? makes : carMakers;
+  };
+  
+  const getModelsForMakeFromDB = (make: string) => {
+    const models = databaseSpecs
+      .filter(spec => spec.make === make)
+      .map(spec => spec.model);
+    return Array.from(new Set(models));
+  };
+  
+  const getYearsForMakeAndModelFromDB = (make: string, model: string) => {
+    const years = databaseSpecs
+      .filter(spec => spec.make === make && spec.model === model)
+      .map(spec => spec.year);
+    return Array.from(new Set(years));
+  };
+  
+  const getSpecificationsFromDB = (make: string, model: string, year: number) => {
+    return databaseSpecs.find(spec => 
+      spec.make === make && spec.model === model && spec.year === year
+    );
+  };
+
   // Effects
   useEffect(() => {
     const calculateTotal = () => {
@@ -198,7 +244,15 @@ const VehicleQuotation = () => {
       carYear: "",
       specifications: ""
     }));
-    setAvailableModels(getModelsForMake(maker));
+    
+    // Use database specs first, fallback to static data
+    const models = getModelsForMakeFromDB(maker);
+    if (models.length > 0) {
+      setAvailableModels(models);
+    } else {
+      setAvailableModels(getModelsForMake(maker));
+    }
+    
     setAvailableYears([]);
     setVehicleSpecs(null);
   };
@@ -210,7 +264,15 @@ const VehicleQuotation = () => {
       carYear: "",
       specifications: ""
     }));
-    setAvailableYears(getYearsForMakeAndModel(formData.carMaker, model));
+    
+    // Use database specs first, fallback to static data
+    const years = getYearsForMakeAndModelFromDB(formData.carMaker, model);
+    if (years.length > 0) {
+      setAvailableYears(years);
+    } else {
+      setAvailableYears(getYearsForMakeAndModel(formData.carMaker, model));
+    }
+    
     setVehicleSpecs(null);
   };
 
@@ -220,12 +282,23 @@ const VehicleQuotation = () => {
       carYear: year
     }));
     
-    // Auto-populate specifications
-    const specs = getVehicleSpecifications(formData.carMaker, formData.carModel, parseInt(year));
-    setVehicleSpecs(specs);
+    // First try to get specifications from database
+    const dbSpecs = getSpecificationsFromDB(formData.carMaker, formData.carModel, parseInt(year));
     
-    if (specs) {
-      const specsText = `المحرك: ${specs.specifications.engine}
+    if (dbSpecs) {
+      // Use database specifications
+      setVehicleSpecs(dbSpecs);
+      setFormData(prev => ({
+        ...prev,
+        specifications: dbSpecs.specifications
+      }));
+    } else {
+      // Fallback to static specifications
+      const specs = getVehicleSpecifications(formData.carMaker, formData.carModel, parseInt(year));
+      setVehicleSpecs(specs);
+      
+      if (specs) {
+        const specsText = `المحرك: ${specs.specifications.engine}
 القوة: ${specs.specifications.horsepower}
 العزم: ${specs.specifications.torque}
 ناقل الحركة: ${specs.specifications.transmission}
@@ -238,8 +311,8 @@ const VehicleQuotation = () => {
 الوزن: ${specs.specifications.weight}
 سعة الركاب: ${specs.specifications.seatingCapacity}
 سعة الشنطة: ${specs.specifications.trunkCapacity}`;
-      
-      const detailedSpecsText = `المحرك: ${specs.specifications.engine}
+        
+        const detailedSpecsText = `المحرك: ${specs.specifications.engine}
 القوة: ${specs.specifications.horsepower}
 عزم الدوران: ${specs.specifications.torque}
 ناقل الحركة: ${specs.specifications.transmission}
@@ -264,12 +337,13 @@ const VehicleQuotation = () => {
 المميزات التقنية: ${specs.specifications.techFeatures.join(', ')}
 المظهر الخارجي: ${specs.specifications.exteriorFeatures.join(', ')}
 المظهر الداخلي: ${specs.specifications.interiorFeatures.join(', ')}`;
-      
-      setFormData(prev => ({
-        ...prev,
-        specifications: specsText,
-        detailedSpecs: detailedSpecsText
-      }));
+        
+        setFormData(prev => ({
+          ...prev,
+          specifications: specsText,
+          detailedSpecs: detailedSpecsText
+        }));
+      }
     }
   };
 
@@ -620,7 +694,7 @@ const VehicleQuotation = () => {
                       <SelectValue placeholder="اختر الماركة" />
                     </SelectTrigger>
                     <SelectContent>
-                      {carMakers.map(maker => (
+                      {getAvailableMakesFromDB().map(maker => (
                         <SelectItem key={maker} value={maker}>{maker}</SelectItem>
                       ))}
                     </SelectContent>
