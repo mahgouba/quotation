@@ -135,6 +135,13 @@ Changelog:
   * Full API endpoints for sales representatives management
   * Added navigation back buttons to all secondary pages
   * Fixed all TypeScript and API integration issues
+- July 03, 2025. Enhanced Company Integration:
+  * Added company logo upload functionality to data management system
+  * Enhanced company selection interface in main quotation page with prominent company picker
+  * Removed statistics cards for cleaner data management interface
+  * Company logos now display in selection dropdowns and quotation headers
+  * Improved company data integration with PDF generation and quotation headers
+  * Streamlined sales representative management without company associations
 ```
 
 ## User Preferences

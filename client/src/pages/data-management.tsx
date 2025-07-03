@@ -475,18 +475,7 @@ export default function DataManagement() {
                 </CardContent>
               </Card>
 
-              {/* Sales Reps Stats */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>إحصائيات المندوبين</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-blue-600">{salesReps.length}</div>
-                    <div className="text-sm text-gray-600">إجمالي المندوبين</div>
-                  </div>
-                </CardContent>
-              </Card>
+
             </div>
 
             {/* Sales Reps Table */}
@@ -643,26 +632,7 @@ export default function DataManagement() {
                 </CardContent>
               </Card>
 
-              {/* Company Stats */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>إحصائيات الشركات</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-blue-600">{companies.length}</div>
-                      <div className="text-sm text-gray-600">إجمالي الشركات</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-green-600">
-                        {salesReps.length}
-                      </div>
-                      <div className="text-sm text-gray-600">المندوبين المسجلين</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+
             </div>
 
             {/* Companies Table */}

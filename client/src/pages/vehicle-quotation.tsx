@@ -627,6 +627,61 @@ const VehicleQuotation = () => {
         </div>
       </div>
 
+      {/* Company Selection Section */}
+      <div className="no-print bg-gradient-to-r from-blue-50 to-indigo-50 border-b mb-6">
+        <div className="container mx-auto px-4 py-6">
+          <div className="max-w-2xl mx-auto">
+            <div className="text-center mb-4">
+              <h2 className="text-xl font-bold text-gray-900 mb-2">اختر الشركة لتخصيص عرض السعر</h2>
+              <p className="text-sm text-gray-600">بيانات الشركة المختارة ستظهر في ترويسة عرض السعر وملف PDF</p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4 items-center">
+              <div className="flex-1 w-full">
+                <Select value={formData.selectedCompanyId} onValueChange={handleCompanyChange}>
+                  <SelectTrigger className="w-full h-12 text-lg">
+                    <SelectValue placeholder="اختر الشركة لتخصيص التصميم" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {companies.map(company => (
+                      <SelectItem key={company.id} value={company.id.toString()}>
+                        <div className="flex items-center gap-3 py-2">
+                          {company.logo && (
+                            <img 
+                              src={company.logo} 
+                              alt={company.name}
+                              className="w-8 h-8 object-contain rounded"
+                            />
+                          )}
+                          <div>
+                            <div className="font-medium">{company.name}</div>
+                            <div className="text-xs text-gray-500">{company.phone || 'لا يوجد هاتف'}</div>
+                          </div>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              {formData.selectedCompanyId && (
+                <div className="flex items-center gap-3 bg-white p-3 rounded-lg shadow-sm">
+                  {formData.companyLogo && (
+                    <img 
+                      src={formData.companyLogo} 
+                      alt={formData.companyName}
+                      className="w-10 h-10 object-contain rounded"
+                    />
+                  )}
+                  <div className="text-sm">
+                    <div className="font-semibold text-gray-900">{formData.companyName}</div>
+                    <div className="text-gray-600">{formData.companyPhone}</div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Action Buttons Section */}
       <div className="no-print bg-card shadow-md mb-6">
         <div className="container mx-auto px-4 py-4">
@@ -709,45 +764,6 @@ const VehicleQuotation = () => {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">بيانات الشركة</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="selectedCompany">اختر الشركة *</Label>
-                  <Select value={formData.selectedCompanyId} onValueChange={handleCompanyChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="اختر الشركة" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {companies.map(company => (
-                        <SelectItem key={company.id} value={company.id.toString()}>
-                          <div className="flex items-center gap-2">
-                            {company.logo && (
-                              <img 
-                                src={company.logo} 
-                                alt={company.name}
-                                className="w-5 h-5 object-contain"
-                              />
-                            )}
-                            {company.name}
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                {formData.selectedCompanyId && (
-                  <div className="p-3 bg-gray-50 rounded-lg text-sm">
-                    <p><strong>الشركة:</strong> {formData.companyName}</p>
-                    <p><strong>العنوان:</strong> {formData.companyAddress}</p>
-                    <p><strong>الهاتف:</strong> {formData.companyPhone}</p>
-                    <p><strong>البريد:</strong> {formData.companyEmail}</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
 
             <Card>
               <CardHeader>
