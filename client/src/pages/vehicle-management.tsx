@@ -169,6 +169,7 @@ export default function VehicleManagement() {
         interiorFeatures: ""
       });
       refetchSpecs();
+      queryClient.invalidateQueries({ queryKey: ['/api/vehicle-specs'] });
     },
     onError: (error) => {
       toast({

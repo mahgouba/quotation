@@ -347,47 +347,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Vehicle Specifications Management API
-  app.get("/api/vehicle-specs", async (req, res) => {
-    try {
-      // For now, return empty array as we don't have data in DB yet
-      res.json([]);
-    } catch (error) {
-      console.error("Error fetching vehicle specs:", error);
-      res.status(500).json({ error: "Failed to fetch vehicle specifications" });
-    }
-  });
 
-  app.post("/api/vehicle-specs", async (req, res) => {
-    try {
-      // For now, simulate success
-      res.status(201).json({ id: 1, ...req.body });
-    } catch (error) {
-      console.error("Error creating vehicle spec:", error);
-      res.status(400).json({ error: "Invalid vehicle specification data" });
-    }
-  });
-
-  app.put("/api/vehicle-specs/:id", async (req, res) => {
-    try {
-      // For now, simulate success
-      const id = parseInt(req.params.id);
-      res.json({ id, ...req.body });
-    } catch (error) {
-      console.error("Error updating vehicle spec:", error);
-      res.status(400).json({ error: "Invalid vehicle specification data" });
-    }
-  });
-
-  app.delete("/api/vehicle-specs/:id", async (req, res) => {
-    try {
-      // For now, simulate success
-      res.status(204).send();
-    } catch (error) {
-      console.error("Error deleting vehicle spec:", error);
-      res.status(500).json({ error: "Failed to delete vehicle specification" });
-    }
-  });
 
   app.get("/api/makes", async (req, res) => {
     try {
@@ -441,10 +401,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("=== POST vehicle-specs called ===");
       console.log("Request body:", JSON.stringify(req.body, null, 2));
       
-      const specData = insertVehicleSpecificationSchema.parse(req.body);
-      console.log("Parsed data:", JSON.stringify(specData, null, 2));
+      // Convert detailed specs to single specifications field
+      const {
+        horsepower, torque, transmission, driveType, fuelType, fuelCapacity,
+        fuelConsumption, topSpeed, acceleration, length, width, height,
+        wheelbase, weight, seatingCapacity, trunkCapacity, safetyFeatures,
+        techFeatures, exteriorFeatures, interiorFeatures,
+        ...basicData
+      } = req.body;
       
-      const spec = await storage.createVehicleSpecification(specData);
+      // Create comprehensive specifications string
+      const specifications = `
+المحرك: ${basicData.engine || 'غير محدد'}
+القوة: ${horsepower || 'غير محدد'} حصان
+عزم الدوران: ${torque || 'غير محدد'}
+ناقل الحركة: ${transmission || 'غير محدد'}
+نوع الدفع: ${driveType || 'غير محدد'}
+نوع الوقود: ${fuelType || 'غير محدد'}
+سعة خزان الوقود: ${fuelCapacity || 'غير محدد'}
+استهلاك الوقود: ${fuelConsumption || 'غير محدد'}
+السرعة القصوى: ${topSpeed || 'غير محدد'}
+التسارع: ${acceleration || 'غير محدد'}
+
+الأبعاد:
+الطول: ${length || 'غير محدد'}
+العرض: ${width || 'غير محدد'}
+الارتفاع: ${height || 'غير محدد'}
+قاعدة العجلات: ${wheelbase || 'غير محدد'}
+الوزن: ${weight || 'غير محدد'}
+
+السعة:
+عدد المقاعد: ${seatingCapacity || 'غير محدد'}
+سعة الصندوق: ${trunkCapacity || 'غير محدد'}
+
+ميزات الأمان: ${safetyFeatures || 'غير محدد'}
+الميزات التقنية: ${techFeatures || 'غير محدد'}
+المميزات الخارجية: ${exteriorFeatures || 'غير محدد'}
+المميزات الداخلية: ${interiorFeatures || 'غير محدد'}
+      `.trim();
+      
+      const specData = {
+        make: basicData.make,
+        model: basicData.model,
+        year: basicData.year,
+        engine: basicData.engine,
+        specifications: specifications
+      };
+      
+      console.log("Transformed data:", JSON.stringify(specData, null, 2));
+      
+      const parsedData = insertVehicleSpecificationSchema.parse(specData);
+      const spec = await storage.createVehicleSpecification(parsedData);
       console.log("Created spec:", JSON.stringify(spec, null, 2));
       
       res.status(201).json(spec);
