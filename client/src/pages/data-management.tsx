@@ -95,7 +95,7 @@ export default function DataManagement() {
   // Mutations
   const addSpecMutation = useMutation({
     mutationFn: async (specData: VehicleSpec) => {
-      return await apiRequest('/api/vehicle-specs', 'POST', specData);
+      return await apiRequest('POST', '/api/vehicle-specs', specData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/vehicle-specs'] });
@@ -106,7 +106,7 @@ export default function DataManagement() {
 
   const addSalesRepMutation = useMutation({
     mutationFn: async (salesRepData: any) => {
-      return await apiRequest('/api/sales-representatives', 'POST', salesRepData);
+      return await apiRequest('POST', '/api/sales-representatives', salesRepData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/sales-representatives'] });
@@ -117,7 +117,7 @@ export default function DataManagement() {
 
   const addCompanyMutation = useMutation({
     mutationFn: async (companyData: any) => {
-      return await apiRequest('/api/companies', 'POST', companyData);
+      return await apiRequest('POST', '/api/companies', companyData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/companies'] });
@@ -128,7 +128,7 @@ export default function DataManagement() {
 
   const deleteSalesRepMutation = useMutation({
     mutationFn: async (id: number) => {
-      return await apiRequest(`/api/sales-representatives/${id}`, 'DELETE');
+      return await apiRequest('DELETE', `/api/sales-representatives/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/sales-representatives'] });
