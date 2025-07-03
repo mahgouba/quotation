@@ -106,6 +106,16 @@ const VehicleQuotation = () => {
     }
   });
 
+  // Fetch sales representatives from database
+  const { data: salesRepresentatives = [] } = useQuery<any[]>({
+    queryKey: ['/api/sales-representatives'],
+    queryFn: async () => {
+      const response = await fetch('/api/sales-representatives');
+      if (!response.ok) throw new Error('Failed to fetch sales representatives');
+      return response.json();
+    }
+  });
+
   // State Management
   const [formData, setFormData] = useState({
     customerTitle: "السادة/ ",
@@ -128,6 +138,7 @@ const VehicleQuotation = () => {
     salesRepName: "",
     salesRepPhone: "",
     salesRepEmail: "",
+    salesRepresentativeId: null as number | null,
 
     companyLogo: null as string | null,
     isWarrantied: false,
@@ -272,6 +283,20 @@ const VehicleQuotation = () => {
     }
   };
 
+  // Handle sales representative selection
+  const handleSalesRepresentativeChange = (representativeId: string) => {
+    const selectedRep = salesRepresentatives.find(rep => rep.id === parseInt(representativeId));
+    if (selectedRep) {
+      setFormData(prev => ({
+        ...prev,
+        salesRepresentativeId: selectedRep.id,
+        salesRepName: selectedRep.name,
+        salesRepPhone: selectedRep.phone || "",
+        salesRepEmail: selectedRep.email || ""
+      }));
+    }
+  };
+
   const handleMakerChange = (maker: string) => {
     setFormData(prev => ({
       ...prev,
@@ -385,7 +410,13 @@ const VehicleQuotation = () => {
 
   const validateField = (name: string, value: any) => {
     let newErrors = { ...errors };
-    if (String(value).trim() === "") {
+    if (name === 'salesRepresentativeId') {
+      if (!value) {
+        newErrors[name] = "هذا الحقل مطلوب";
+      } else {
+        delete newErrors[name];
+      }
+    } else if (String(value).trim() === "") {
       newErrors[name] = "هذا الحقل مطلوب";
     } else {
       delete newErrors[name];
@@ -445,6 +476,15 @@ const VehicleQuotation = () => {
       return;
     }
 
+    if (!formData.salesRepresentativeId) {
+      toast({
+        title: "خطأ في البيانات",
+        description: "يرجى اختيار المندوب",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Prepare data for API
     const quotationData = {
       customer: {
@@ -482,6 +522,7 @@ const VehicleQuotation = () => {
         salesRepName: formData.salesRepName || null,
         salesRepPhone: formData.salesRepPhone || null,
         salesRepEmail: formData.salesRepEmail || null,
+        salesRepresentativeId: formData.salesRepresentativeId,
 
         status: "draft",
       },
@@ -768,6 +809,22 @@ const VehicleQuotation = () => {
                     onChange={(e) => handleInputChange('customerEmail', e.target.value)}
                     placeholder="example@email.com"
                   />
+                </div>
+                <div>
+                  <Label htmlFor="salesRepresentative">المندوب *</Label>
+                  <Select value={formData.salesRepresentativeId?.toString() || ""} onValueChange={handleSalesRepresentativeChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="اختر المندوب" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {salesRepresentatives.map(rep => (
+                        <SelectItem key={rep.id} value={rep.id.toString()}>
+                          {rep.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.salesRepresentativeId && <span className="text-destructive text-sm">{errors.salesRepresentativeId}</span>}
                 </div>
               </CardContent>
             </Card>
