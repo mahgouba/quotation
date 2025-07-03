@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -115,6 +118,42 @@ const VehicleQuotation = () => {
   const [availableModels, setAvailableModels] = useState<string[]>([]);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Save quotation mutation
+  const saveQuotationMutation = useMutation({
+    mutationFn: async (quotationData: any) => {
+      const response = await fetch("/api/quotations/complete", {
+        method: "POST",
+        body: JSON.stringify(quotationData),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to save quotation");
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "تم الحفظ بنجاح",
+        description: "تم حفظ عرض السعر في قاعدة البيانات",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/quotations"] });
+    },
+    onError: () => {
+      toast({
+        title: "خطأ في الحفظ",
+        description: "حدث خطأ أثناء حفظ عرض السعر",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Effects
   useEffect(() => {
     const calculateTotal = () => {
@@ -192,7 +231,79 @@ const VehicleQuotation = () => {
     handleExportPDF();
   };
   
-  const handleSave = () => console.log("Saving data:", formData);
+  const handleSave = () => {
+    // Validate required fields
+    if (!formData.customerName) {
+      toast({
+        title: "خطأ في البيانات",
+        description: "يرجى إدخال اسم العميل",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.carMaker || !formData.carModel) {
+      toast({
+        title: "خطأ في البيانات",
+        description: "يرجى إدخال بيانات المركبة",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.basePrice || formData.basePrice <= 0) {
+      toast({
+        title: "خطأ في البيانات",
+        description: "يرجى إدخال سعر صحيح",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Prepare data for API
+    const quotationData = {
+      customer: {
+        title: formData.customerTitle,
+        name: formData.customerName,
+        email: formData.customerEmail || null,
+        phone: formData.customerPhone || null,
+      },
+      vehicle: {
+        maker: formData.carMaker,
+        model: formData.carModel,
+        exteriorColor: formData.exteriorColor || null,
+        interiorColor: formData.interiorColor || null,
+        specifications: formData.specifications || null,
+      },
+      company: {
+        name: formData.companyName,
+        address: formData.companyAddress || null,
+        phone: formData.companyPhone || null,
+        email: formData.companyEmail || null,
+        logo: formData.companyLogo || null,
+      },
+      quotation: {
+        quantity: formData.quantity,
+        basePrice: formData.basePrice.toString(),
+        vatRate: formData.vatRate.toString(),
+        platePrice: formData.platePrice.toString(),
+        totalPrice: formData.totalPrice.toString(),
+        issueDate: new Date(formData.issueDate),
+        deadlineDate: new Date(formData.deadlineDate),
+        includesPlatesAndTax: formData.includesPlatesAndTax,
+        isWarrantied: formData.isWarrantied,
+        isRiyadhDelivery: formData.isRiyadhDelivery,
+        salesRepName: formData.salesRepName || null,
+        salesRepPhone: formData.salesRepPhone || null,
+        salesRepEmail: formData.salesRepEmail || null,
+        stampImage: formData.stampImage || null,
+        signatureImage: formData.signatureImage || null,
+        status: "draft",
+      },
+    };
+
+    saveQuotationMutation.mutate(quotationData);
+  };
 
   const handleExportPDF = () => {
     if (typeof (window as any).jspdf === 'undefined' || typeof (window as any).html2canvas === 'undefined') {

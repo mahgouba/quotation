@@ -1,6 +1,7 @@
-import { pgTable, text, serial, integer, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, decimal } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import { relations } from "drizzle-orm";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -8,10 +9,145 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
 });
 
+export const companies = pgTable("companies", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  address: text("address"),
+  phone: text("phone"),
+  email: text("email"),
+  logo: text("logo"), // Base64 encoded image
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const customers = pgTable("customers", {
+  id: serial("id").primaryKey(),
+  title: text("title").default("السادة/ "),
+  name: text("name").notNull(),
+  email: text("email"),
+  phone: text("phone"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const vehicles = pgTable("vehicles", {
+  id: serial("id").primaryKey(),
+  maker: text("maker").notNull(),
+  model: text("model").notNull(),
+  exteriorColor: text("exterior_color"),
+  interiorColor: text("interior_color"),
+  specifications: text("specifications"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const quotations = pgTable("quotations", {
+  id: serial("id").primaryKey(),
+  customerId: integer("customer_id").references(() => customers.id),
+  companyId: integer("company_id").references(() => companies.id),
+  vehicleId: integer("vehicle_id").references(() => vehicles.id),
+  
+  // Pricing details
+  quantity: integer("quantity").default(1),
+  basePrice: decimal("base_price", { precision: 10, scale: 2 }).notNull(),
+  vatRate: decimal("vat_rate", { precision: 5, scale: 2 }).default("15.00"),
+  platePrice: decimal("plate_price", { precision: 10, scale: 2 }).default("0.00"),
+  totalPrice: decimal("total_price", { precision: 10, scale: 2 }).notNull(),
+  
+  // Dates
+  issueDate: timestamp("issue_date").defaultNow(),
+  deadlineDate: timestamp("deadline_date"),
+  
+  // Options
+  includesPlatesAndTax: boolean("includes_plates_and_tax").default(false),
+  isWarrantied: boolean("is_warrantied").default(false),
+  isRiyadhDelivery: boolean("is_riyadh_delivery").default(false),
+  
+  // Sales representative
+  salesRepName: text("sales_rep_name"),
+  salesRepPhone: text("sales_rep_phone"),
+  salesRepEmail: text("sales_rep_email"),
+  
+  // Images
+  stampImage: text("stamp_image"), // Base64 encoded
+  signatureImage: text("signature_image"), // Base64 encoded
+  
+  // Metadata
+  status: text("status").default("draft"), // draft, sent, accepted, rejected
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Relations
+export const companiesRelations = relations(companies, ({ many }) => ({
+  quotations: many(quotations),
+}));
+
+export const customersRelations = relations(customers, ({ many }) => ({
+  quotations: many(quotations),
+}));
+
+export const vehiclesRelations = relations(vehicles, ({ many }) => ({
+  quotations: many(quotations),
+}));
+
+export const quotationsRelations = relations(quotations, ({ one }) => ({
+  customer: one(customers, {
+    fields: [quotations.customerId],
+    references: [customers.id],
+  }),
+  company: one(companies, {
+    fields: [quotations.companyId],
+    references: [companies.id],
+  }),
+  vehicle: one(vehicles, {
+    fields: [quotations.vehicleId],
+    references: [vehicles.id],
+  }),
+}));
+
+// Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
 });
 
+export const insertCompanySchema = createInsertSchema(companies).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertCustomerSchema = createInsertSchema(customers).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertVehicleSchema = createInsertSchema(vehicles).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertQuotationSchema = createInsertSchema(quotations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
+
+export type InsertCompany = z.infer<typeof insertCompanySchema>;
+export type Company = typeof companies.$inferSelect;
+
+export type InsertCustomer = z.infer<typeof insertCustomerSchema>;
+export type Customer = typeof customers.$inferSelect;
+
+export type InsertVehicle = z.infer<typeof insertVehicleSchema>;
+export type Vehicle = typeof vehicles.$inferSelect;
+
+export type InsertQuotation = z.infer<typeof insertQuotationSchema>;
+export type Quotation = typeof quotations.$inferSelect;

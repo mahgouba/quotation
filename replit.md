@@ -105,6 +105,12 @@ Changelog:
   * QR code generation for quotation details
   * Improved file upload interface with click-to-upload functionality
   * Real-time price calculations with Arabic number-to-words conversion
+- July 03, 2025. Database integration:
+  * PostgreSQL database with comprehensive schema for quotations, customers, vehicles, and companies
+  * Full CRUD API endpoints for all entities
+  * Database storage layer with Drizzle ORM
+  * Save functionality integrated with database
+  * Complete quotation management with relational data
 ```
 
 ## User Preferences

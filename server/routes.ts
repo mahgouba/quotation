@@ -1,13 +1,271 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { 
+  insertCompanySchema, insertCustomerSchema, 
+  insertVehicleSchema, insertQuotationSchema 
+} from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // put application routes here
-  // prefix all routes with /api
+  
+  // Company routes
+  app.get("/api/companies", async (req, res) => {
+    try {
+      const companies = await storage.getCompanies();
+      res.json(companies);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get companies" });
+    }
+  });
 
-  // use storage to perform CRUD operations on the storage interface
-  // e.g. storage.insertUser(user) or storage.getUserByUsername(username)
+  app.get("/api/companies/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const company = await storage.getCompany(id);
+      if (!company) {
+        return res.status(404).json({ error: "Company not found" });
+      }
+      res.json(company);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get company" });
+    }
+  });
+
+  app.post("/api/companies", async (req, res) => {
+    try {
+      const companyData = insertCompanySchema.parse(req.body);
+      const company = await storage.createCompany(companyData);
+      res.status(201).json(company);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid company data" });
+    }
+  });
+
+  app.put("/api/companies/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const companyData = insertCompanySchema.partial().parse(req.body);
+      const company = await storage.updateCompany(id, companyData);
+      if (!company) {
+        return res.status(404).json({ error: "Company not found" });
+      }
+      res.json(company);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid company data" });
+    }
+  });
+
+  // Customer routes
+  app.get("/api/customers", async (req, res) => {
+    try {
+      const customers = await storage.getCustomers();
+      res.json(customers);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get customers" });
+    }
+  });
+
+  app.get("/api/customers/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const customer = await storage.getCustomer(id);
+      if (!customer) {
+        return res.status(404).json({ error: "Customer not found" });
+      }
+      res.json(customer);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get customer" });
+    }
+  });
+
+  app.post("/api/customers", async (req, res) => {
+    try {
+      const customerData = insertCustomerSchema.parse(req.body);
+      const customer = await storage.createCustomer(customerData);
+      res.status(201).json(customer);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid customer data" });
+    }
+  });
+
+  app.put("/api/customers/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const customerData = insertCustomerSchema.partial().parse(req.body);
+      const customer = await storage.updateCustomer(id, customerData);
+      if (!customer) {
+        return res.status(404).json({ error: "Customer not found" });
+      }
+      res.json(customer);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid customer data" });
+    }
+  });
+
+  // Vehicle routes
+  app.get("/api/vehicles", async (req, res) => {
+    try {
+      const vehicles = await storage.getVehicles();
+      res.json(vehicles);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get vehicles" });
+    }
+  });
+
+  app.get("/api/vehicles/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const vehicle = await storage.getVehicle(id);
+      if (!vehicle) {
+        return res.status(404).json({ error: "Vehicle not found" });
+      }
+      res.json(vehicle);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get vehicle" });
+    }
+  });
+
+  app.post("/api/vehicles", async (req, res) => {
+    try {
+      const vehicleData = insertVehicleSchema.parse(req.body);
+      const vehicle = await storage.createVehicle(vehicleData);
+      res.status(201).json(vehicle);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid vehicle data" });
+    }
+  });
+
+  app.put("/api/vehicles/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const vehicleData = insertVehicleSchema.partial().parse(req.body);
+      const vehicle = await storage.updateVehicle(id, vehicleData);
+      if (!vehicle) {
+        return res.status(404).json({ error: "Vehicle not found" });
+      }
+      res.json(vehicle);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid vehicle data" });
+    }
+  });
+
+  // Quotation routes
+  app.get("/api/quotations", async (req, res) => {
+    try {
+      const customerId = req.query.customerId;
+      let quotations;
+      
+      if (customerId) {
+        quotations = await storage.getQuotationsByCustomer(parseInt(customerId as string));
+      } else {
+        quotations = await storage.getQuotations();
+      }
+      
+      res.json(quotations);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get quotations" });
+    }
+  });
+
+  app.get("/api/quotations/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const quotation = await storage.getQuotation(id);
+      if (!quotation) {
+        return res.status(404).json({ error: "Quotation not found" });
+      }
+      res.json(quotation);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get quotation" });
+    }
+  });
+
+  app.post("/api/quotations", async (req, res) => {
+    try {
+      const quotationData = insertQuotationSchema.parse(req.body);
+      const quotation = await storage.createQuotation(quotationData);
+      res.status(201).json(quotation);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid quotation data" });
+    }
+  });
+
+  app.put("/api/quotations/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const quotationData = insertQuotationSchema.partial().parse(req.body);
+      const quotation = await storage.updateQuotation(id, quotationData);
+      if (!quotation) {
+        return res.status(404).json({ error: "Quotation not found" });
+      }
+      res.json(quotation);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid quotation data" });
+    }
+  });
+
+  app.delete("/api/quotations/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteQuotation(id);
+      if (!success) {
+        return res.status(404).json({ error: "Quotation not found" });
+      }
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete quotation" });
+    }
+  });
+
+  // Special endpoint to save complete quotation with customer and vehicle data
+  app.post("/api/quotations/complete", async (req, res) => {
+    try {
+      const { customer, vehicle, company, quotation } = req.body;
+
+      // Create or find customer
+      let customerId;
+      if (customer.phone) {
+        const existingCustomer = await storage.getCustomerByPhone(customer.phone);
+        if (existingCustomer) {
+          customerId = existingCustomer.id;
+          // Update existing customer
+          await storage.updateCustomer(existingCustomer.id, customer);
+        } else {
+          const newCustomer = await storage.createCustomer(customer);
+          customerId = newCustomer.id;
+        }
+      } else {
+        const newCustomer = await storage.createCustomer(customer);
+        customerId = newCustomer.id;
+      }
+
+      // Create vehicle
+      const newVehicle = await storage.createVehicle(vehicle);
+      const vehicleId = newVehicle.id;
+
+      // Create or update company
+      let companyId;
+      if (company.id) {
+        await storage.updateCompany(company.id, company);
+        companyId = company.id;
+      } else {
+        const newCompany = await storage.createCompany(company);
+        companyId = newCompany.id;
+      }
+
+      // Create quotation
+      const newQuotation = await storage.createQuotation({
+        ...quotation,
+        customerId,
+        vehicleId,
+        companyId,
+      });
+
+      res.status(201).json(newQuotation);
+    } catch (error) {
+      res.status(400).json({ error: "Failed to create complete quotation" });
+    }
+  });
 
   const httpServer = createServer(app);
 
