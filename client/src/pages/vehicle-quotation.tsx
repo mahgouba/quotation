@@ -1160,7 +1160,7 @@ const VehicleQuotation = () => {
                   </div>
 
                   <div className="bg-primary-50 rounded-lg p-4">
-                    <h3 className="font-semibold text-foreground mb-2">المبلغ بالكلمات</h3>
+                    <h3 className="font-semibold text-foreground mb-2">المبلغ كتاباً</h3>
                     <p className="text-sm text-muted-foreground">{numberToArabicWords(formData.totalPrice)}</p>
                   </div>
 
