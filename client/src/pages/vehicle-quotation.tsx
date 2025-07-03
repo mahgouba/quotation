@@ -864,84 +864,75 @@ const VehicleQuotation = () => {
                     onChange={(e) => handleInputChange('quantity', parseInt(e.target.value) || 1)}
                   />
                 </div>
-                <div>
-                  <Label htmlFor="basePrice">السعر الأساسي (ريال)</Label>
-                  <Input
-                    id="basePrice"
-                    type="number"
-                    step="0.01"
-                    value={formData.basePrice}
-                    onChange={(e) => handleInputChange('basePrice', parseFloat(e.target.value) || 0)}
-                    placeholder="0.00"
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label htmlFor="basePrice">السعر الأساسي (ريال)</Label>
+                    <Input
+                      id="basePrice"
+                      type="number"
+                      step="0.01"
+                      value={formData.basePrice}
+                      onChange={(e) => handleInputChange('basePrice', parseFloat(e.target.value) || 0)}
+                      placeholder="0.00"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="vatRate">نسبة الضريبة (%)</Label>
+                    <Input
+                      id="vatRate"
+                      type="number"
+                      step="0.01"
+                      value={formData.vatRate}
+                      onChange={(e) => handleInputChange('vatRate', parseFloat(e.target.value) || 15)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="platePrice">سعر اللوحة (ريال)</Label>
+                    <Input
+                      id="platePrice"
+                      type="number"
+                      step="0.01"
+                      value={formData.platePrice}
+                      onChange={(e) => handleInputChange('platePrice', parseFloat(e.target.value) || 0)}
+                    />
+                  </div>
                 </div>
-                <div className="md:col-span-2">
-                  <Label htmlFor="specifications">المواصفات الإضافية</Label>
-                  <Textarea
-                    id="specifications"
-                    value={formData.specifications}
-                    onChange={(e) => handleInputChange('specifications', e.target.value)}
-                    placeholder="أدخل المواصفات والملحقات الإضافية"
-                    rows={3}
-                  />
-                </div>
+
               </CardContent>
             </Card>
 
-            {/* Pricing Information */}
+            {/* Additional Options */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Calculator className="mr-3 h-5 w-5 text-primary" />
-                  تفاصيل السعر
+                  خيارات إضافية
                 </CardTitle>
               </CardHeader>
-              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="vatRate">نسبة الضريبة (%)</Label>
-                  <Input
-                    id="vatRate"
-                    type="number"
-                    step="0.01"
-                    value={formData.vatRate}
-                    onChange={(e) => handleInputChange('vatRate', parseFloat(e.target.value) || 15)}
+              <CardContent className="space-y-4">
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  <Checkbox
+                    id="includesTax"
+                    checked={formData.includesPlatesAndTax}
+                    onCheckedChange={(checked) => handleInputChange('includesPlatesAndTax', checked)}
                   />
+                  <Label htmlFor="includesTax">السعر المدخل شامل الضريبة</Label>
                 </div>
-                <div>
-                  <Label htmlFor="platePrice">سعر اللوحة (ريال)</Label>
-                  <Input
-                    id="platePrice"
-                    type="number"
-                    step="0.01"
-                    value={formData.platePrice}
-                    onChange={(e) => handleInputChange('platePrice', parseFloat(e.target.value) || 0)}
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  <Checkbox
+                    id="warrantyIncluded"
+                    checked={formData.isWarrantied}
+                    onCheckedChange={(checked) => handleInputChange('isWarrantied', checked)}
                   />
+                  <Label htmlFor="warrantyIncluded">يشمل الضمان</Label>
                 </div>
-                <div className="md:col-span-2 space-y-4">
-                  <div className="flex items-center space-x-2 space-x-reverse">
-                    <Checkbox
-                      id="includesTax"
-                      checked={formData.includesPlatesAndTax}
-                      onCheckedChange={(checked) => handleInputChange('includesPlatesAndTax', checked)}
-                    />
-                    <Label htmlFor="includesTax">السعر المدخل شامل الضريبة</Label>
-                  </div>
-                  <div className="flex items-center space-x-2 space-x-reverse">
-                    <Checkbox
-                      id="warrantyIncluded"
-                      checked={formData.isWarrantied}
-                      onCheckedChange={(checked) => handleInputChange('isWarrantied', checked)}
-                    />
-                    <Label htmlFor="warrantyIncluded">يشمل الضمان</Label>
-                  </div>
-                  <div className="flex items-center space-x-2 space-x-reverse">
-                    <Checkbox
-                      id="riyadhDelivery"
-                      checked={formData.isRiyadhDelivery}
-                      onCheckedChange={(checked) => handleInputChange('isRiyadhDelivery', checked)}
-                    />
-                    <Label htmlFor="riyadhDelivery">التوصيل داخل الرياض</Label>
-                  </div>
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  <Checkbox
+                    id="riyadhDelivery"
+                    checked={formData.isRiyadhDelivery}
+                    onCheckedChange={(checked) => handleInputChange('isRiyadhDelivery', checked)}
+                  />
+                  <Label htmlFor="riyadhDelivery">التوصيل داخل الرياض</Label>
                 </div>
               </CardContent>
             </Card>
