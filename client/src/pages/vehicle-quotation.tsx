@@ -128,8 +128,7 @@ const VehicleQuotation = () => {
     salesRepName: "",
     salesRepPhone: "",
     salesRepEmail: "",
-    stampImage: null as string | null,
-    signatureImage: null as string | null,
+
     companyLogo: null as string | null,
     isWarrantied: false,
     isRiyadhDelivery: false,
@@ -483,8 +482,7 @@ const VehicleQuotation = () => {
         salesRepName: formData.salesRepName || null,
         salesRepPhone: formData.salesRepPhone || null,
         salesRepEmail: formData.salesRepEmail || null,
-        stampImage: formData.stampImage || null,
-        signatureImage: formData.signatureImage || null,
+
         status: "draft",
       },
     };
@@ -1061,61 +1059,7 @@ const VehicleQuotation = () => {
               </CardContent>
             </Card>
 
-            {/* File Upload */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Upload className="mr-3 h-5 w-5 text-primary" />
-                  الختم والتوقيع
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="stampUpload">ختم الشركة</Label>
-                  <div 
-                    className="border-2 border-dashed border-input rounded-lg p-4 text-center hover:border-primary transition-colors cursor-pointer"
-                    onClick={() => document.getElementById('stampUpload')?.click()}
-                  >
-                    <Upload className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
-                    <p className="text-muted-foreground">اسحب الملف هنا أو انقر للتحديد</p>
-                    <input
-                      id="stampUpload"
-                      type="file"
-                      className="hidden"
-                      accept="image/*"
-                      onChange={(e) => handleFileUpload(e, 'stampImage')}
-                    />
-                  </div>
-                  {formData.stampImage && (
-                    <div className="mt-2">
-                      <img src={formData.stampImage} alt="ختم الشركة" className="h-16 mx-auto" />
-                    </div>
-                  )}
-                </div>
-                <div>
-                  <Label htmlFor="signatureUpload">توقيع المندوب</Label>
-                  <div 
-                    className="border-2 border-dashed border-input rounded-lg p-4 text-center hover:border-primary transition-colors cursor-pointer"
-                    onClick={() => document.getElementById('signatureUpload')?.click()}
-                  >
-                    <Upload className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
-                    <p className="text-muted-foreground">اسحب الملف هنا أو انقر للتحديد</p>
-                    <input
-                      id="signatureUpload"
-                      type="file"
-                      className="hidden"
-                      accept="image/*"
-                      onChange={(e) => handleFileUpload(e, 'signatureImage')}
-                    />
-                  </div>
-                  {formData.signatureImage && (
-                    <div className="mt-2">
-                      <img src={formData.signatureImage} alt="توقيع المندوب" className="h-16 mx-auto" />
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+
 
             {/* WhatsApp Settings */}
             <Card>
@@ -1563,9 +1507,7 @@ const VehicleQuotation = () => {
                   className="border-b-2 pb-2 mb-2 h-20 flex items-center justify-center"
                   style={{ borderColor: formData.companySecondaryColor }}
                 >
-                  {formData.signatureImage && (
-                    <img src={formData.signatureImage} alt="توقيع المندوب" className="max-h-16" />
-                  )}
+
                 </div>
                 <p className="text-sm" style={{ color: formData.companyTextColor }}>توقيع العميل</p>
               </div>
@@ -1574,10 +1516,8 @@ const VehicleQuotation = () => {
                   className="border-b-2 pb-2 mb-2 h-20 flex items-center justify-center"
                   style={{ borderColor: formData.companySecondaryColor }}
                 >
-                  {formData.companyStamp ? (
+                  {formData.companyStamp && (
                     <img src={formData.companyStamp} alt="ختم الشركة" className="max-h-16" />
-                  ) : formData.stampImage && (
-                    <img src={formData.stampImage} alt="ختم الشركة" className="max-h-16" />
                   )}
                 </div>
                 <p className="text-sm" style={{ color: formData.companyTextColor }}>ختم الشركة</p>

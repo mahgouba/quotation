@@ -156,6 +156,12 @@ Changelog:
   * Added stamp column to company management table
   * Company stamps appear in natural size in quotation signature area
   * Automatic stamp application when company is selected for quotations
+- July 03, 2025. Simplified Interface:
+  * Removed stamp and signature upload sections from main quotation form
+  * Removed stamp upload from company data management interface
+  * Removed stamp column from company management table
+  * Simplified PDF signature area to focus on company stamp from database only
+  * Cleaner interface focusing on essential quotation data
 ```
 
 ## User Preferences
