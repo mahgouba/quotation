@@ -90,6 +90,7 @@ export default function DataManagement() {
     registrationNumber: "",
     taxNumber: "",
     logo: "",
+    stamp: "",
     primaryColor: "#3b82f6",
     secondaryColor: "#1e40af",
     textColor: "#1f2937",
@@ -133,6 +134,7 @@ export default function DataManagement() {
         registrationNumber: "", 
         taxNumber: "", 
         logo: "",
+        stamp: "",
         primaryColor: "#3b82f6",
         secondaryColor: "#1e40af", 
         textColor: "#1f2937",
@@ -621,6 +623,38 @@ export default function DataManagement() {
                         </div>
                       )}
                     </div>
+                    
+                    {/* Company Stamp Upload */}
+                    <div>
+                      <Label htmlFor="company-stamp">ختم الشركة</Label>
+                      <Input
+                        id="company-stamp"
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                              const result = e.target?.result as string;
+                              setCompanyForm({...companyForm, stamp: result});
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                        className="mb-2"
+                      />
+                      {companyForm.stamp && (
+                        <div className="mt-2">
+                          <img 
+                            src={companyForm.stamp} 
+                            alt="معاينة الختم" 
+                            className="w-20 h-20 object-contain border rounded"
+                          />
+                        </div>
+                      )}
+                    </div>
+                    
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="registration-number">رقم السجل التجاري</Label>
@@ -763,6 +797,7 @@ export default function DataManagement() {
                     <TableHeader>
                       <TableRow>
                         <TableHead>الشعار</TableHead>
+                        <TableHead>الختم</TableHead>
                         <TableHead>اسم الشركة</TableHead>
                         <TableHead>العنوان</TableHead>
                         <TableHead>الهاتف</TableHead>
@@ -785,6 +820,19 @@ export default function DataManagement() {
                             ) : (
                               <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
                                 <Building className="w-4 h-4 text-gray-400" />
+                              </div>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {company.stamp ? (
+                              <img 
+                                src={company.stamp} 
+                                alt={`ختم ${company.name}`}
+                                className="w-8 h-8 object-contain rounded"
+                              />
+                            ) : (
+                              <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
+                                <span className="text-xs text-gray-400">ختم</span>
                               </div>
                             )}
                           </TableCell>

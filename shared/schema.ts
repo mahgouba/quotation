@@ -16,6 +16,7 @@ export const companies = pgTable("companies", {
   phone: text("phone"),
   email: text("email"),
   logo: text("logo"), // Base64 encoded image
+  stamp: text("stamp"), // Base64 encoded company stamp
   registrationNumber: text("registration_number"),
   taxNumber: text("tax_number"),
   primaryColor: text("primary_color").default("#3b82f6"),

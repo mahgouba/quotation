@@ -141,6 +141,7 @@ const VehicleQuotation = () => {
     companyAddress: "عنوان الشركة",
     companyPhone: "رقم هاتف الشركة",
     companyEmail: "البريد الإلكتروني للشركة",
+    companyStamp: null,
     companyPrimaryColor: "#3b82f6",
     companySecondaryColor: "#1e40af", 
     companyTextColor: "#1f2937",
@@ -263,6 +264,7 @@ const VehicleQuotation = () => {
         companyPhone: selectedCompany.phone || "رقم هاتف الشركة",
         companyEmail: selectedCompany.email || "البريد الإلكتروني للشركة",
         companyLogo: selectedCompany.logo || null,
+        companyStamp: selectedCompany.stamp || null,
         companyPrimaryColor: selectedCompany.primaryColor || "#3b82f6",
         companySecondaryColor: selectedCompany.secondaryColor || "#1e40af",
         companyTextColor: selectedCompany.textColor || "#1f2937",
@@ -1273,7 +1275,7 @@ const VehicleQuotation = () => {
               </div>
 
               {/* Company Information */}
-              <div className="text-center flex-grow mx-8">
+              <div className="text-center flex-grow mx-8 relative">
                 <h1 
                   className="text-3xl font-bold mb-2"
                   style={{ color: formData.companyPrimaryColor }}
@@ -1293,6 +1295,17 @@ const VehicleQuotation = () => {
                   </h2>
                   <p style={{ color: formData.companyTextColor }}>Vehicle Quotation</p>
                 </div>
+                
+                {/* Company Stamp in Header (watermark style) */}
+                {formData.companyStamp && (
+                  <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
+                    <img 
+                      src={formData.companyStamp} 
+                      alt="ختم الشركة" 
+                      className="max-w-32 max-h-32"
+                    />
+                  </div>
+                )}
               </div>
 
               {/* QR Code */}
@@ -1561,11 +1574,13 @@ const VehicleQuotation = () => {
                   className="border-b-2 pb-2 mb-2 h-20 flex items-center justify-center"
                   style={{ borderColor: formData.companySecondaryColor }}
                 >
-                  {formData.stampImage && (
+                  {formData.companyStamp ? (
+                    <img src={formData.companyStamp} alt="ختم الشركة" className="max-h-16" />
+                  ) : formData.stampImage && (
                     <img src={formData.stampImage} alt="ختم الشركة" className="max-h-16" />
                   )}
                 </div>
-                <p className="text-sm" style={{ color: formData.companyTextColor }}>ختم وتوقيع الشركة</p>
+                <p className="text-sm" style={{ color: formData.companyTextColor }}>ختم الشركة</p>
               </div>
             </div>
 

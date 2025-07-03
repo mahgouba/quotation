@@ -149,6 +149,13 @@ Changelog:
   * Applied company colors automatically to PDF quotation headers and content
   * Custom color picker interface with hex code input support
   * Real-time theme application to quotation design based on selected company
+- July 03, 2025. Company Stamp Integration:
+  * Added company stamp upload functionality to data management interface
+  * Enhanced database schema with stamp field for companies
+  * Integrated company stamp display in PDF quotation headers (watermark style)
+  * Added stamp column to company management table
+  * Company stamps appear in natural size in quotation signature area
+  * Automatic stamp application when company is selected for quotations
 ```
 
 ## User Preferences
