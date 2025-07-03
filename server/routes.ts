@@ -161,7 +161,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         quotations = await storage.getQuotations();
       }
       
-      res.json(quotations);
+      // Fetch related data for each quotation for search functionality
+      const quotationsWithDetails = await Promise.all(
+        quotations.map(async (quotation) => {
+          const customer = quotation.customerId ? await storage.getCustomer(quotation.customerId) : null;
+          const vehicle = quotation.vehicleId ? await storage.getVehicle(quotation.vehicleId) : null;
+          const company = quotation.companyId ? await storage.getCompany(quotation.companyId) : null;
+          
+          return {
+            ...quotation,
+            customer: customer ? {
+              name: customer.name,
+              phone: customer.phone,
+              email: customer.email
+            } : null,
+            vehicle: vehicle ? {
+              maker: vehicle.maker,
+              model: vehicle.model,
+              exteriorColor: vehicle.exteriorColor,
+              interiorColor: vehicle.interiorColor
+            } : null,
+            company: company ? {
+              name: company.name
+            } : null
+          };
+        })
+      );
+      
+      res.json(quotationsWithDetails);
     } catch (error) {
       res.status(500).json({ error: "Failed to get quotations" });
     }

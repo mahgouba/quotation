@@ -3,6 +3,8 @@ import { format } from "date-fns";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "wouter";
+import { getVehicleSpecifications, getAvailableMakes, getModelsForMake, getYearsForMakeAndModel } from "@/data/vehicle-specifications";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,7 +26,9 @@ import {
   MessageCircle,
   Save,
   QrCode,
-  Edit
+  Edit,
+  Search,
+  Home
 } from "lucide-react";
 
 // SVG Icons
@@ -66,16 +70,8 @@ const FaUpload = ({ className }: { className?: string }) => (
 );
 
 const VehicleQuotation = () => {
-  // Static Data
-  const carMakers = ["Toyota", "Honda", "Ford", "BMW", "Mercedes", "Audi"];
-  const carModelsByMaker: { [key: string]: string[] } = {
-    Toyota: ["Camry", "Corolla", "Land Cruiser", "Hilux", "RAV4"],
-    Honda: ["Accord", "Civic", "CR-V", "Pilot"],
-    Ford: ["Mustang", "F-150", "Explorer", "Focus"],
-    BMW: ["3 Series", "5 Series", "X5", "X7"],
-    Mercedes: ["C-Class", "E-Class", "S-Class", "GLE"],
-    Audi: ["A4", "A6", "Q5", "Q7"],
-  };
+  // Static Data - Using Arabic names from vehicle specifications database
+  const carMakers = getAvailableMakes();
   const exteriorColors = ["أبيض", "أسود", "فضي", "رمادي", "أحمر", "أزرق"];
   const interiorColors = ["أسود", "بيج", "بني", "رمادي"];
 
@@ -87,6 +83,7 @@ const VehicleQuotation = () => {
     customerPhone: "",
     carMaker: "",
     carModel: "",
+    carYear: "",
     exteriorColor: "",
     interiorColor: "",
     quantity: 1,
@@ -116,6 +113,8 @@ const VehicleQuotation = () => {
   });
 
   const [availableModels, setAvailableModels] = useState<string[]>([]);
+  const [availableYears, setAvailableYears] = useState<number[]>([]);
+  const [vehicleSpecs, setVehicleSpecs] = useState<any>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const { toast } = useToast();
@@ -193,9 +192,56 @@ const VehicleQuotation = () => {
     setFormData(prev => ({
       ...prev,
       carMaker: maker,
-      carModel: ""
+      carModel: "",
+      carYear: "",
+      specifications: ""
     }));
-    setAvailableModels(carModelsByMaker[maker] || []);
+    setAvailableModels(getModelsForMake(maker));
+    setAvailableYears([]);
+    setVehicleSpecs(null);
+  };
+
+  const handleModelChange = (model: string) => {
+    setFormData(prev => ({
+      ...prev,
+      carModel: model,
+      carYear: "",
+      specifications: ""
+    }));
+    setAvailableYears(getYearsForMakeAndModel(formData.carMaker, model));
+    setVehicleSpecs(null);
+  };
+
+  const handleYearChange = (year: string) => {
+    setFormData(prev => ({
+      ...prev,
+      carYear: year
+    }));
+    
+    // Auto-populate specifications
+    const specs = getVehicleSpecifications(formData.carMaker, formData.carModel, parseInt(year));
+    setVehicleSpecs(specs);
+    
+    if (specs) {
+      const specsText = `المحرك: ${specs.specifications.engine}
+القوة: ${specs.specifications.horsepower}
+العزم: ${specs.specifications.torque}
+ناقل الحركة: ${specs.specifications.transmission}
+نوع الدفع: ${specs.specifications.driveType}
+نوع الوقود: ${specs.specifications.fuelType}
+استهلاك الوقود: ${specs.specifications.fuelConsumption}
+السرعة القصوى: ${specs.specifications.topSpeed}
+التسارع: ${specs.specifications.acceleration}
+الأبعاد: ${specs.specifications.dimensions.length} x ${specs.specifications.dimensions.width} x ${specs.specifications.dimensions.height}
+الوزن: ${specs.specifications.weight}
+سعة الركاب: ${specs.specifications.seatingCapacity}
+سعة الشنطة: ${specs.specifications.trunkCapacity}`;
+      
+      setFormData(prev => ({
+        ...prev,
+        specifications: specsText
+      }));
+    }
   };
 
   const validateField = (name: string, value: any) => {
@@ -419,6 +465,31 @@ const VehicleQuotation = () => {
 
   return (
     <div className="bg-background min-h-screen" dir="rtl">
+      {/* Navigation Header */}
+      <div className="bg-white shadow-sm border-b no-print">
+        <div className="max-w-6xl mx-auto px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <h1 className="text-xl font-bold text-gray-900">نظام عروض أسعار المركبات</h1>
+            </div>
+            <div className="flex items-center gap-2">
+              <Link href="/">
+                <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                  <Home className="h-4 w-4" />
+                  الرئيسية
+                </Button>
+              </Link>
+              <Link href="/search">
+                <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                  <Search className="h-4 w-4" />
+                  البحث
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Action Buttons Section */}
       <div className="no-print bg-card shadow-md mb-6">
         <div className="container mx-auto px-4 py-4">
@@ -521,13 +592,26 @@ const VehicleQuotation = () => {
                 </div>
                 <div>
                   <Label htmlFor="carModel">موديل السيارة *</Label>
-                  <Select value={formData.carModel} onValueChange={(value) => handleInputChange('carModel', value)}>
+                  <Select value={formData.carModel} onValueChange={handleModelChange}>
                     <SelectTrigger>
                       <SelectValue placeholder="اختر الموديل" />
                     </SelectTrigger>
                     <SelectContent>
                       {availableModels.map(model => (
                         <SelectItem key={model} value={model}>{model}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="carYear">سنة الصنع *</Label>
+                  <Select value={formData.carYear} onValueChange={handleYearChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="اختر السنة" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableYears.map(year => (
+                        <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>

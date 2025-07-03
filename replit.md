@@ -111,6 +111,13 @@ Changelog:
   * Database storage layer with Drizzle ORM
   * Save functionality integrated with database
   * Complete quotation management with relational data
+- July 03, 2025. Search and specifications enhancement:
+  * Added comprehensive search page with QR code scanning capability
+  * Integrated detailed vehicle specifications database based on make/model/year
+  * Auto-population of vehicle specifications when selecting make, model, and year
+  * Navigation header with links between main form and search functionality
+  * Enhanced quotations API to include customer, vehicle, and company details for search
+  * Arabic vehicle specifications including engine, power, dimensions, and features
 ```
 
 ## User Preferences
