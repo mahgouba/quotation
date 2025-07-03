@@ -232,16 +232,48 @@ export default function VehicleManagement() {
   });
 
   const handleAddSpec = () => {
-    if (!newSpec.make || !newSpec.model || !newSpec.year) {
+    if (!newSpec.make || !newSpec.model || !newSpec.year || !newSpec.engine) {
       toast({
         title: "بيانات ناقصة",
-        description: "يرجى إدخال الماركة والموديل والسنة",
+        description: "يرجى إدخال الماركة والموديل والسنة والمحرك",
         variant: "destructive",
       });
       return;
     }
 
-    addSpecMutation.mutate(newSpec);
+    // Convert all individual fields to a single specifications string
+    const specificationsText = [
+      newSpec.horsepower && `القوة: ${newSpec.horsepower}`,
+      newSpec.torque && `عزم الدوران: ${newSpec.torque}`,
+      newSpec.transmission && `ناقل الحركة: ${newSpec.transmission}`,
+      newSpec.driveType && `نوع الدفع: ${newSpec.driveType}`,
+      newSpec.fuelType && `نوع الوقود: ${newSpec.fuelType}`,
+      newSpec.fuelCapacity && `سعة الوقود: ${newSpec.fuelCapacity}`,
+      newSpec.fuelConsumption && `استهلاك الوقود: ${newSpec.fuelConsumption}`,
+      newSpec.topSpeed && `السرعة القصوى: ${newSpec.topSpeed}`,
+      newSpec.acceleration && `التسارع: ${newSpec.acceleration}`,
+      newSpec.length && `الطول: ${newSpec.length}`,
+      newSpec.width && `العرض: ${newSpec.width}`,
+      newSpec.height && `الارتفاع: ${newSpec.height}`,
+      newSpec.wheelbase && `قاعدة العجلات: ${newSpec.wheelbase}`,
+      newSpec.weight && `الوزن: ${newSpec.weight}`,
+      newSpec.seatingCapacity && `سعة الركاب: ${newSpec.seatingCapacity}`,
+      newSpec.trunkCapacity && `سعة الصندوق: ${newSpec.trunkCapacity}`,
+      newSpec.safetyFeatures && `مميزات الأمان: ${newSpec.safetyFeatures}`,
+      newSpec.techFeatures && `المميزات التقنية: ${newSpec.techFeatures}`,
+      newSpec.exteriorFeatures && `المميزات الخارجية: ${newSpec.exteriorFeatures}`,
+      newSpec.interiorFeatures && `المميزات الداخلية: ${newSpec.interiorFeatures}`,
+    ].filter(Boolean).join(' • ');
+
+    const specData = {
+      make: newSpec.make,
+      model: newSpec.model,
+      year: newSpec.year,
+      engine: newSpec.engine,
+      specifications: specificationsText || 'مواصفات أساسية'
+    };
+
+    addSpecMutation.mutate(specData);
   };
 
   const handleUpdateSpec = () => {
