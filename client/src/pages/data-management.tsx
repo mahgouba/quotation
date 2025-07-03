@@ -78,8 +78,7 @@ export default function DataManagement() {
   const [salesRepForm, setSalesRepForm] = useState({
     name: "",
     email: "",
-    phone: "",
-    companyId: ""
+    phone: ""
   });
 
   // Company Form
@@ -110,7 +109,7 @@ export default function DataManagement() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/sales-representatives'] });
-      setSalesRepForm({ name: "", email: "", phone: "", companyId: "" });
+      setSalesRepForm({ name: "", email: "", phone: "" });
       toast({ title: "تم إضافة المندوب بنجاح" });
     },
   });
@@ -168,7 +167,7 @@ export default function DataManagement() {
     }
     addSalesRepMutation.mutate({
       ...salesRepForm,
-      companyId: salesRepForm.companyId && salesRepForm.companyId !== "none" ? parseInt(salesRepForm.companyId) : null
+      companyId: null
     });
   };
 
@@ -467,20 +466,7 @@ export default function DataManagement() {
                         placeholder="01234567890"
                       />
                     </div>
-                    <div>
-                      <Label htmlFor="rep-company">الشركة</Label>
-                      <Select value={salesRepForm.companyId} onValueChange={(value) => setSalesRepForm({...salesRepForm, companyId: value})}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="اختر الشركة" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">بدون شركة</SelectItem>
-                          {companies.map(company => (
-                            <SelectItem key={company.id} value={company.id.toString()}>{company.name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+
                     <Button type="submit" className="w-full" disabled={addSalesRepMutation.isPending}>
                       {addSalesRepMutation.isPending ? "جاري الإضافة..." : "إضافة المندوب"}
                     </Button>
@@ -494,15 +480,9 @@ export default function DataManagement() {
                   <CardTitle>إحصائيات المندوبين</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-blue-600">{salesReps.length}</div>
-                      <div className="text-sm text-gray-600">إجمالي المندوبين</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-green-600">{companies.length}</div>
-                      <div className="text-sm text-gray-600">الشركات المسجلة</div>
-                    </div>
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-blue-600">{salesReps.length}</div>
+                    <div className="text-sm text-gray-600">إجمالي المندوبين</div>
                   </div>
                 </CardContent>
               </Card>
@@ -521,7 +501,6 @@ export default function DataManagement() {
                         <TableHead>الاسم</TableHead>
                         <TableHead>البريد الإلكتروني</TableHead>
                         <TableHead>الهاتف</TableHead>
-                        <TableHead>الشركة</TableHead>
                         <TableHead>الإجراءات</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -531,13 +510,7 @@ export default function DataManagement() {
                           <TableCell className="font-medium">{rep.name}</TableCell>
                           <TableCell>{rep.email || "غير محدد"}</TableCell>
                           <TableCell>{rep.phone || "غير محدد"}</TableCell>
-                          <TableCell>
-                            {rep.companyId ? (
-                              companies.find(c => c.id === rep.companyId)?.name || "شركة غير موجودة"
-                            ) : (
-                              "بدون شركة"
-                            )}
-                          </TableCell>
+
                           <TableCell>
                             <div className="flex gap-2">
                               <Button variant="outline" size="sm">
@@ -653,9 +626,9 @@ export default function DataManagement() {
                     </div>
                     <div className="text-center">
                       <div className="text-3xl font-bold text-green-600">
-                        {salesReps.filter(rep => rep.companyId).length}
+                        {salesReps.length}
                       </div>
-                      <div className="text-sm text-gray-600">مندوبين لديهم شركات</div>
+                      <div className="text-sm text-gray-600">المندوبين المسجلين</div>
                     </div>
                   </div>
                 </CardContent>

@@ -438,8 +438,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/vehicle-specs", async (req, res) => {
     try {
+      console.log("=== POST vehicle-specs called ===");
+      console.log("Request body:", JSON.stringify(req.body, null, 2));
+      
       const specData = insertVehicleSpecificationSchema.parse(req.body);
+      console.log("Parsed data:", JSON.stringify(specData, null, 2));
+      
       const spec = await storage.createVehicleSpecification(specData);
+      console.log("Created spec:", JSON.stringify(spec, null, 2));
+      
       res.status(201).json(spec);
     } catch (error) {
       console.error("Error creating vehicle spec:", error);

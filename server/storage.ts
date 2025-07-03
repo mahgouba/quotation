@@ -242,11 +242,20 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createVehicleSpecification(spec: InsertVehicleSpecification): Promise<VehicleSpecification> {
-    const [newSpec] = await db
-      .insert(vehicleSpecifications)
-      .values(spec)
-      .returning();
-    return newSpec;
+    console.log("=== DatabaseStorage.createVehicleSpecification called ===");
+    console.log("Input spec:", JSON.stringify(spec, null, 2));
+    
+    try {
+      const [newSpec] = await db
+        .insert(vehicleSpecifications)
+        .values(spec)
+        .returning();
+      console.log("Created spec:", JSON.stringify(newSpec, null, 2));
+      return newSpec;
+    } catch (error) {
+      console.error("Database error in createVehicleSpecification:", error);
+      throw error;
+    }
   }
 
   async updateVehicleSpecification(id: number, spec: Partial<InsertVehicleSpecification>): Promise<VehicleSpecification | undefined> {
