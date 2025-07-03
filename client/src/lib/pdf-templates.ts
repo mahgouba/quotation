@@ -189,10 +189,11 @@ export class PDFTemplateEngine {
 
   private addBackground() {
     if (this.template.elements.showWatermark) {
-      this.doc.setGState(new this.doc.GState({ opacity: 0.1 }));
+      // Set background with watermark effect
       this.doc.setFillColor(...this.hexToRgb(this.template.colors.primary));
+      this.doc.setGlobalAlpha(0.1);
       this.doc.rect(0, 0, this.pageWidth, this.pageHeight, 'F');
-      this.doc.setGState(new this.doc.GState({ opacity: 1 }));
+      this.doc.setGlobalAlpha(1.0);
     }
   }
 

@@ -780,7 +780,10 @@ const VehicleQuotation = () => {
               <span>واتساب</span>
             </Button>
             <Button 
-              onClick={() => setShowTemplateSelector(!showTemplateSelector)} 
+              onClick={() => {
+                console.log("Template selector button clicked, current state:", showTemplateSelector);
+                setShowTemplateSelector(!showTemplateSelector);
+              }} 
               className="bg-purple-600 hover:bg-purple-700 text-white"
             >
               <Palette className="ml-2 h-4 w-4" />
@@ -1009,11 +1012,17 @@ const VehicleQuotation = () => {
 
             {/* Template Selector */}
             {showTemplateSelector && (
-              <TemplateSelector
-                selectedTemplate={selectedTemplate}
-                onTemplateChange={setSelectedTemplate}
-                onPreview={handlePreviewPDF}
-              />
+              <div className="w-full">
+                <div className="mb-4 p-4 bg-purple-50 rounded-lg border border-purple-200">
+                  <h3 className="text-lg font-semibold text-purple-800 mb-2">اختيار قالب PDF</h3>
+                  <p className="text-sm text-purple-600">اختر من القوالب المتاحة أو خصص القالب الخاص بك</p>
+                </div>
+                <TemplateSelector
+                  selectedTemplate={selectedTemplate}
+                  onTemplateChange={setSelectedTemplate}
+                  onPreview={handlePreviewPDF}
+                />
+              </div>
             )}
 
 
