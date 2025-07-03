@@ -156,3 +156,43 @@ export type Vehicle = typeof vehicles.$inferSelect;
 
 export type InsertQuotation = z.infer<typeof insertQuotationSchema>;
 export type Quotation = typeof quotations.$inferSelect;
+
+// Vehicle Specifications table for management
+export const vehicleSpecifications = pgTable("vehicle_specifications", {
+  id: serial("id").primaryKey(),
+  make: text("make").notNull(),
+  model: text("model").notNull(),
+  year: integer("year").notNull(),
+  engine: text("engine").notNull(),
+  horsepower: text("horsepower").notNull(),
+  torque: text("torque").notNull(),
+  transmission: text("transmission").notNull(),
+  driveType: text("drive_type").notNull(),
+  fuelType: text("fuel_type").notNull(),
+  fuelCapacity: text("fuel_capacity").notNull(),
+  fuelConsumption: text("fuel_consumption").notNull(),
+  topSpeed: text("top_speed").notNull(),
+  acceleration: text("acceleration").notNull(),
+  length: text("length").notNull(),
+  width: text("width").notNull(),
+  height: text("height").notNull(),
+  wheelbase: text("wheelbase").notNull(),
+  weight: text("weight").notNull(),
+  seatingCapacity: text("seating_capacity").notNull(),
+  trunkCapacity: text("trunk_capacity").notNull(),
+  safetyFeatures: text("safety_features").notNull(),
+  techFeatures: text("tech_features").notNull(),
+  exteriorFeatures: text("exterior_features").notNull(),
+  interiorFeatures: text("interior_features").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertVehicleSpecificationSchema = createInsertSchema(vehicleSpecifications).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertVehicleSpecification = z.infer<typeof insertVehicleSpecificationSchema>;
+export type VehicleSpecification = typeof vehicleSpecifications.$inferSelect;

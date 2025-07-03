@@ -28,7 +28,8 @@ import {
   QrCode,
   Edit,
   Search,
-  Home
+  Home,
+  Database
 } from "lucide-react";
 
 // SVG Icons
@@ -512,6 +513,12 @@ const VehicleQuotation = () => {
                 <Button variant="ghost" size="sm" className="flex items-center gap-2">
                   <Search className="h-4 w-4" />
                   البحث
+                </Button>
+              </Link>
+              <Link href="/management">
+                <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                  <Database className="h-4 w-4" />
+                  إدارة البيانات
                 </Button>
               </Link>
             </div>

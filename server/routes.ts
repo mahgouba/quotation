@@ -298,6 +298,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Vehicle Specifications Management API
+  app.get("/api/vehicle-specs", async (req, res) => {
+    try {
+      // For now, return empty array as we don't have data in DB yet
+      res.json([]);
+    } catch (error) {
+      console.error("Error fetching vehicle specs:", error);
+      res.status(500).json({ error: "Failed to fetch vehicle specifications" });
+    }
+  });
+
+  app.post("/api/vehicle-specs", async (req, res) => {
+    try {
+      // For now, simulate success
+      res.status(201).json({ id: 1, ...req.body });
+    } catch (error) {
+      console.error("Error creating vehicle spec:", error);
+      res.status(400).json({ error: "Invalid vehicle specification data" });
+    }
+  });
+
+  app.put("/api/vehicle-specs/:id", async (req, res) => {
+    try {
+      // For now, simulate success
+      const id = parseInt(req.params.id);
+      res.json({ id, ...req.body });
+    } catch (error) {
+      console.error("Error updating vehicle spec:", error);
+      res.status(400).json({ error: "Invalid vehicle specification data" });
+    }
+  });
+
+  app.delete("/api/vehicle-specs/:id", async (req, res) => {
+    try {
+      // For now, simulate success
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting vehicle spec:", error);
+      res.status(500).json({ error: "Failed to delete vehicle specification" });
+    }
+  });
+
+  app.get("/api/makes", async (req, res) => {
+    try {
+      // Return empty for now
+      res.json([]);
+    } catch (error) {
+      console.error("Error fetching makes:", error);
+      res.status(500).json({ error: "Failed to fetch makes" });
+    }
+  });
+
+  app.get("/api/models", async (req, res) => {
+    try {
+      // Return empty for now
+      res.json([]);
+    } catch (error) {
+      console.error("Error fetching models:", error);
+      res.status(500).json({ error: "Failed to fetch models" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;
