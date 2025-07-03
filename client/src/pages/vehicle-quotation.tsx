@@ -901,38 +901,16 @@ const VehicleQuotation = () => {
               </CardContent>
             </Card>
 
-            {/* Additional Options */}
+            {/* Price Options */}
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Calculator className="mr-3 h-5 w-5 text-primary" />
-                  خيارات إضافية
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="pt-6">
                 <div className="flex items-center space-x-2 space-x-reverse">
                   <Checkbox
                     id="includesTax"
                     checked={formData.includesPlatesAndTax}
                     onCheckedChange={(checked) => handleInputChange('includesPlatesAndTax', checked)}
                   />
-                  <Label htmlFor="includesTax">السعر المدخل شامل الضريبة</Label>
-                </div>
-                <div className="flex items-center space-x-2 space-x-reverse">
-                  <Checkbox
-                    id="warrantyIncluded"
-                    checked={formData.isWarrantied}
-                    onCheckedChange={(checked) => handleInputChange('isWarrantied', checked)}
-                  />
-                  <Label htmlFor="warrantyIncluded">يشمل الضمان</Label>
-                </div>
-                <div className="flex items-center space-x-2 space-x-reverse">
-                  <Checkbox
-                    id="riyadhDelivery"
-                    checked={formData.isRiyadhDelivery}
-                    onCheckedChange={(checked) => handleInputChange('isRiyadhDelivery', checked)}
-                  />
-                  <Label htmlFor="riyadhDelivery">التوصيل داخل الرياض</Label>
+                  <Label htmlFor="includesTax">السعر شامل الضريبة</Label>
                 </div>
               </CardContent>
             </Card>
