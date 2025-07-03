@@ -5,6 +5,8 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
 import { getVehicleSpecifications, getAvailableMakes, getModelsForMake, getYearsForMakeAndModel } from "@/data/vehicle-specifications";
+import { TemplateSelector } from "@/components/template-selector";
+import { generateCustomPDF, defaultTemplates, type PDFTemplate } from "@/lib/pdf-templates";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,7 +31,8 @@ import {
   Edit,
   Search,
   Home,
-  Database
+  Database,
+  Palette
 } from "lucide-react";
 
 // SVG Icons
@@ -164,6 +167,8 @@ const VehicleQuotation = () => {
   const [availableYears, setAvailableYears] = useState<number[]>([]);
   const [vehicleSpecs, setVehicleSpecs] = useState<any>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [selectedTemplate, setSelectedTemplate] = useState<PDFTemplate>(defaultTemplates[0]);
+  const [showTemplateSelector, setShowTemplateSelector] = useState(false);
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -532,42 +537,65 @@ const VehicleQuotation = () => {
   };
 
   const handleExportPDF = () => {
-    if (typeof (window as any).jspdf === 'undefined' || typeof (window as any).html2canvas === 'undefined') {
-      console.error("PDF generation libraries not loaded!");
-      return;
-    }
-    const { jsPDF } = (window as any).jspdf;
-    const html2canvas = (window as any).html2canvas;
+    try {
+      // Prepare data for PDF generation
+      const pdfData = {
+        ...formData,
+        totalInWords: numberToArabicWords(formData.totalPrice),
+        carYear: formData.carYear || new Date().getFullYear().toString(),
+        specifications: vehicleSpecs?.specifications || formData.detailedSpecs || '',
+      };
 
-    const input = document.getElementById('quotation-sheet');
-    if (!input) return;
-
-    const elementsToHide = input.querySelectorAll('.print-hidden');
-    elementsToHide.forEach((el: any) => el.style.visibility = 'hidden');
-
-    html2canvas(input, { scale: 2, useCORS: true, logging: false })
-      .then((canvas: any) => {
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-        const imgRatio = canvas.width / canvas.height;
-        let imgWidth = pdfWidth;
-        let imgHeight = pdfWidth / imgRatio;
-
-        if (imgHeight > pdfHeight) {
-          imgHeight = pdfHeight;
-          imgWidth = imgHeight * imgRatio;
-        }
-        
-        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-        pdf.save(`quotation-${formData.customerName || 'quote'}.pdf`);
-        
-        elementsToHide.forEach((el: any) => el.style.visibility = 'visible');
-      }).catch((err: any) => {
-        console.error("PDF generation failed:", err);
-        elementsToHide.forEach((el: any) => el.style.visibility = 'visible');
+      // Generate PDF using advanced templating
+      const pdf = generateCustomPDF(pdfData, selectedTemplate.id);
+      
+      // Save the PDF
+      pdf.save(`quotation-${formData.customerName || 'quote'}-${selectedTemplate.name}.pdf`);
+      
+      toast({
+        title: "تم تصدير PDF بنجاح",
+        description: `تم استخدام قالب: ${selectedTemplate.name}`,
       });
+    } catch (error) {
+      console.error("PDF generation failed:", error);
+      toast({
+        title: "فشل في تصدير PDF",
+        description: "حدث خطأ أثناء إنشاء ملف PDF",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handlePreviewPDF = () => {
+    try {
+      // Prepare data for PDF generation
+      const pdfData = {
+        ...formData,
+        totalInWords: numberToArabicWords(formData.totalPrice),
+        carYear: formData.carYear || new Date().getFullYear().toString(),
+        specifications: vehicleSpecs?.specifications || formData.detailedSpecs || '',
+      };
+
+      // Generate PDF using advanced templating
+      const pdf = generateCustomPDF(pdfData, selectedTemplate.id);
+      
+      // Open PDF in new window for preview
+      const pdfBlob = pdf.output('blob');
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      window.open(pdfUrl, '_blank');
+      
+      toast({
+        title: "معاينة PDF",
+        description: `تم عرض القالب: ${selectedTemplate.name}`,
+      });
+    } catch (error) {
+      console.error("PDF preview failed:", error);
+      toast({
+        title: "فشل في معاينة PDF",
+        description: "حدث خطأ أثناء إنشاء معاينة PDF",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleWhatsAppShare = () => {
@@ -750,6 +778,13 @@ const VehicleQuotation = () => {
             <Button onClick={handleWhatsAppShare} className="bg-green-500 hover:bg-green-600 text-white">
               <FaWhatsapp className="ml-2" />
               <span>واتساب</span>
+            </Button>
+            <Button 
+              onClick={() => setShowTemplateSelector(!showTemplateSelector)} 
+              className="bg-purple-600 hover:bg-purple-700 text-white"
+            >
+              <Palette className="ml-2 h-4 w-4" />
+              <span>قوالب PDF</span>
             </Button>
           </div>
         </div>
@@ -972,9 +1007,14 @@ const VehicleQuotation = () => {
               </CardContent>
             </Card>
 
-
-
-
+            {/* Template Selector */}
+            {showTemplateSelector && (
+              <TemplateSelector
+                selectedTemplate={selectedTemplate}
+                onTemplateChange={setSelectedTemplate}
+                onPreview={handlePreviewPDF}
+              />
+            )}
 
 
 
