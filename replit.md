@@ -142,6 +142,13 @@ Changelog:
   * Company logos now display in selection dropdowns and quotation headers
   * Improved company data integration with PDF generation and quotation headers
   * Streamlined sales representative management without company associations
+- July 03, 2025. Company Branding & Color Customization:
+  * Added company color customization fields (primary, secondary, text, background)
+  * Enhanced database schema with color fields for companies
+  * Implemented live color preview in company management interface
+  * Applied company colors automatically to PDF quotation headers and content
+  * Custom color picker interface with hex code input support
+  * Real-time theme application to quotation design based on selected company
 ```
 
 ## User Preferences

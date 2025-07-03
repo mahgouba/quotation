@@ -89,7 +89,11 @@ export default function DataManagement() {
     email: "",
     registrationNumber: "",
     taxNumber: "",
-    logo: ""
+    logo: "",
+    primaryColor: "#3b82f6",
+    secondaryColor: "#1e40af",
+    textColor: "#1f2937",
+    backgroundColor: "#ffffff"
   });
 
   // Mutations
@@ -121,7 +125,19 @@ export default function DataManagement() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/companies'] });
-      setCompanyForm({ name: "", address: "", phone: "", email: "", registrationNumber: "", taxNumber: "", logo: "" });
+      setCompanyForm({ 
+        name: "", 
+        address: "", 
+        phone: "", 
+        email: "", 
+        registrationNumber: "", 
+        taxNumber: "", 
+        logo: "",
+        primaryColor: "#3b82f6",
+        secondaryColor: "#1e40af", 
+        textColor: "#1f2937",
+        backgroundColor: "#ffffff"
+      });
       toast({ title: "تم إضافة الشركة بنجاح" });
     },
   });
@@ -625,6 +641,107 @@ export default function DataManagement() {
                         />
                       </div>
                     </div>
+                    
+                    {/* Company Colors Section */}
+                    <div className="pt-4 border-t">
+                      <h4 className="font-medium text-gray-900 mb-3">ألوان الشركة لتخصيص التصميم</h4>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="primary-color">اللون الأساسي</Label>
+                          <div className="flex items-center gap-2">
+                            <Input
+                              id="primary-color"
+                              type="color"
+                              value={companyForm.primaryColor}
+                              onChange={(e) => setCompanyForm({...companyForm, primaryColor: e.target.value})}
+                              className="w-12 h-10 p-1 rounded"
+                            />
+                            <Input
+                              type="text"
+                              value={companyForm.primaryColor}
+                              onChange={(e) => setCompanyForm({...companyForm, primaryColor: e.target.value})}
+                              placeholder="#3b82f6"
+                              className="flex-1"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <Label htmlFor="secondary-color">اللون الثانوي</Label>
+                          <div className="flex items-center gap-2">
+                            <Input
+                              id="secondary-color"
+                              type="color"
+                              value={companyForm.secondaryColor}
+                              onChange={(e) => setCompanyForm({...companyForm, secondaryColor: e.target.value})}
+                              className="w-12 h-10 p-1 rounded"
+                            />
+                            <Input
+                              type="text"
+                              value={companyForm.secondaryColor}
+                              onChange={(e) => setCompanyForm({...companyForm, secondaryColor: e.target.value})}
+                              placeholder="#1e40af"
+                              className="flex-1"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <Label htmlFor="text-color">لون النص</Label>
+                          <div className="flex items-center gap-2">
+                            <Input
+                              id="text-color"
+                              type="color"
+                              value={companyForm.textColor}
+                              onChange={(e) => setCompanyForm({...companyForm, textColor: e.target.value})}
+                              className="w-12 h-10 p-1 rounded"
+                            />
+                            <Input
+                              type="text"
+                              value={companyForm.textColor}
+                              onChange={(e) => setCompanyForm({...companyForm, textColor: e.target.value})}
+                              placeholder="#1f2937"
+                              className="flex-1"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <Label htmlFor="background-color">لون الخلفية</Label>
+                          <div className="flex items-center gap-2">
+                            <Input
+                              id="background-color"
+                              type="color"
+                              value={companyForm.backgroundColor}
+                              onChange={(e) => setCompanyForm({...companyForm, backgroundColor: e.target.value})}
+                              className="w-12 h-10 p-1 rounded"
+                            />
+                            <Input
+                              type="text"
+                              value={companyForm.backgroundColor}
+                              onChange={(e) => setCompanyForm({...companyForm, backgroundColor: e.target.value})}
+                              placeholder="#ffffff"
+                              className="flex-1"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Color Preview */}
+                      <div className="mt-4 p-4 rounded-lg border" style={{
+                        backgroundColor: companyForm.backgroundColor,
+                        color: companyForm.textColor,
+                        borderColor: companyForm.primaryColor
+                      }}>
+                        <div className="text-center">
+                          <h5 style={{ color: companyForm.primaryColor }} className="font-bold text-lg mb-2">
+                            {companyForm.name || "اسم الشركة"}
+                          </h5>
+                          <div style={{ color: companyForm.secondaryColor }} className="text-sm">
+                            معاينة تصميم الشركة
+                          </div>
+                          <div className="text-xs mt-1">هذا مثال على كيفية ظهور الألوان في عرض السعر</div>
+                        </div>
+                      </div>
+                    </div>
+                    
                     <Button type="submit" className="w-full" disabled={addCompanyMutation.isPending}>
                       {addCompanyMutation.isPending ? "جاري الإضافة..." : "إضافة الشركة"}
                     </Button>
