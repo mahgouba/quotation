@@ -1,10 +1,11 @@
 import { 
-  users, companies, customers, vehicles, quotations,
+  users, companies, customers, vehicles, quotations, salesRepresentatives,
   type User, type InsertUser,
   type Company, type InsertCompany,
   type Customer, type InsertCustomer,
   type Vehicle, type InsertVehicle,
-  type Quotation, type InsertQuotation
+  type Quotation, type InsertQuotation,
+  type SalesRepresentative, type InsertSalesRepresentative
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -20,6 +21,13 @@ export interface IStorage {
   createCompany(company: InsertCompany): Promise<Company>;
   updateCompany(id: number, company: Partial<InsertCompany>): Promise<Company | undefined>;
   getCompanies(): Promise<Company[]>;
+  
+  // Sales Representative methods
+  getSalesRepresentative(id: number): Promise<SalesRepresentative | undefined>;
+  createSalesRepresentative(salesRep: InsertSalesRepresentative): Promise<SalesRepresentative>;
+  updateSalesRepresentative(id: number, salesRep: Partial<InsertSalesRepresentative>): Promise<SalesRepresentative | undefined>;
+  getSalesRepresentatives(): Promise<SalesRepresentative[]>;
+  deleteSalesRepresentative(id: number): Promise<boolean>;
   
   // Customer methods
   getCustomer(id: number): Promise<Customer | undefined>;
@@ -88,6 +96,40 @@ export class DatabaseStorage implements IStorage {
 
   async getCompanies(): Promise<Company[]> {
     return await db.select().from(companies);
+  }
+
+  // Sales Representative methods
+  async getSalesRepresentative(id: number): Promise<SalesRepresentative | undefined> {
+    const [salesRep] = await db.select().from(salesRepresentatives).where(eq(salesRepresentatives.id, id));
+    return salesRep || undefined;
+  }
+
+  async createSalesRepresentative(salesRep: InsertSalesRepresentative): Promise<SalesRepresentative> {
+    const [newSalesRep] = await db
+      .insert(salesRepresentatives)
+      .values(salesRep)
+      .returning();
+    return newSalesRep;
+  }
+
+  async updateSalesRepresentative(id: number, salesRep: Partial<InsertSalesRepresentative>): Promise<SalesRepresentative | undefined> {
+    const [updatedSalesRep] = await db
+      .update(salesRepresentatives)
+      .set(salesRep)
+      .where(eq(salesRepresentatives.id, id))
+      .returning();
+    return updatedSalesRep || undefined;
+  }
+
+  async getSalesRepresentatives(): Promise<SalesRepresentative[]> {
+    return await db.select().from(salesRepresentatives);
+  }
+
+  async deleteSalesRepresentative(id: number): Promise<boolean> {
+    const result = await db
+      .delete(salesRepresentatives)
+      .where(eq(salesRepresentatives.id, id));
+    return (result.rowCount || 0) > 0;
   }
 
   // Customer methods

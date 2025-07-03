@@ -16,6 +16,18 @@ export const companies = pgTable("companies", {
   phone: text("phone"),
   email: text("email"),
   logo: text("logo"), // Base64 encoded image
+  registrationNumber: text("registration_number"),
+  taxNumber: text("tax_number"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const salesRepresentatives = pgTable("sales_representatives", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email"),
+  phone: text("phone"),
+  companyId: integer("company_id").references(() => companies.id),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -86,6 +98,14 @@ export const quotations = pgTable("quotations", {
 // Relations
 export const companiesRelations = relations(companies, ({ many }) => ({
   quotations: many(quotations),
+  salesRepresentatives: many(salesRepresentatives),
+}));
+
+export const salesRepresentativesRelations = relations(salesRepresentatives, ({ one }) => ({
+  company: one(companies, {
+    fields: [salesRepresentatives.companyId],
+    references: [companies.id],
+  }),
 }));
 
 export const customersRelations = relations(customers, ({ many }) => ({
@@ -117,6 +137,12 @@ export const insertUserSchema = createInsertSchema(users).pick({
   password: true,
 });
 
+export const insertSalesRepresentativeSchema = createInsertSchema(salesRepresentatives).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertCompanySchema = createInsertSchema(companies).omit({
   id: true,
   createdAt: true,
@@ -144,6 +170,9 @@ export const insertQuotationSchema = createInsertSchema(quotations).omit({
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
+
+export type InsertSalesRepresentative = z.infer<typeof insertSalesRepresentativeSchema>;
+export type SalesRepresentative = typeof salesRepresentatives.$inferSelect;
 
 export type InsertCompany = z.infer<typeof insertCompanySchema>;
 export type Company = typeof companies.$inferSelect;

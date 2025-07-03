@@ -125,6 +125,14 @@ Changelog:
   * Database schema for vehicle specifications with complete CRUD operations
   * Tabbed interface with specifications management and summary statistics
   * Full navigation integration between all system pages
+- July 03, 2025. Enhanced Data Management System:
+  * Added sales representatives management with company associations
+  * Enhanced company data with registration and tax numbers
+  * Created comprehensive data management page with three main tabs
+  * Simplified vehicle specifications form (make/model/year/engine + formatted specifications)
+  * Complete CRUD operations for sales representatives and companies
+  * Integrated filtering and statistics across all data types
+  * Full API endpoints for sales representatives management
 ```
 
 ## User Preferences

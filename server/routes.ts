@@ -3,7 +3,8 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { 
   insertCompanySchema, insertCustomerSchema, 
-  insertVehicleSchema, insertQuotationSchema 
+  insertVehicleSchema, insertQuotationSchema,
+  insertSalesRepresentativeSchema 
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -52,6 +53,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(company);
     } catch (error) {
       res.status(400).json({ error: "Invalid company data" });
+    }
+  });
+
+  // Sales Representative routes
+  app.get("/api/sales-representatives", async (req, res) => {
+    try {
+      const salesReps = await storage.getSalesRepresentatives();
+      res.json(salesReps);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch sales representatives" });
+    }
+  });
+
+  app.post("/api/sales-representatives", async (req, res) => {
+    try {
+      const validatedData = insertSalesRepresentativeSchema.parse(req.body);
+      const salesRep = await storage.createSalesRepresentative(validatedData);
+      res.json(salesRep);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create sales representative" });
+    }
+  });
+
+  app.put("/api/sales-representatives/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const validatedData = insertSalesRepresentativeSchema.partial().parse(req.body);
+      const salesRep = await storage.updateSalesRepresentative(id, validatedData);
+      if (!salesRep) {
+        return res.status(404).json({ error: "Sales representative not found" });
+      }
+      res.json(salesRep);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update sales representative" });
+    }
+  });
+
+  app.delete("/api/sales-representatives/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const deleted = await storage.deleteSalesRepresentative(id);
+      if (!deleted) {
+        return res.status(404).json({ error: "Sales representative not found" });
+      }
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete sales representative" });
     }
   });
 
