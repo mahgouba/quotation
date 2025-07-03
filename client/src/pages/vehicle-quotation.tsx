@@ -174,6 +174,8 @@ const VehicleQuotation = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+
+
   // Save quotation mutation
   const saveQuotationMutation = useMutation({
     mutationFn: async (quotationData: any) => {
@@ -207,31 +209,7 @@ const VehicleQuotation = () => {
     },
   });
 
-  // Helper functions for database specs
-  const getAvailableMakesFromDB = () => {
-    const makes = Array.from(new Set(databaseSpecs.map(spec => spec.make)));
-    return makes.length > 0 ? makes : carMakers;
-  };
-  
-  const getModelsForMakeFromDB = (make: string) => {
-    const models = databaseSpecs
-      .filter(spec => spec.make === make)
-      .map(spec => spec.model);
-    return Array.from(new Set(models));
-  };
-  
-  const getYearsForMakeAndModelFromDB = (make: string, model: string) => {
-    const years = databaseSpecs
-      .filter(spec => spec.make === make && spec.model === model)
-      .map(spec => spec.year);
-    return Array.from(new Set(years));
-  };
-  
-  const getSpecificationsFromDB = (make: string, model: string, year: number) => {
-    return databaseSpecs.find(spec => 
-      spec.make === make && spec.model === model && spec.year === year
-    );
-  };
+
 
   // Effects
   useEffect(() => {
@@ -313,9 +291,13 @@ const VehicleQuotation = () => {
     }));
     
     // Use database specs first, fallback to static data
-    const models = getModelsForMakeFromDB(maker);
-    if (models.length > 0) {
-      setAvailableModels(models);
+    const dbModels = Array.from(new Set(
+      databaseSpecs
+        .filter(spec => spec.make === maker)
+        .map(spec => spec.model)
+    ));
+    if (dbModels.length > 0) {
+      setAvailableModels(dbModels);
     } else {
       setAvailableModels(getModelsForMake(maker));
     }
@@ -333,9 +315,13 @@ const VehicleQuotation = () => {
     }));
     
     // Use database specs first, fallback to static data
-    const years = getYearsForMakeAndModelFromDB(formData.carMaker, model);
-    if (years.length > 0) {
-      setAvailableYears(years);
+    const dbYears = Array.from(new Set(
+      databaseSpecs
+        .filter(spec => spec.make === formData.carMaker && spec.model === model)
+        .map(spec => spec.year)
+    )).sort((a, b) => b - a);
+    if (dbYears.length > 0) {
+      setAvailableYears(dbYears);
     } else {
       setAvailableYears(getYearsForMakeAndModel(formData.carMaker, model));
     }
@@ -350,14 +336,19 @@ const VehicleQuotation = () => {
     }));
     
     // First try to get specifications from database
-    const dbSpecs = getSpecificationsFromDB(formData.carMaker, formData.carModel, parseInt(year));
+    const dbSpec = databaseSpecs.find(spec => 
+      spec.make === formData.carMaker && 
+      spec.model === formData.carModel && 
+      spec.year === parseInt(year)
+    );
     
-    if (dbSpecs) {
+    if (dbSpec) {
       // Use database specifications
-      setVehicleSpecs(dbSpecs);
+      setVehicleSpecs(dbSpec);
       setFormData(prev => ({
         ...prev,
-        specifications: dbSpecs.specifications
+        specifications: dbSpec.specifications || "",
+        detailedSpecs: dbSpec.specifications || ""
       }));
     } else {
       // Fallback to static specifications
@@ -922,9 +913,13 @@ const VehicleQuotation = () => {
                       <SelectValue placeholder="اختر الماركة" />
                     </SelectTrigger>
                     <SelectContent>
-                      {getAvailableMakesFromDB().map(maker => (
-                        <SelectItem key={maker} value={maker}>{maker}</SelectItem>
-                      ))}
+                      {(() => {
+                        const dbMakes = Array.from(new Set(databaseSpecs.map(spec => spec.make)));
+                        const makes = dbMakes.length > 0 ? dbMakes : carMakers;
+                        return makes.map((maker: string) => (
+                          <SelectItem key={maker} value={maker}>{maker}</SelectItem>
+                        ));
+                      })()}
                     </SelectContent>
                   </Select>
                 </div>
