@@ -88,7 +88,8 @@ export default function DataManagement() {
     phone: "",
     email: "",
     registrationNumber: "",
-    taxNumber: ""
+    taxNumber: "",
+    logo: ""
   });
 
   // Mutations
@@ -120,7 +121,7 @@ export default function DataManagement() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/companies'] });
-      setCompanyForm({ name: "", address: "", phone: "", email: "", registrationNumber: "", taxNumber: "" });
+      setCompanyForm({ name: "", address: "", phone: "", email: "", registrationNumber: "", taxNumber: "", logo: "" });
       toast({ title: "تم إضافة الشركة بنجاح" });
     },
   });
@@ -586,6 +587,35 @@ export default function DataManagement() {
                         />
                       </div>
                     </div>
+                    <div>
+                      <Label htmlFor="company-logo">شعار الشركة</Label>
+                      <Input
+                        id="company-logo"
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                              const result = e.target?.result as string;
+                              setCompanyForm({...companyForm, logo: result});
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                        className="mb-2"
+                      />
+                      {companyForm.logo && (
+                        <div className="mt-2">
+                          <img 
+                            src={companyForm.logo} 
+                            alt="معاينة الشعار" 
+                            className="w-20 h-20 object-contain border rounded"
+                          />
+                        </div>
+                      )}
+                    </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="registration-number">رقم السجل التجاري</Label>
@@ -645,6 +675,7 @@ export default function DataManagement() {
                   <Table>
                     <TableHeader>
                       <TableRow>
+                        <TableHead>الشعار</TableHead>
                         <TableHead>اسم الشركة</TableHead>
                         <TableHead>العنوان</TableHead>
                         <TableHead>الهاتف</TableHead>
@@ -657,6 +688,19 @@ export default function DataManagement() {
                     <TableBody>
                       {companies.map(company => (
                         <TableRow key={company.id}>
+                          <TableCell>
+                            {company.logo ? (
+                              <img 
+                                src={company.logo} 
+                                alt={`شعار ${company.name}`}
+                                className="w-8 h-8 object-contain rounded"
+                              />
+                            ) : (
+                              <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
+                                <Building className="w-4 h-4 text-gray-400" />
+                              </div>
+                            )}
+                          </TableCell>
                           <TableCell className="font-medium">{company.name}</TableCell>
                           <TableCell>{company.address || "غير محدد"}</TableCell>
                           <TableCell>{company.phone || "غير محدد"}</TableCell>

@@ -96,6 +96,16 @@ const VehicleQuotation = () => {
     }
   });
 
+  // Fetch companies from database
+  const { data: companies = [] } = useQuery<any[]>({
+    queryKey: ['/api/companies'],
+    queryFn: async () => {
+      const response = await fetch('/api/companies');
+      if (!response.ok) throw new Error('Failed to fetch companies');
+      return response.json();
+    }
+  });
+
   // State Management
   const [formData, setFormData] = useState({
     customerTitle: "السادة/ ",
@@ -126,6 +136,7 @@ const VehicleQuotation = () => {
     includesPlatesAndTax: false,
     totalPrice: 0,
     whatsappNumber: "",
+    selectedCompanyId: "",
     companyName: "اسم الشركة",
     companyAddress: "عنوان الشركة",
     companyPhone: "رقم هاتف الشركة",
@@ -233,6 +244,22 @@ const VehicleQuotation = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
     if (name !== 'carMaker') {
       validateField(name, value);
+    }
+  };
+
+  // Update company data when company is selected
+  const handleCompanyChange = (companyId: string) => {
+    const selectedCompany = companies.find(c => c.id === parseInt(companyId));
+    if (selectedCompany) {
+      setFormData(prev => ({
+        ...prev,
+        selectedCompanyId: companyId,
+        companyName: selectedCompany.name,
+        companyAddress: selectedCompany.address || "عنوان الشركة",
+        companyPhone: selectedCompany.phone || "رقم هاتف الشركة",
+        companyEmail: selectedCompany.email || "البريد الإلكتروني للشركة",
+        companyLogo: selectedCompany.logo || null
+      }));
     }
   };
 
@@ -679,6 +706,46 @@ const VehicleQuotation = () => {
                     placeholder="example@email.com"
                   />
                 </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">بيانات الشركة</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="selectedCompany">اختر الشركة *</Label>
+                  <Select value={formData.selectedCompanyId} onValueChange={handleCompanyChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="اختر الشركة" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {companies.map(company => (
+                        <SelectItem key={company.id} value={company.id.toString()}>
+                          <div className="flex items-center gap-2">
+                            {company.logo && (
+                              <img 
+                                src={company.logo} 
+                                alt={company.name}
+                                className="w-5 h-5 object-contain"
+                              />
+                            )}
+                            {company.name}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                {formData.selectedCompanyId && (
+                  <div className="p-3 bg-gray-50 rounded-lg text-sm">
+                    <p><strong>الشركة:</strong> {formData.companyName}</p>
+                    <p><strong>العنوان:</strong> {formData.companyAddress}</p>
+                    <p><strong>الهاتف:</strong> {formData.companyPhone}</p>
+                    <p><strong>البريد:</strong> {formData.companyEmail}</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
