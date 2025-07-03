@@ -36,7 +36,8 @@ export const vehicles = pgTable("vehicles", {
   model: text("model").notNull(),
   exteriorColor: text("exterior_color"),
   interiorColor: text("interior_color"),
-  specifications: text("specifications"),
+  specifications: text("specifications"), // User-added specifications
+  detailedSpecs: text("detailed_specs"), // Auto-generated detailed specifications
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -67,6 +68,10 @@ export const quotations = pgTable("quotations", {
   salesRepName: text("sales_rep_name"),
   salesRepPhone: text("sales_rep_phone"),
   salesRepEmail: text("sales_rep_email"),
+  
+  // Vehicle specifications
+  specifications: text("specifications"), // Additional specs input by user
+  detailedSpecs: text("detailed_specs"), // Complete vehicle specifications based on make/model/year
   
   // Images
   stampImage: text("stamp_image"), // Base64 encoded

@@ -266,8 +266,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         customerId = newCustomer.id;
       }
 
-      // Create vehicle
-      const newVehicle = await storage.createVehicle(vehicle);
+      // Create vehicle with detailed specifications
+      const newVehicle = await storage.createVehicle({
+        ...vehicle,
+        specifications: vehicle.specifications || null,
+        detailedSpecs: vehicle.detailedSpecs || null,
+      });
       const vehicleId = newVehicle.id;
 
       // Create or update company

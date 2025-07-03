@@ -109,6 +109,7 @@ const VehicleQuotation = () => {
     companyAddress: "عنوان الشركة",
     companyPhone: "رقم هاتف الشركة",
     companyEmail: "البريد الإلكتروني للشركة",
+    detailedSpecs: "",
     _display: { subTotal: 0, vat: 0 }
   });
 
@@ -237,9 +238,36 @@ const VehicleQuotation = () => {
 سعة الركاب: ${specs.specifications.seatingCapacity}
 سعة الشنطة: ${specs.specifications.trunkCapacity}`;
       
+      const detailedSpecsText = `المحرك: ${specs.specifications.engine}
+القوة: ${specs.specifications.horsepower}
+عزم الدوران: ${specs.specifications.torque}
+ناقل الحركة: ${specs.specifications.transmission}
+نوع الدفع: ${specs.specifications.driveType}
+نوع الوقود: ${specs.specifications.fuelType}
+سعة خزان الوقود: ${specs.specifications.fuelCapacity}
+استهلاك الوقود: ${specs.specifications.fuelConsumption}
+السرعة القصوى: ${specs.specifications.topSpeed}
+التسارع: ${specs.specifications.acceleration}
+
+الأبعاد:
+- الطول: ${specs.specifications.dimensions.length}
+- العرض: ${specs.specifications.dimensions.width}
+- الارتفاع: ${specs.specifications.dimensions.height}
+- قاعدة العجلات: ${specs.specifications.dimensions.wheelbase}
+
+الوزن: ${specs.specifications.weight}
+عدد المقاعد: ${specs.specifications.seatingCapacity}
+سعة الصندوق: ${specs.specifications.trunkCapacity}
+
+ميزات السلامة: ${specs.specifications.safetyFeatures.join(', ')}
+المميزات التقنية: ${specs.specifications.techFeatures.join(', ')}
+المظهر الخارجي: ${specs.specifications.exteriorFeatures.join(', ')}
+المظهر الداخلي: ${specs.specifications.interiorFeatures.join(', ')}`;
+      
       setFormData(prev => ({
         ...prev,
-        specifications: specsText
+        specifications: specsText,
+        detailedSpecs: detailedSpecsText
       }));
     }
   };
@@ -320,6 +348,7 @@ const VehicleQuotation = () => {
         exteriorColor: formData.exteriorColor || null,
         interiorColor: formData.interiorColor || null,
         specifications: formData.specifications || null,
+        detailedSpecs: formData.detailedSpecs || null,
       },
       company: {
         name: formData.companyName,
@@ -641,6 +670,17 @@ const VehicleQuotation = () => {
                       ))}
                     </SelectContent>
                   </Select>
+                </div>
+                <div className="md:col-span-2">
+                  <Label htmlFor="detailedSpecs">المواصفات التفصيلية</Label>
+                  <Textarea
+                    id="detailedSpecs"
+                    value={formData.detailedSpecs}
+                    placeholder="ستظهر المواصفات التفصيلية تلقائياً عند اختيار الماركة والموديل وسنة الصنع"
+                    rows={15}
+                    readOnly
+                    className="text-sm leading-relaxed bg-gray-50 border-gray-200"
+                  />
                 </div>
                 <div>
                   <Label htmlFor="quantity">الكمية</Label>
