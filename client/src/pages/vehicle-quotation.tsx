@@ -19,20 +19,53 @@ import {
   Printer,
   FileDown,
   MessageCircle,
-  Save
+  Save,
+  QrCode,
+  Edit
 } from "lucide-react";
 
 // SVG Icons
-const FaWhatsapp = () => (
-  <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+const FaWhatsapp = ({ className }: { className?: string }) => (
+  <svg className={className} stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
     <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.8 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.5-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6z"/>
+  </svg>
+);
+
+const FaPrint = ({ className }: { className?: string }) => (
+  <svg className={className} stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+    <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+    <path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5z"/>
+  </svg>
+);
+
+const FaFilePdf = ({ className }: { className?: string }) => (
+  <svg className={className} stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+    <path d="M128 0C92.7 0 64 28.7 64 64v384c0 35.3 28.7 64 64 64h256c35.3 0 64-28.7 64-64V160H256c-17.7 0-32-14.3-32-32V0H128zM384 0V128h128L384 0z"/>
+  </svg>
+);
+
+const FaSave = ({ className }: { className?: string }) => (
+  <svg className={className} stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+    <path d="M433.941 129.941l-83.882-83.882A48 48 0 0 0 316.118 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V163.882a48 48 0 0 0-14.059-33.941z"/>
+  </svg>
+);
+
+const FaEdit = ({ className }: { className?: string }) => (
+  <svg className={className} stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+    <path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9z"/>
+  </svg>
+);
+
+const FaUpload = ({ className }: { className?: string }) => (
+  <svg className={className} stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+    <path d="M296 384h-80c-13.3 0-24-10.7-24-24V192h-87.7c-17.8 0-26.7-21.5-14.1-34.1L242.3 5.7c7.5-7.5 19.8-7.5 27.3 0l152.2 152.2c12.6 12.6 3.7 34.1-14.1 34.1H320v168c0 13.3-10.7 24-24 24z"/>
   </svg>
 );
 
 const VehicleQuotation = () => {
   // Static Data
   const carMakers = ["Toyota", "Honda", "Ford", "BMW", "Mercedes", "Audi"];
-  const carModelsByMaker = {
+  const carModelsByMaker: { [key: string]: string[] } = {
     Toyota: ["Camry", "Corolla", "Land Cruiser", "Hilux", "RAV4"],
     Honda: ["Accord", "Civic", "CR-V", "Pilot"],
     Ford: ["Mustang", "F-150", "Explorer", "Focus"],
@@ -64,8 +97,8 @@ const VehicleQuotation = () => {
     salesRepName: "",
     salesRepPhone: "",
     salesRepEmail: "",
-    stampImage: null,
-    signatureImage: null,
+    stampImage: null as string | null,
+    signatureImage: null as string | null,
     isWarrantied: false,
     isRiyadhDelivery: false,
     includesPlatesAndTax: false,
@@ -73,16 +106,16 @@ const VehicleQuotation = () => {
     _display: { subTotal: 0, vat: 0 }
   });
 
-  const [availableModels, setAvailableModels] = useState([]);
-  const [errors, setErrors] = useState({});
+  const [availableModels, setAvailableModels] = useState<string[]>([]);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   // Effects
   useEffect(() => {
     const calculateTotal = () => {
-      const basePriceInput = parseFloat(formData.basePrice) || 0;
-      const quantity = parseInt(formData.quantity) || 1;
-      const platePrice = parseFloat(formData.platePrice) || 0;
-      const vatRate = parseFloat(formData.vatRate) || 15;
+      const basePriceInput = parseFloat(String(formData.basePrice)) || 0;
+      const quantity = parseInt(String(formData.quantity)) || 1;
+      const platePrice = parseFloat(String(formData.platePrice)) || 0;
+      const vatRate = parseFloat(String(formData.vatRate)) || 15;
 
       let priceBeforeTax = basePriceInput;
 
@@ -104,14 +137,14 @@ const VehicleQuotation = () => {
   }, [formData.basePrice, formData.quantity, formData.platePrice, formData.includesPlatesAndTax, formData.vatRate]);
 
   // Handlers
-  const handleInputChange = (name, value) => {
+  const handleInputChange = (name: string, value: any) => {
     setFormData(prev => ({ ...prev, [name]: value }));
     if (name !== 'carMaker') {
       validateField(name, value);
     }
   };
 
-  const handleMakerChange = (maker) => {
+  const handleMakerChange = (maker: string) => {
     setFormData(prev => ({
       ...prev,
       carMaker: maker,
@@ -120,7 +153,7 @@ const VehicleQuotation = () => {
     setAvailableModels(carModelsByMaker[maker] || []);
   };
 
-  const validateField = (name, value) => {
+  const validateField = (name: string, value: any) => {
     let newErrors = { ...errors };
     if (String(value).trim() === "") {
       newErrors[name] = "هذا الحقل مطلوب";
@@ -130,12 +163,12 @@ const VehicleQuotation = () => {
     setErrors(newErrors);
   };
 
-  const handleFileUpload = (event, type) => {
-    const file = event.target.files[0];
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>, type: string) => {
+    const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData(prev => ({ ...prev, [type]: reader.result }));
+        setFormData(prev => ({ ...prev, [type]: reader.result as string }));
       };
       reader.readAsDataURL(file);
     }
@@ -147,21 +180,21 @@ const VehicleQuotation = () => {
   const handleSave = () => console.log("Saving data:", formData);
 
   const handleExportPDF = () => {
-    if (typeof window.jspdf === 'undefined' || typeof window.html2canvas === 'undefined') {
+    if (typeof (window as any).jspdf === 'undefined' || typeof (window as any).html2canvas === 'undefined') {
       console.error("PDF generation libraries not loaded!");
       return;
     }
-    const { jsPDF } = window.jspdf;
-    const html2canvas = window.html2canvas;
+    const { jsPDF } = (window as any).jspdf;
+    const html2canvas = (window as any).html2canvas;
 
     const input = document.getElementById('quotation-sheet');
     if (!input) return;
 
     const elementsToHide = input.querySelectorAll('.print-hidden');
-    elementsToHide.forEach(el => el.style.visibility = 'hidden');
+    elementsToHide.forEach((el: any) => el.style.visibility = 'hidden');
 
     html2canvas(input, { scale: 2, useCORS: true, logging: false })
-      .then((canvas) => {
+      .then((canvas: any) => {
         const imgData = canvas.toDataURL('image/png');
         const pdf = new jsPDF('p', 'mm', 'a4');
         const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -178,10 +211,10 @@ const VehicleQuotation = () => {
         pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
         pdf.save(`quotation-${formData.customerName || 'quote'}.pdf`);
         
-        elementsToHide.forEach(el => el.style.visibility = 'visible');
-      }).catch(err => {
+        elementsToHide.forEach((el: any) => el.style.visibility = 'visible');
+      }).catch((err: any) => {
         console.error("PDF generation failed:", err);
-        elementsToHide.forEach(el => el.style.visibility = 'visible');
+        elementsToHide.forEach((el: any) => el.style.visibility = 'visible');
       });
   };
 
@@ -192,9 +225,9 @@ const VehicleQuotation = () => {
   };
 
   // Arabic Number to Words
-  const numberToArabicWords = (number) => {
+  const numberToArabicWords = (number: number | null) => {
     if (number === null || isNaN(number)) return "";
-    let num = parseInt(number, 10);
+    let num = parseInt(String(number), 10);
     if (num === 0) return "صفر ريال سعودي فقط لا غير";
 
     const ones = ["", "واحد", "اثنان", "ثلاثة", "أربعة", "خمسة", "ستة", "سبعة", "ثمانية", "تسعة"];
@@ -242,47 +275,40 @@ const VehicleQuotation = () => {
 
   return (
     <div className="bg-background min-h-screen" dir="rtl">
-      {/* Header */}
-      <header className="bg-card shadow-md print-hidden">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4 space-x-reverse">
-              <div className="bg-primary text-white p-3 rounded-lg">
-                <Car className="h-8 w-8" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">نظام عروض الأسعار للمركبات</h1>
-                <p className="text-muted-foreground">إنشاء وإدارة عروض أسعار المركبات</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3 space-x-reverse">
-              <Button onClick={handleSave} className="accent-green text-white">
-                <Save className="mr-2 h-4 w-4" />
-                حفظ
-              </Button>
-              <Button onClick={handleExportPDF} className="bg-primary text-white">
-                <FileDown className="mr-2 h-4 w-4" />
-                تصدير PDF
-              </Button>
-            </div>
+      {/* Action Buttons Section */}
+      <div className="no-print bg-card shadow-md mb-6">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex justify-center items-center space-x-4 space-x-reverse">
+            <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700 text-white">
+              <FaSave className="ml-2" />
+              <span>حفظ</span>
+            </Button>
+            <Button onClick={handleExportPDF} className="bg-red-600 hover:bg-red-700 text-white">
+              <FaFilePdf className="ml-2" />
+              <span>تصدير PDF</span>
+            </Button>
+            <Button onClick={handlePrint} className="bg-blue-600 hover:bg-blue-700 text-white">
+              <FaPrint className="ml-2" />
+              <span>طباعة</span>
+            </Button>
+            <Button onClick={handleWhatsAppShare} className="bg-green-500 hover:bg-green-600 text-white">
+              <FaWhatsapp className="ml-2" />
+              <span>واتساب</span>
+            </Button>
           </div>
         </div>
-      </header>
+      </div>
 
-      <div className="container mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Form Section */}
-          <div className="lg:col-span-2 space-y-6">
-            
-            {/* Customer Information */}
+      {/* A4 Quotation Sheet */}
+      <div className="container mx-auto px-4 pb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left Column - Form Controls */}
+          <div className="no-print space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center">
-                  <User className="mr-3 h-5 w-5 text-primary" />
-                  بيانات العميل
-                </CardTitle>
+                <CardTitle className="text-lg">بيانات العميل</CardTitle>
               </CardHeader>
-              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <CardContent className="space-y-4">
                 <div>
                   <Label htmlFor="customerTitle">اللقب</Label>
                   <Select value={formData.customerTitle} onValueChange={(value) => handleInputChange('customerTitle', value)}>
@@ -331,15 +357,11 @@ const VehicleQuotation = () => {
               </CardContent>
             </Card>
 
-            {/* Vehicle Information */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Car className="mr-3 h-5 w-5 text-primary" />
-                  بيانات المركبة
-                </CardTitle>
+                <CardTitle className="text-lg">بيانات المركبة</CardTitle>
               </CardHeader>
-              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <CardContent className="space-y-4">
                 <div>
                   <Label htmlFor="carMaker">ماركة السيارة *</Label>
                   <Select value={formData.carMaker} onValueChange={handleMakerChange}>
@@ -653,8 +675,8 @@ const VehicleQuotation = () => {
                       تصدير PDF
                     </Button>
                     <Button onClick={handleWhatsAppShare} className="w-full bg-green-500 hover:bg-green-600 text-white print-hidden">
-                      <FaWhatsapp className="mr-2 h-4 w-4" />
-                      مشاركة واتساب
+                      <FaWhatsapp />
+                      <span className="mr-2">مشاركة واتساب</span>
                     </Button>
                   </div>
                 </div>
