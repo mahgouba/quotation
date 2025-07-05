@@ -568,6 +568,144 @@ export class PDFTemplateEngine {
     }
   }
 
+  private addModernHeader(data: any) {
+    // Add black background header
+    this.doc.setFillColor(0, 0, 0);
+    this.doc.rect(0, 0, this.pageWidth, 60, 'F');
+    
+    // Add company logo on left
+    if (data.companyLogo) {
+      try {
+        this.doc.addImage(data.companyLogo, 'JPEG', 15, 10, 40, 40);
+      } catch (error) {
+        console.warn('Could not add logo to PDF');
+      }
+    }
+    
+    // Add header text in white/gold
+    this.doc.setTextColor(255, 215, 0); // Gold color
+    this.doc.setFontSize(16);
+    this.doc.text('عرض سعر', this.pageWidth - 20, 20, { align: 'right' });
+    
+    this.doc.setFontSize(12);
+    this.doc.text('الرقم الضريبي', this.pageWidth - 20, 35, { align: 'right' });
+    
+    // Add date
+    const currentDate = new Date().toLocaleDateString('ar-SA');
+    this.doc.setTextColor(255, 255, 255);
+    this.doc.text(`التاريخ: ${currentDate}`, this.pageWidth - 20, 50, { align: 'right' });
+    
+    this.currentY = 70;
+  }
+
+  private addCustomerVehicleSection(data: any) {
+    // Customer details section
+    this.doc.setFillColor(240, 240, 240);
+    this.doc.rect(this.pageWidth/2 + 5, this.currentY, this.pageWidth/2 - 15, 60, 'F');
+    
+    this.doc.setTextColor(0, 0, 0);
+    this.doc.setFontSize(12);
+    this.doc.text('بيانات العميل', this.pageWidth - 20, this.currentY + 15, { align: 'right' });
+    
+    this.doc.setFontSize(10);
+    this.doc.text(`الاسم: ${data.customerName || 'غير محدد'}`, this.pageWidth - 20, this.currentY + 30, { align: 'right' });
+    this.doc.text(`الهاتف: ${data.customerPhone || 'غير محدد'}`, this.pageWidth - 20, this.currentY + 40, { align: 'right' });
+    this.doc.text(`البريد: ${data.customerEmail || 'غير محدد'}`, this.pageWidth - 20, this.currentY + 50, { align: 'right' });
+    
+    // Vehicle details section
+    this.doc.setFillColor(240, 240, 240);
+    this.doc.rect(10, this.currentY, this.pageWidth/2 - 15, 60, 'F');
+    
+    this.doc.setFontSize(12);
+    this.doc.text('بيانات المركبة', this.pageWidth/2 - 20, this.currentY + 15, { align: 'right' });
+    
+    this.doc.setFontSize(10);
+    this.doc.text(`الماركة: ${data.carMaker || 'غير محدد'}`, this.pageWidth/2 - 20, this.currentY + 30, { align: 'right' });
+    this.doc.text(`الموديل: ${data.carModel || 'غير محدد'}`, this.pageWidth/2 - 20, this.currentY + 40, { align: 'right' });
+    this.doc.text(`السنة: ${data.carYear || 'غير محدد'}`, this.pageWidth/2 - 20, this.currentY + 50, { align: 'right' });
+    
+    this.currentY += 80;
+  }
+
+  private addCompanyLogoWatermark(data: any) {
+    // Add large company logo as watermark in center
+    if (data.companyLogo) {
+      try {
+        this.doc.addImage(data.companyLogo, 'JPEG', this.pageWidth/2 - 50, this.currentY, 100, 100);
+      } catch (error) {
+        console.warn('Could not add watermark logo to PDF');
+      }
+    }
+    
+    this.currentY += 120;
+  }
+
+  private addPricingSummaryBox(data: any) {
+    // Add pricing summary with modern design
+    this.doc.setFillColor(255, 255, 255);
+    this.doc.rect(10, this.currentY, this.pageWidth - 20, 80, 'F');
+    this.doc.setDrawColor(0, 0, 0);
+    this.doc.rect(10, this.currentY, this.pageWidth - 20, 80, 'S');
+    
+    this.doc.setTextColor(0, 0, 0);
+    this.doc.setFontSize(12);
+    this.doc.text('ملخص العرض', this.pageWidth - 20, this.currentY + 15, { align: 'right' });
+    
+    // Calculate prices
+    const basePrice = parseFloat(data.basePrice || '0');
+    const platePrice = parseFloat(data.platePrice || '0');
+    const tax = basePrice * 0.15;
+    const total = basePrice + tax + platePrice;
+    
+    this.doc.setFontSize(10);
+    this.doc.text(`تفاصيل السعر:`, this.pageWidth - 20, this.currentY + 30, { align: 'right' });
+    this.doc.text(`السعر الأساسي: ${basePrice.toLocaleString()} ريال`, this.pageWidth - 20, this.currentY + 40, { align: 'right' });
+    this.doc.text(`الضريبة (%15): ${tax.toLocaleString()} ريال`, this.pageWidth - 20, this.currentY + 50, { align: 'right' });
+    this.doc.text(`اللوحات والاستمارة: ${platePrice.toLocaleString()} ريال`, this.pageWidth - 20, this.currentY + 60, { align: 'right' });
+    
+    // Total in gold
+    this.doc.setTextColor(255, 215, 0);
+    this.doc.setFontSize(12);
+    this.doc.text(`الإجمالي النهائي: ${total.toLocaleString()} ريال`, this.pageWidth - 20, this.currentY + 70, { align: 'right' });
+    
+    this.currentY += 100;
+  }
+
+  private addQRCodeAndContact(data: any) {
+    // Add QR code on the left
+    const qrCodeSize = 40;
+    this.doc.setFillColor(200, 200, 200);
+    this.doc.rect(15, this.currentY, qrCodeSize, qrCodeSize, 'F');
+    
+    this.doc.setTextColor(0, 0, 0);
+    this.doc.setFontSize(8);
+    this.doc.text('QR Code', 15 + qrCodeSize/2, this.currentY + qrCodeSize + 10, { align: 'center' });
+    
+    // Add contact information
+    this.doc.setFontSize(10);
+    this.doc.text('للاستفسار:', this.pageWidth - 20, this.currentY + 10, { align: 'right' });
+    this.doc.text(`${data.salesRepName || 'غير محدد'}`, this.pageWidth - 20, this.currentY + 20, { align: 'right' });
+    this.doc.text(`${data.salesRepPhone || 'غير محدد'}`, this.pageWidth - 20, this.currentY + 30, { align: 'right' });
+    
+    this.currentY += 60;
+  }
+
+  private addModernFooter(data: any) {
+    // Add black footer
+    this.doc.setFillColor(0, 0, 0);
+    this.doc.rect(0, this.pageHeight - 40, this.pageWidth, 40, 'F');
+    
+    // Add company name in gold
+    this.doc.setTextColor(255, 215, 0);
+    this.doc.setFontSize(14);
+    this.doc.text(data.companyName || 'اسم الشركة', this.pageWidth/2, this.pageHeight - 20, { align: 'center' });
+    
+    // Add company details in white
+    this.doc.setTextColor(255, 255, 255);
+    this.doc.setFontSize(8);
+    this.doc.text(`${data.companyAddress || ''} | ${data.companyPhone || ''} | ${data.companyEmail || ''}`, this.pageWidth/2, this.pageHeight - 10, { align: 'center' });
+  }
+
   private addFooter(data: any) {
     const footerY = this.pageHeight - 60;
     
@@ -631,32 +769,23 @@ export class PDFTemplateEngine {
   }
 
   public generatePDF(data: any): jsPDF {
-    // Add header with dates
-    this.addCustomHeader(data);
+    // Add modern header with company branding
+    this.addModernHeader(data);
     
-    // Add company logo and quotation number
-    this.addLogoAndQuotationNumber(data);
+    // Add customer and vehicle info section
+    this.addCustomerVehicleSection(data);
     
-    // Add customer greeting
-    this.addCustomerGreeting(data);
+    // Add company logo watermark
+    this.addCompanyLogoWatermark(data);
     
-    // Add vehicle details in custom format
-    this.addVehicleDetailsCustom(data);
+    // Add pricing summary box
+    this.addPricingSummaryBox(data);
     
-    // Add vehicle specifications paragraph
-    this.addVehicleSpecificationsParagraph(data);
+    // Add QR code and contact info
+    this.addQRCodeAndContact(data);
     
-    // Add pricing table in custom format
-    this.addCustomPricingTable(data);
-    
-    // Add total in words
-    this.addTotalInWords(data);
-    
-    // Add terms and conditions
-    this.addTermsAndConditions(data);
-    
-    // Add company signature
-    this.addCompanySignature(data);
+    // Add footer with company details
+    this.addModernFooter(data);
     
     return this.doc;
   }
