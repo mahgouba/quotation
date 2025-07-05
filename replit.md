@@ -393,6 +393,17 @@ Changelog:
   * Added company logo as watermark in background of entire PDF page
   * Watermark positioned in center with 200x200 size and 8% opacity for subtle effect
   * Enhanced professional appearance with prominent branding throughout document
+- July 05, 2025. Font Size Enhancement Throughout PDF:
+  * Increased header "عرض سعر" text from 18pt to 24pt for better visibility
+  * Enlarged company name from 32pt to 40pt for maximum prominence
+  * Enhanced date and quotation number fonts from 10pt to 14pt
+  * Increased greeting section font from 12pt to 16pt with adjusted height
+  * Enlarged customer and vehicle data titles from 11pt to 14pt, content from 9pt to 12pt
+  * Enhanced specifications section title from 12pt to 16pt, content from 10pt to 13pt
+  * Increased pricing summary title from 12pt to 16pt, table content from 10pt to 13pt
+  * Enlarged amount in words from 11pt to 14pt for better readability
+  * Enhanced signature section title from 10pt to 14pt, signature text from 8pt to 12pt
+  * Professional document with consistently larger, more readable fonts throughout
 ```
 
 ## User Preferences
