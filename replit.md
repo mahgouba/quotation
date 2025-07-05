@@ -226,6 +226,12 @@ Changelog:
   * Right column: Sales representative information (name, phone, email)
   * Left column: Price summary with QR code and signature area (expanded width)
   * Improved spacing with wider sections for better content display
+- July 05, 2025. Removed Duplicate Data and Cleaned PDF Layout:
+  * Removed duplicate terms and conditions section from middle of PDF
+  * Eliminated redundant price summary in bottom section (kept detailed price table)
+  * Simplified bottom left section to focus on QR code and signature only
+  * Cleaner, more professional PDF layout without repetitive information
+  * Improved readability with better section organization
 ```
 
 ## User Preferences

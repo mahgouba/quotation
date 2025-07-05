@@ -204,26 +204,7 @@ export function generateQuotationPDF(data: any): jsPDF {
   doc.setFontSize(11);
   doc.text(`المبلغ كتابة: ${total.toLocaleString()} ريال سعودي فقط لا غير`, pageWidth - 25, tableY + 12, { align: 'right' });
   
-  currentY += 90;
-  
-  // Terms and conditions from company data
-  doc.setFontSize(9);
-  doc.setTextColor(0, 0, 0);
-  
-  const termsText = data.companyTerms || 
-    '• يجب على العميل دفع مقدم بنسبة 50% من إجمالي السعر\n• الباقي يُدفع عند استلام المركبة\n• مدة التسليم: 2-4 أسابيع من تاريخ تأكيد الطلب\n• ضمان الوكيل لمدة 3 سنوات أو 100,000 كم أيهما أقل\n• العرض لا يشمل التأمين ورسوم النقل\n• الشركة غير مسؤولة عن التأخير الناجم عن ظروف خارجة عن إرادتها';
-  
-  doc.text('الشروط والأحكام:', pageWidth - 25, currentY, { align: 'right' });
-  currentY += 8;
-  
-  const terms = termsText.split('\n').filter((term: string) => term.trim());
-  
-  terms.forEach((term: string) => {
-    doc.text(term, pageWidth - 25, currentY, { align: 'right' });
-    currentY += 6;
-  });
-  
-  currentY += 10;
+  currentY += 30;
   
   // Two-column bottom section: Rep Info, QR Code & Price Summary
   const bottomY = currentY;
@@ -246,7 +227,7 @@ export function generateQuotationPDF(data: any): jsPDF {
   doc.text(`الهاتف: ${data.salesRepPhone || 'غير محدد'}`, repX + sectionWidth - 5, bottomY + 26, { align: 'right' });
   doc.text(`البريد: ${data.salesRepEmail || 'غير محدد'}`, repX + sectionWidth - 5, bottomY + 34, { align: 'right' });
   
-  // QR Code and Price Summary (left section)
+  // QR Code and Signature (left section)
   doc.setFillColor(240, 245, 255);
   doc.rect(margin, bottomY, sectionWidth, 50, 'F');
   doc.setDrawColor(...darkTeal);
@@ -255,31 +236,21 @@ export function generateQuotationPDF(data: any): jsPDF {
   // Section title
   doc.setTextColor(...darkTeal);
   doc.setFontSize(10);
-  doc.text('ملخص العرض', margin + sectionWidth - 5, bottomY + 10, { align: 'right' });
+  doc.text('QR Code والتوقيع', margin + sectionWidth - 5, bottomY + 10, { align: 'right' });
   
-  // QR Code placeholder (smaller)
+  // QR Code placeholder (larger)
   doc.setFillColor(255, 255, 255);
-  doc.rect(margin + 5, bottomY + 15, 20, 20, 'F');
+  doc.rect(margin + 10, bottomY + 15, 30, 30, 'F');
   doc.setDrawColor(200, 200, 200);
-  doc.rect(margin + 5, bottomY + 15, 20, 20, 'S');
+  doc.rect(margin + 10, bottomY + 15, 30, 30, 'S');
   doc.setTextColor(100, 100, 100);
-  doc.setFontSize(6);
-  doc.text('QR', margin + 15, bottomY + 26, { align: 'center' });
-  
-  // Price summary next to QR
-  doc.setTextColor(0, 0, 0);
   doc.setFontSize(8);
-  const basePriceSummary = parseFloat(data.basePrice) || 0;
-  const quantitySummary = parseInt(data.quantity) || 1;
-  const totalSummary = basePriceSummary * quantitySummary;
-  
-  doc.text(`السعر: ${basePriceSummary.toLocaleString()} ريال`, margin + sectionWidth - 5, bottomY + 18, { align: 'right' });
-  doc.text(`الكمية: ${quantitySummary}`, margin + sectionWidth - 5, bottomY + 26, { align: 'right' });
-  doc.text(`المجموع: ${totalSummary.toLocaleString()} ريال`, margin + sectionWidth - 5, bottomY + 34, { align: 'right' });
+  doc.text('QR Code', margin + 25, bottomY + 32, { align: 'center' });
   
   // Signature area
-  doc.setFontSize(7);
-  doc.text('ختم وتوقيع الشركة', margin + sectionWidth/2, bottomY + 44, { align: 'center' });
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(8);
+  doc.text('ختم وتوقيع الشركة', margin + sectionWidth - 5, bottomY + 35, { align: 'right' });
   
   // Footer with Gold background
   doc.setFillColor(...gold);
