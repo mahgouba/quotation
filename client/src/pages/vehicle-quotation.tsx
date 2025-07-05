@@ -5,7 +5,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
 import { getVehicleSpecifications, getAvailableMakes, getModelsForMake, getYearsForMakeAndModel } from "@/data/vehicle-specifications";
-import { generateCustomPDF, defaultTemplates, type PDFTemplate } from "@/lib/pdf-templates";
+import { generateQuotationPDF } from "@/lib/pdf-generator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -166,7 +166,7 @@ const VehicleQuotation = () => {
   const [availableYears, setAvailableYears] = useState<number[]>([]);
   const [vehicleSpecs, setVehicleSpecs] = useState<any>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const selectedTemplate = defaultTemplates[0];
+
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -541,15 +541,15 @@ const VehicleQuotation = () => {
         salesRepEmail: formData.salesRepEmail,
       };
 
-      // Generate PDF using advanced templating
-      const pdf = generateCustomPDF(pdfData, selectedTemplate.id);
+      // Generate PDF using simplified generator
+      const pdf = generateQuotationPDF(pdfData);
       
       // Save the PDF
-      pdf.save(`quotation-${formData.customerName || 'quote'}-${selectedTemplate.name}.pdf`);
+      pdf.save(`quotation-${formData.customerName || 'quote'}.pdf`);
       
       toast({
         title: "تم تصدير PDF بنجاح",
-        description: `تم استخدام قالب: ${selectedTemplate.name}`,
+        description: "تم إنشاء عرض السعر بنجاح",
       });
     } catch (error) {
       console.error("PDF generation failed:", error);
@@ -568,7 +568,7 @@ const VehicleQuotation = () => {
       
       toast({
         title: "معاينة PDF",
-        description: `تم عرض القالب: ${selectedTemplate.name}`,
+        description: "تم إنشاء معاينة PDF",
       });
     } catch (error) {
       console.error("PDF preview failed:", error);
