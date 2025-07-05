@@ -43,10 +43,10 @@ export function generateQuotationPDF(data: any): jsPDF {
   doc.setFillColor(...darkTeal);
   doc.rect(0, 0, pageWidth, 110, 'F');
   
-  // Company logo on right (Arabic RTL) - Made 3x larger
+  // Company logo on right (Arabic RTL) - Made even larger
   if (data.companyLogo) {
     try {
-      doc.addImage(data.companyLogo, 'JPEG', pageWidth - 165, 3, 150, 102);
+      doc.addImage(data.companyLogo, 'JPEG', pageWidth - 180, 3, 200, 136);
     } catch (error) {
       console.warn('Could not add logo to PDF');
     }
@@ -71,6 +71,22 @@ export function generateQuotationPDF(data: any): jsPDF {
   doc.text(`رقم العرض: ${quotationNumber}`, 8, 95);
   
   currentY = 115;
+  
+  // Add company logo as watermark in background
+  if (data.companyLogo) {
+    try {
+      // Semi-transparent watermark in center of page
+      const watermarkX = pageWidth / 2 - 100;
+      const watermarkY = pageHeight / 2 - 100;
+      
+      // Add watermark with reduced opacity
+      doc.setGState(doc.GState({opacity: 0.08}));
+      doc.addImage(data.companyLogo, 'JPEG', watermarkX, watermarkY, 200, 200);
+      doc.setGState(doc.GState({opacity: 1}));
+    } catch (error) {
+      console.warn('Could not add watermark logo to PDF');
+    }
+  }
   
   // Greeting section - reduced margins
   doc.setFillColor(250, 250, 250);
