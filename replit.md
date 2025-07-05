@@ -282,6 +282,12 @@ Changelog:
   * Enhanced PDF generation to include database terms with proper Arabic formatting
   * Complete integration allowing terms modification through data management interface
   * Fallback to default terms if database is empty for system reliability
+- July 05, 2025. Terms Management Interface Removal:
+  * Removed terms and conditions management tab from data administration interface
+  * Simplified data management to focus on core business entities (vehicles, representatives, companies)
+  * Terms and conditions remain functional through database integration but no longer user-editable
+  * Cleaner admin interface with 3-column layout instead of 4-column
+  * Terms data persists in database and continues to display in quotations automatically
 ```
 
 ## User Preferences

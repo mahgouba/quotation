@@ -446,7 +446,7 @@ export default function DataManagement() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="vehicles" className="flex items-center gap-2">
               <Car className="w-4 h-4" />
               مواصفات المركبات
@@ -458,10 +458,6 @@ export default function DataManagement() {
             <TabsTrigger value="companies" className="flex items-center gap-2">
               <Building className="w-4 h-4" />
               الشركات
-            </TabsTrigger>
-            <TabsTrigger value="terms" className="flex items-center gap-2">
-              <FileText className="w-4 h-4" />
-              الشروط والأحكام
             </TabsTrigger>
           </TabsList>
 
@@ -1267,142 +1263,7 @@ export default function DataManagement() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="terms" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Add Terms Form */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    {editingTerms ? (
-                      <>
-                        <Edit className="w-5 h-5" />
-                        تعديل الشرط
-                      </>
-                    ) : (
-                      <>
-                        <Plus className="w-5 h-5" />
-                        إضافة شرط جديد
-                      </>
-                    )}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label htmlFor="title">العنوان</Label>
-                    <Input
-                      id="title"
-                      value={termsForm.title}
-                      onChange={(e) => setTermsForm(prev => ({ ...prev, title: e.target.value }))}
-                      placeholder="عنوان الشرط"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="content">المحتوى</Label>
-                    <Textarea
-                      id="content"
-                      value={termsForm.content}
-                      onChange={(e) => setTermsForm(prev => ({ ...prev, content: e.target.value }))}
-                      placeholder="محتوى الشرط"
-                      rows={6}
-                    />
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      id="isActive"
-                      checked={termsForm.isActive}
-                      onChange={(e) => setTermsForm(prev => ({ ...prev, isActive: e.target.checked }))}
-                    />
-                    <Label htmlFor="isActive">فعال</Label>
-                  </div>
-                  <div>
-                    <Label htmlFor="displayOrder">ترتيب العرض</Label>
-                    <Input
-                      id="displayOrder"
-                      type="number"
-                      value={termsForm.displayOrder}
-                      onChange={(e) => setTermsForm(prev => ({ ...prev, displayOrder: parseInt(e.target.value) || 0 }))}
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="flex gap-2">
-                    <Button 
-                      onClick={handleTermsSubmit}
-                      disabled={!termsForm.title || !termsForm.content}
-                    >
-                      {editingTerms ? "تحديث" : "إضافة"}
-                    </Button>
-                    {editingTerms && (
-                      <Button 
-                        variant="outline" 
-                        onClick={() => {
-                          setEditingTerms(null);
-                          setTermsForm({ title: "", content: "", isActive: true, displayOrder: 0 });
-                        }}
-                      >
-                        إلغاء
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
 
-              {/* Terms List */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="w-5 h-5" />
-                    قائمة الشروط والأحكام ({termsAndConditions.length})
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4 max-h-96 overflow-y-auto">
-                    {termsAndConditions.map((terms) => (
-                      <div key={terms.id} className="p-4 border rounded-lg">
-                        <div className="flex justify-between items-start mb-2">
-                          <h4 className="font-semibold">{terms.title}</h4>
-                          <div className="flex gap-2">
-                            {terms.isActive ? (
-                              <Badge className="bg-green-100 text-green-800">فعال</Badge>
-                            ) : (
-                              <Badge variant="outline">غير فعال</Badge>
-                            )}
-                            <Badge variant="outline">#{terms.displayOrder}</Badge>
-                          </div>
-                        </div>
-                        <p className="text-sm text-gray-600 mb-3 line-clamp-2">{terms.content}</p>
-                        <div className="flex gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleEditTerms(terms)}
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              if (confirm("هل أنت متأكد من حذف هذا الشرط؟")) {
-                                deleteTermsMutation.mutate(terms.id);
-                              }
-                            }}
-                          >
-                            <Trash2 className="w-4 h-4 text-red-600" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                    {termsAndConditions.length === 0 && (
-                      <div className="text-center py-8 text-gray-500">
-                        لا توجد شروط وأحكام مضافة بعد
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
         </Tabs>
       </div>
     </div>
