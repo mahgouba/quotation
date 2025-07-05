@@ -1,12 +1,13 @@
 import { 
-  users, companies, customers, vehicles, quotations, salesRepresentatives, vehicleSpecifications,
+  users, companies, customers, vehicles, quotations, salesRepresentatives, vehicleSpecifications, termsAndConditions,
   type User, type InsertUser,
   type Company, type InsertCompany,
   type Customer, type InsertCustomer,
   type Vehicle, type InsertVehicle,
   type Quotation, type InsertQuotation,
   type SalesRepresentative, type InsertSalesRepresentative,
-  type VehicleSpecification, type InsertVehicleSpecification
+  type VehicleSpecification, type InsertVehicleSpecification,
+  type TermsAndConditions, type InsertTermsAndConditions
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gte, lte } from "drizzle-orm";
@@ -57,6 +58,12 @@ export interface IStorage {
   updateVehicleSpecification(id: number, spec: Partial<InsertVehicleSpecification>): Promise<VehicleSpecification | undefined>;
   getVehicleSpecifications(): Promise<VehicleSpecification[]>;
   deleteVehicleSpecification(id: number): Promise<boolean>;
+  
+  // Terms and Conditions methods
+  getTermsAndConditions(): Promise<TermsAndConditions[]>;
+  createTermsAndConditions(terms: InsertTermsAndConditions): Promise<TermsAndConditions>;
+  updateTermsAndConditions(id: number, terms: Partial<InsertTermsAndConditions>): Promise<TermsAndConditions | undefined>;
+  deleteTermsAndConditions(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -312,6 +319,33 @@ export class DatabaseStorage implements IStorage {
 
   async deleteVehicleSpecification(id: number): Promise<boolean> {
     const result = await db.delete(vehicleSpecifications).where(eq(vehicleSpecifications.id, id));
+    return (result.rowCount || 0) > 0;
+  }
+
+  // Terms and Conditions methods
+  async getTermsAndConditions(): Promise<TermsAndConditions[]> {
+    return await db.select().from(termsAndConditions).orderBy(termsAndConditions.displayOrder);
+  }
+
+  async createTermsAndConditions(terms: InsertTermsAndConditions): Promise<TermsAndConditions> {
+    const [createdTerms] = await db
+      .insert(termsAndConditions)
+      .values(terms)
+      .returning();
+    return createdTerms;
+  }
+
+  async updateTermsAndConditions(id: number, terms: Partial<InsertTermsAndConditions>): Promise<TermsAndConditions | undefined> {
+    const [updatedTerms] = await db
+      .update(termsAndConditions)
+      .set({ ...terms, updatedAt: new Date() })
+      .where(eq(termsAndConditions.id, id))
+      .returning();
+    return updatedTerms || undefined;
+  }
+
+  async deleteTermsAndConditions(id: number): Promise<boolean> {
+    const result = await db.delete(termsAndConditions).where(eq(termsAndConditions.id, id));
     return (result.rowCount || 0) > 0;
   }
 }

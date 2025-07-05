@@ -41,10 +41,10 @@ export function generateQuotationPDF(data: any): jsPDF {
   doc.setFillColor(...darkTeal);
   doc.rect(0, 0, pageWidth, 45, 'F');
   
-  // Company logo on right (Arabic RTL)
+  // Company logo on right (Arabic RTL) - Made larger
   if (data.companyLogo) {
     try {
-      doc.addImage(data.companyLogo, 'JPEG', pageWidth - 45, 8, 30, 30);
+      doc.addImage(data.companyLogo, 'JPEG', pageWidth - 60, 5, 50, 40);
     } catch (error) {
       console.warn('Could not add logo to PDF');
     }
@@ -230,6 +230,15 @@ export function generateQuotationPDF(data: any): jsPDF {
   doc.setTextColor(100, 100, 100);
   doc.setFontSize(8);
   doc.text('QR Code', centerX + 25, bottomY + 32, { align: 'center' });
+  
+  // Company stamp (larger size)
+  if (data.companyStamp) {
+    try {
+      doc.addImage(data.companyStamp, 'JPEG', centerX + sectionWidth - 45, bottomY + 15, 40, 30);
+    } catch (error) {
+      console.warn('Could not add company stamp to PDF');
+    }
+  }
   
   // Signature area
   doc.setTextColor(0, 0, 0);

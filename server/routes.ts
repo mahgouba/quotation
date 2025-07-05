@@ -5,7 +5,8 @@ import {
   insertCompanySchema, insertCustomerSchema, 
   insertVehicleSchema, insertQuotationSchema,
   insertSalesRepresentativeSchema,
-  insertVehicleSpecificationSchema
+  insertVehicleSpecificationSchema,
+  insertTermsAndConditionsSchema
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -498,6 +499,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting vehicle spec:", error);
       res.status(500).json({ error: "Failed to delete vehicle specification" });
+    }
+  });
+
+  // Terms and Conditions routes
+  app.get("/api/terms-and-conditions", async (req, res) => {
+    try {
+      const terms = await storage.getTermsAndConditions();
+      res.json(terms);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get terms and conditions" });
+    }
+  });
+
+  app.post("/api/terms-and-conditions", async (req, res) => {
+    try {
+      const termsData = insertTermsAndConditionsSchema.parse(req.body);
+      const terms = await storage.createTermsAndConditions(termsData);
+      res.status(201).json(terms);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid terms and conditions data" });
+    }
+  });
+
+  app.put("/api/terms-and-conditions/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const termsData = insertTermsAndConditionsSchema.partial().parse(req.body);
+      const terms = await storage.updateTermsAndConditions(id, termsData);
+      if (!terms) {
+        return res.status(404).json({ error: "Terms and conditions not found" });
+      }
+      res.json(terms);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid terms and conditions data" });
+    }
+  });
+
+  app.delete("/api/terms-and-conditions/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteTermsAndConditions(id);
+      if (!success) {
+        return res.status(404).json({ error: "Terms and conditions not found" });
+      }
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete terms and conditions" });
     }
   });
 

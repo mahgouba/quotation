@@ -252,6 +252,14 @@ Changelog:
   * Enhanced quotation saving functionality with validation and error handling
   * Removed sales representative requirements from save validation process
   * Integrated quotation numbering and complete data persistence system
+- July 05, 2025. Enhanced PDF Design & Terms Management System:
+  * Increased company logo size in PDF from 30x30 to 50x40 for better visibility
+  * Added larger company stamp display in PDF signature area (40x30)
+  * Created comprehensive terms and conditions management system in data management interface
+  * Added new database table for terms and conditions with full CRUD operations
+  * Integrated terms management tab in data administration panel with add/edit/delete functionality
+  * Enhanced API endpoints for terms and conditions management
+  * Improved PDF layout with larger visual elements for professional appearance
 ```
 
 ## User Preferences

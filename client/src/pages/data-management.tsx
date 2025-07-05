@@ -43,6 +43,16 @@ interface Company {
   taxNumber: string | null;
 }
 
+interface TermsAndConditions {
+  id: number;
+  title: string;
+  content: string;
+  isActive: boolean;
+  displayOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export default function DataManagement() {
   const [selectedMake, setSelectedMake] = useState<string>("");
   const [selectedModel, setSelectedModel] = useState<string>("");
@@ -64,6 +74,11 @@ export default function DataManagement() {
   // Companies
   const { data: companies = [] as Company[], isLoading: isLoadingCompanies } = useQuery<Company[]>({
     queryKey: ['/api/companies'],
+  });
+
+  // Terms and Conditions
+  const { data: termsAndConditions = [] as TermsAndConditions[], isLoading: isLoadingTerms } = useQuery<TermsAndConditions[]>({
+    queryKey: ['/api/terms-and-conditions'],
   });
 
   // Vehicle Spec Form
@@ -102,6 +117,15 @@ export default function DataManagement() {
     termsAndConditions: "• يجب على العميل دفع مقدم بنسبة 50% من إجمالي السعر\n• الباقي يُدفع عند استلام المركبة\n• مدة التسليم: 2-4 أسابيع من تاريخ تأكيد الطلب\n• ضمان الوكيل لمدة 3 سنوات أو 100,000 كم أيهما أقل\n• العرض لا يشمل التأمين ورسوم النقل\n• الشركة غير مسؤولة عن التأخير الناجم عن ظروف خارجة عن إرادتها"
   });
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
+
+  // Terms and Conditions Form
+  const [termsForm, setTermsForm] = useState({
+    title: "",
+    content: "",
+    isActive: true,
+    displayOrder: 0
+  });
+  const [editingTerms, setEditingTerms] = useState<TermsAndConditions | null>(null);
 
   // Mutations
   const addSpecMutation = useMutation({
@@ -170,6 +194,41 @@ export default function DataManagement() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/sales-representatives'] });
       toast({ title: "تم حذف المندوب بنجاح" });
+    },
+  });
+
+  // Terms and Conditions Mutations
+  const addTermsMutation = useMutation({
+    mutationFn: async (termsData: any) => {
+      return await apiRequest('POST', '/api/terms-and-conditions', termsData);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/terms-and-conditions'] });
+      setTermsForm({ title: "", content: "", isActive: true, displayOrder: 0 });
+      toast({ title: "تم إضافة الشرط بنجاح" });
+    },
+  });
+
+  const updateTermsMutation = useMutation({
+    mutationFn: async (termsData: any) => {
+      const { id, ...data } = termsData;
+      return await apiRequest('PUT', `/api/terms-and-conditions/${id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/terms-and-conditions'] });
+      setEditingTerms(null);
+      setTermsForm({ title: "", content: "", isActive: true, displayOrder: 0 });
+      toast({ title: "تم تحديث الشرط بنجاح" });
+    },
+  });
+
+  const deleteTermsMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await apiRequest('DELETE', `/api/terms-and-conditions/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/terms-and-conditions'] });
+      toast({ title: "تم حذف الشرط بنجاح" });
     },
   });
 
@@ -307,6 +366,25 @@ export default function DataManagement() {
     .catch(() => {
       toast({ title: "خطأ في التحديث", variant: "destructive" });
     });
+  };
+
+  // Terms handlers
+  const handleEditTerms = (terms: TermsAndConditions) => {
+    setEditingTerms(terms);
+    setTermsForm({
+      title: terms.title,
+      content: terms.content,
+      isActive: terms.isActive,
+      displayOrder: terms.displayOrder
+    });
+  };
+
+  const handleTermsSubmit = () => {
+    if (editingTerms) {
+      updateTermsMutation.mutate({ id: editingTerms.id, ...termsForm });
+    } else {
+      addTermsMutation.mutate(termsForm);
+    }
   };
 
   const handleCancelEdit = () => {
@@ -1187,6 +1265,143 @@ export default function DataManagement() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="terms" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Add Terms Form */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    {editingTerms ? (
+                      <>
+                        <Edit className="w-5 h-5" />
+                        تعديل الشرط
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-5 h-5" />
+                        إضافة شرط جديد
+                      </>
+                    )}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <Label htmlFor="title">العنوان</Label>
+                    <Input
+                      id="title"
+                      value={termsForm.title}
+                      onChange={(e) => setTermsForm(prev => ({ ...prev, title: e.target.value }))}
+                      placeholder="عنوان الشرط"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="content">المحتوى</Label>
+                    <Textarea
+                      id="content"
+                      value={termsForm.content}
+                      onChange={(e) => setTermsForm(prev => ({ ...prev, content: e.target.value }))}
+                      placeholder="محتوى الشرط"
+                      rows={6}
+                    />
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="isActive"
+                      checked={termsForm.isActive}
+                      onChange={(e) => setTermsForm(prev => ({ ...prev, isActive: e.target.checked }))}
+                    />
+                    <Label htmlFor="isActive">فعال</Label>
+                  </div>
+                  <div>
+                    <Label htmlFor="displayOrder">ترتيب العرض</Label>
+                    <Input
+                      id="displayOrder"
+                      type="number"
+                      value={termsForm.displayOrder}
+                      onChange={(e) => setTermsForm(prev => ({ ...prev, displayOrder: parseInt(e.target.value) || 0 }))}
+                      placeholder="0"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <Button 
+                      onClick={handleTermsSubmit}
+                      disabled={!termsForm.title || !termsForm.content}
+                    >
+                      {editingTerms ? "تحديث" : "إضافة"}
+                    </Button>
+                    {editingTerms && (
+                      <Button 
+                        variant="outline" 
+                        onClick={() => {
+                          setEditingTerms(null);
+                          setTermsForm({ title: "", content: "", isActive: true, displayOrder: 0 });
+                        }}
+                      >
+                        إلغاء
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Terms List */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="w-5 h-5" />
+                    قائمة الشروط والأحكام ({termsAndConditions.length})
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4 max-h-96 overflow-y-auto">
+                    {termsAndConditions.map((terms) => (
+                      <div key={terms.id} className="p-4 border rounded-lg">
+                        <div className="flex justify-between items-start mb-2">
+                          <h4 className="font-semibold">{terms.title}</h4>
+                          <div className="flex gap-2">
+                            {terms.isActive ? (
+                              <Badge className="bg-green-100 text-green-800">فعال</Badge>
+                            ) : (
+                              <Badge variant="outline">غير فعال</Badge>
+                            )}
+                            <Badge variant="outline">#{terms.displayOrder}</Badge>
+                          </div>
+                        </div>
+                        <p className="text-sm text-gray-600 mb-3 line-clamp-2">{terms.content}</p>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEditTerms(terms)}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              if (confirm("هل أنت متأكد من حذف هذا الشرط؟")) {
+                                deleteTermsMutation.mutate(terms.id);
+                              }
+                            }}
+                          >
+                            <Trash2 className="w-4 h-4 text-red-600" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                    {termsAndConditions.length === 0 && (
+                      <div className="text-center py-8 text-gray-500">
+                        لا توجد شروط وأحكام مضافة بعد
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </div>

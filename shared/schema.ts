@@ -233,3 +233,23 @@ export const insertVehicleSpecificationSchema = createInsertSchema(vehicleSpecif
 
 export type InsertVehicleSpecification = z.infer<typeof insertVehicleSpecificationSchema>;
 export type VehicleSpecification = typeof vehicleSpecifications.$inferSelect;
+
+// Terms and Conditions table for management
+export const termsAndConditions = pgTable("terms_and_conditions", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  isActive: boolean("is_active").default(true),
+  displayOrder: integer("display_order").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertTermsAndConditionsSchema = createInsertSchema(termsAndConditions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertTermsAndConditions = z.infer<typeof insertTermsAndConditionsSchema>;
+export type TermsAndConditions = typeof termsAndConditions.$inferSelect;
