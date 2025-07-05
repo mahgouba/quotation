@@ -71,7 +71,8 @@ export default function DataManagement() {
     model: "",
     year: "",
     engine: "",
-    specifications: ""
+    specifications: "",
+    brandLogo: ""
   });
   const [editingSpec, setEditingSpec] = useState<VehicleSpec | null>(null);
 
@@ -228,7 +229,8 @@ export default function DataManagement() {
       model: spec.model,
       year: spec.year.toString(),
       engine: spec.engine,
-      specifications: spec.specifications || ""
+      specifications: spec.specifications || "",
+      brandLogo: (spec as any).brandLogo || ""
     });
   };
 
@@ -240,7 +242,8 @@ export default function DataManagement() {
       model: specForm.model,
       year: parseInt(specForm.year),
       engine: specForm.engine,
-      specifications: specForm.specifications
+      specifications: specForm.specifications,
+      brandLogo: specForm.brandLogo
     };
 
     fetch(`/api/vehicle-specs/${editingSpec.id}`, {
@@ -399,6 +402,16 @@ export default function DataManagement() {
                           required
                         />
                       </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="brandLogo">شعار الماركة</Label>
+                      <Input
+                        id="brandLogo"
+                        value={specForm.brandLogo}
+                        onChange={(e) => setSpecForm({...specForm, brandLogo: e.target.value})}
+                        placeholder="رابط شعار الماركة (URL)"
+                        type="url"
+                      />
                     </div>
                     <div>
                       <Label htmlFor="specifications">المواصفات الإضافية</Label>

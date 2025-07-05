@@ -134,6 +134,7 @@ const VehicleQuotation = () => {
     vatRate: 15,
     issueDate: format(new Date(), "yyyy-MM-dd"),
     deadlineDate: format(new Date(Date.now() + 15 * 24 * 60 * 60 * 1000), "yyyy-MM-dd"),
+    validityPeriod: 15, // مدة صلاحية العرض بالأيام
     platePrice: 0,
     specifications: "",
     includeTax: false,
@@ -992,6 +993,23 @@ const VehicleQuotation = () => {
                       onChange={(e) => handleInputChange('platePrice', parseFloat(e.target.value) || 0)}
                     />
                   </div>
+                  <div>
+                    <Label htmlFor="validityPeriod">مدة صلاحية العرض (بالأيام)</Label>
+                    <Input
+                      id="validityPeriod"
+                      type="number"
+                      min="1"
+                      max="365"
+                      value={formData.validityPeriod}
+                      onChange={(e) => {
+                        const days = parseInt(e.target.value) || 15;
+                        handleInputChange('validityPeriod', days);
+                        // تحديث تاريخ انتهاء العرض تلقائياً
+                        const newDeadline = format(new Date(Date.now() + days * 24 * 60 * 60 * 1000), "yyyy-MM-dd");
+                        handleInputChange('deadlineDate', newDeadline);
+                      }}
+                    />
+                  </div>
                 </div>
 
               </CardContent>
@@ -1168,8 +1186,9 @@ const VehicleQuotation = () => {
                 <div className="text-right">
                   <h1 className="text-xl font-bold mb-2">عرض سعر</h1>
                   <div className="text-sm space-y-1">
-                    <p>تاريخ {new Date().toLocaleDateString('ar-SA')}</p>
-                    <p>رقم {Date.now().toString().slice(-4)}</p>
+                    <p>تاريخ الإصدار: {format(new Date(formData.issueDate), "dd/MM/yyyy")}</p>
+                    <p>تاريخ الانتهاء: {format(new Date(formData.deadlineDate), "dd/MM/yyyy")}</p>
+                    <p>رقم العرض: {Date.now().toString().slice(-4)}</p>
                   </div>
                 </div>
               </div>
@@ -1207,7 +1226,7 @@ const VehicleQuotation = () => {
                 </div>
 
                 {/* Vehicle Info (Left Column) */}
-                <div className="bg-gray-50 p-4 rounded-lg border">
+                <div className="bg-gray-50 p-4 rounded-lg border relative">
                   <h3 className="font-semibold text-lg mb-3 text-right">بيانات المركبة</h3>
                   <div className="space-y-2 text-right text-sm">
                     <p><span className="font-medium">الماركة:</span> {formData.carMaker || 'غير محدد'}</p>
@@ -1215,6 +1234,17 @@ const VehicleQuotation = () => {
                     <p><span className="font-medium">السنة:</span> {formData.carYear || 'غير محدد'}</p>
                     <p><span className="font-medium">رقم الهيكل:</span> غير محدد</p>
                   </div>
+                  
+                  {/* Brand Logo if available */}
+                  {vehicleSpecs?.brandLogo && (
+                    <div className="absolute top-4 left-4">
+                      <img 
+                        src={vehicleSpecs.brandLogo} 
+                        alt={`شعار ${formData.carMaker}`} 
+                        className="h-12 w-auto opacity-80"
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -1292,10 +1322,33 @@ const VehicleQuotation = () => {
 
                 {/* Notes */}
                 <div className="text-right text-xs text-gray-600 space-y-1">
-                  <p>• مدة صلاحية العرض: 15 يوم</p>
+                  <p>• مدة صلاحية العرض: {formData.validityPeriod} يوم (ينتهي في: {format(new Date(formData.deadlineDate), "dd/MM/yyyy")})</p>
                   <p>• السعر لا يشمل رسوم التسجيل والتأمين</p>
                   <p>• يجب التأكد من التحويل البنكي</p>
                   <p>• الشروط خاضعة للموافقة</p>
+                </div>
+              </div>
+
+              {/* Sales Representative Information */}
+              <div className="mt-8 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                <h4 className="font-semibold text-lg mb-2 text-right">بيانات المندوب</h4>
+                <div className="text-sm text-right space-y-1">
+                  <p><span className="font-medium">الاسم:</span> {formData.salesRepName || 'غير محدد'}</p>
+                  <p><span className="font-medium">الهاتف:</span> {formData.salesRepPhone || 'غير محدد'}</p>
+                  <p><span className="font-medium">البريد الإلكتروني:</span> {formData.salesRepEmail || 'غير محدد'}</p>
+                </div>
+              </div>
+
+              {/* Terms and Conditions */}
+              <div className="mt-6 p-4 bg-gray-50 rounded-lg border">
+                <h4 className="font-semibold text-lg mb-3 text-right">الشروط والأحكام</h4>
+                <div className="text-sm text-right space-y-2">
+                  <p>• يجب على العميل دفع مقدم بنسبة 50% من إجمالي السعر</p>
+                  <p>• الباقي يُدفع عند استلام المركبة</p>
+                  <p>• مدة التسليم: 2-4 أسابيع من تاريخ تأكيد الطلب</p>
+                  <p>• ضمان الوكيل لمدة 3 سنوات أو 100,000 كم أيهما أقل</p>
+                  <p>• العرض لا يشمل التأمين ورسوم النقل</p>
+                  <p>• الشركة غير مسؤولة عن التأخير الناجم عن ظروف خارجة عن إرادتها</p>
                 </div>
               </div>
 

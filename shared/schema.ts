@@ -204,6 +204,7 @@ export const vehicleSpecifications = pgTable("vehicle_specifications", {
   year: integer("year").notNull(),
   engine: text("engine").notNull(),
   specifications: text("specifications").notNull(),
+  brandLogo: text("brand_logo"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
