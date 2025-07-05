@@ -288,6 +288,14 @@ Changelog:
   * Terms and conditions remain functional through database integration but no longer user-editable
   * Cleaner admin interface with 3-column layout instead of 4-column
   * Terms data persists in database and continues to display in quotations automatically
+- July 05, 2025. Automatic Vehicle Specifications System:
+  * Implemented intelligent vehicle specifications management based on make, model, and year
+  * Added automatic specification saving when user edits detailed specs manually
+  * Integrated debounced auto-save with 2-second delay to prevent excessive database writes
+  * Enhanced specification retrieval to prioritize database entries over static data
+  * Added visual feedback during auto-save process with toast notifications
+  * Specifications are now automatically associated with specific vehicle combinations
+  * System intelligently checks for existing specifications and only saves when changed
 ```
 
 ## User Preferences

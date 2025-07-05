@@ -177,6 +177,7 @@ const VehicleQuotation = () => {
   const [availableYears, setAvailableYears] = useState<number[]>([]);
   const [vehicleSpecs, setVehicleSpecs] = useState<any>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [saveTimeout, setSaveTimeout] = useState<NodeJS.Timeout | null>(null);
 
 
   const { toast } = useToast();
@@ -217,6 +218,39 @@ const VehicleQuotation = () => {
     },
   });
 
+  // Save vehicle specifications mutation
+  const saveVehicleSpecMutation = useMutation({
+    mutationFn: async (specData: any) => {
+      const response = await fetch("/api/vehicle-specs", {
+        method: "POST",
+        body: JSON.stringify(specData),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to save vehicle specification");
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/vehicle-specs'] });
+      toast({
+        title: "تم الحفظ",
+        description: "تم حفظ المواصفات التفصيلية تلقائياً",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "خطأ في الحفظ",
+        description: "فشل في حفظ المواصفات التفصيلية",
+        variant: "destructive",
+      });
+    },
+  });
+
 
 
   // Effects
@@ -251,6 +285,44 @@ const VehicleQuotation = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
     if (name !== 'carMaker') {
       validateField(name, value);
+    }
+    
+    // Auto-save detailed specs when updated with debounce
+    if (name === 'detailedSpecs' && value && formData.carMaker && formData.carModel && formData.carYear) {
+      // Clear existing timeout
+      if (saveTimeout) {
+        clearTimeout(saveTimeout);
+      }
+      
+      // Set new timeout for debounced saving
+      const newTimeout = setTimeout(() => {
+        // Double-check that we still have the required data
+        const currentFormData = formData;
+        if (!currentFormData.carMaker || !currentFormData.carModel || !currentFormData.carYear) {
+          return;
+        }
+        
+        const existingSpec = databaseSpecs.find(spec => 
+          spec.make === currentFormData.carMaker && 
+          spec.model === currentFormData.carModel && 
+          spec.year === parseInt(currentFormData.carYear)
+        );
+        
+        // Only save if it doesn't exist or the specs have changed and value is not empty
+        if (value.trim() && (!existingSpec || existingSpec.specifications !== value)) {
+          const specData = {
+            make: currentFormData.carMaker,
+            model: currentFormData.carModel,
+            year: parseInt(currentFormData.carYear),
+            engine: existingSpec?.engine || "غير محدد",
+            specifications: value
+          };
+          
+          saveVehicleSpecMutation.mutate(specData);
+        }
+      }, 2000); // Wait 2 seconds after user stops typing
+      
+      setSaveTimeout(newTimeout);
     }
   };
 
@@ -959,11 +1031,15 @@ const VehicleQuotation = () => {
                   <Textarea
                     id="detailedSpecs"
                     value={formData.detailedSpecs}
-                    placeholder="ستظهر المواصفات التفصيلية تلقائياً عند اختيار الماركة والموديل وسنة الصنع"
+                    onChange={(e) => handleInputChange('detailedSpecs', e.target.value)}
+                    placeholder="ستظهر المواصفات التفصيلية تلقائياً عند اختيار الماركة والموديل وسنة الصنع، أو يمكنك تحريرها يدوياً"
                     rows={15}
-                    readOnly
-                    className="text-sm leading-relaxed bg-gray-50 border-gray-200"
+                    className="text-sm leading-relaxed"
+                    style={{ direction: 'rtl' }}
                   />
+                  {saveVehicleSpecMutation.isPending && (
+                    <p className="text-xs text-blue-600 mt-1 text-right">جاري حفظ المواصفات في قاعدة البيانات...</p>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="quantity">الكمية</Label>
