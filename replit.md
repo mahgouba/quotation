@@ -374,6 +374,13 @@ Changelog:
   * Auto-populates all form fields with saved quotation data for editing
   * Clears edit parameters and localStorage after successful data loading
   * Enhanced user experience with seamless edit workflow from saved quotations list
+- July 05, 2025. Arabic Number-to-Words Conversion System:
+  * Created comprehensive Arabic number-to-words conversion library
+  * Added support for converting currency amounts to written Arabic format
+  * Implemented proper Arabic grammar rules for currency naming (ريال/ريالان/ريالات)
+  * Enhanced PDF generation to display amounts in both numbers and Arabic words
+  * Updated quotation preview interface to show amounts written in Arabic
+  * Complete integration with "فقط لا غير" formatting for professional invoicing
 ```
 
 ## User Preferences

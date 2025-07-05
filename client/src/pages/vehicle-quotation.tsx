@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
 import { getVehicleSpecifications, getAvailableMakes, getModelsForMake, getYearsForMakeAndModel } from "@/data/vehicle-specifications";
 import { generateQuotationPDF, generateQuotationPDFFromHTML } from "@/lib/pdf-generator";
+import { formatPriceWithWords } from "@/lib/number-to-words";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -1464,7 +1465,7 @@ const VehicleQuotation = () => {
                   <p><span className="font-medium">سعر النهائي:</span> {(parseFloat(formData.basePrice || '0') * parseInt(formData.quantity || '1') * 1.15 + parseFloat(formData.platePrice || '0')).toLocaleString()} ريال</p>
                   
                   <div className="mt-4 text-lg font-bold" style={{ color: '#C79C45' }}>
-                    المبلغ كتابة: {(parseFloat(formData.basePrice || '0') * parseInt(formData.quantity || '1') * 1.15 + parseFloat(formData.platePrice || '0')).toLocaleString()} ريال سعودي فقط لا غير
+                    المبلغ كتابة: {formatPriceWithWords(parseFloat(formData.basePrice || '0') * parseInt(formData.quantity || '1') * 1.15 + parseFloat(formData.platePrice || '0'), 'ريال سعودي')} فقط لا غير
                   </div>
                 </div>
               </div>

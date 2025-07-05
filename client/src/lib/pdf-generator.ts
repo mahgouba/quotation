@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { formatPriceWithWords } from './number-to-words';
 
 // Helper function to create PDF from HTML element
 export async function generateQuotationPDFFromHTML(element: HTMLElement): Promise<jsPDF> {
@@ -242,7 +243,8 @@ export function generateQuotationPDF(data: any): jsPDF {
   // Amount in words
   doc.setTextColor(...gold);
   doc.setFontSize(11);
-  doc.text(`المبلغ كتابة: ${total.toLocaleString()} ريال سعودي فقط لا غير`, pageWidth - 15, tableY + 12, { align: 'right' });
+  const amountInWords = formatPriceWithWords(total, 'ريال سعودي');
+  doc.text(`المبلغ كتابة: ${amountInWords} فقط لا غير`, pageWidth - 15, tableY + 12, { align: 'right' });
   
   currentY += 70;
   
