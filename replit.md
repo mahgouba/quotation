@@ -450,6 +450,12 @@ Changelog:
   * Document numbers adapt accordingly ("رقم العرض" vs "رقم الفاتورة")
   * PDF file names automatically reflect document type (فاتورة-عميل.pdf vs عرض-سعر-عميل.pdf)
   * Complete integration with existing PDF generation system for both document types
+- July 05, 2025. Enhanced Invoice Mode Features:
+  * Added automatic hiding of validity period field when document type is set to invoice
+  * Implemented conditional display for terms and conditions section (hidden in invoice mode)
+  * Invoice mode now completely removes all quote-specific fields for cleaner document
+  * Terms and conditions from database are automatically filtered out in invoice preview and PDF
+  * Complete separation between quotation and invoice display modes for professional documentation
 ```
 
 ## User Preferences
