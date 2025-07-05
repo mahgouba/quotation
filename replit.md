@@ -427,6 +427,10 @@ Changelog:
   * Adjusted date and quotation number positioning to match new layout
   * Updated content start position to accommodate expanded header section
   * Enhanced professional branding with prominent logo and centered company name
+- July 05, 2025. Company Stamp Size Adjustment:
+  * Reduced company stamp size from 120×90 to 113×71 (4cm width × 2.5cm height)
+  * Adjusted stamp positioning to accommodate new dimensions
+  * Maintained professional appearance with appropriately sized company seal
 ```
 
 ## User Preferences

@@ -289,10 +289,10 @@ export function generateQuotationPDF(data: any): jsPDF {
   doc.setFontSize(8);
   doc.text('QR Code', centerX + 25, bottomY + 32, { align: 'center' });
   
-  // Company stamp (made 3x larger)
+  // Company stamp (4cm width, 2.5cm height)
   if (data.companyStamp) {
     try {
-      doc.addImage(data.companyStamp, 'JPEG', centerX + sectionWidth - 135, bottomY + 15, 120, 90);
+      doc.addImage(data.companyStamp, 'JPEG', centerX + sectionWidth - 125, bottomY + 15, 113, 71);
     } catch (error) {
       console.warn('Could not add company stamp to PDF');
     }
