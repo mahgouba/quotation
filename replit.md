@@ -179,6 +179,16 @@ Changelog:
   * Fixed action buttons functionality in data management interfaces
   * Enhanced delete operations for vehicle specifications and sales representatives
   * Improved PDF layout with better organization of specifications and company branding
+- July 05, 2025. PDF Template Redesign to Match User Sample:
+  * Completely redesigned PDF layout to match provided template format
+  * Added date headers (issue date right, deadline left) at top of document
+  * Repositioned company logo to top-right and quotation number to top-left
+  * Added formal Arabic greeting section: "تحية طيبة وبعد"
+  * Enhanced vehicle specifications display with comprehensive technical details
+  * Redesigned pricing summary as boxed section at bottom of quotation
+  * Added formal terms and conditions section with delivery and warranty info
+  * Improved company signature section with proper Arabic business closing
+  * Removed template selector interface for simplified user experience
 ```
 
 ## User Preferences

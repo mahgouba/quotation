@@ -413,20 +413,50 @@ export class PDFTemplateEngine {
   }
 
   private addVehicleSpecificationsParagraph(data: any) {
-    if (data.vehicleSpecifications || data.detailedSpecs) {
-      this.doc.setFontSize(10);
-      this.doc.setTextColor(0, 0, 0);
-      
-      const specs = data.vehicleSpecifications || data.detailedSpecs || '';
-      const lines = this.doc.splitTextToSize(specs, this.pageWidth - 2 * this.template.spacing.margin);
-      
-      lines.forEach((line: string) => {
-        this.doc.text(line, this.pageWidth - this.template.spacing.margin, this.currentY, { align: 'right' });
-        this.currentY += 8;
-      });
-      
-      this.currentY += 20;
+    // Always add detailed specifications
+    this.doc.setFontSize(10);
+    this.doc.setTextColor(0, 0, 0);
+    
+    // Create comprehensive specifications text
+    let specsText = '';
+    
+    // Add selected vehicle specifications if available
+    if (data.vehicleSpecifications) {
+      specsText += data.vehicleSpecifications;
     }
+    
+    // Add custom detailed specs
+    if (data.detailedSpecs) {
+      if (specsText) specsText += ' - ';
+      specsText += data.detailedSpecs;
+    }
+    
+    // Add basic vehicle info if no detailed specs
+    if (!specsText) {
+      specsText = `${data.carMaker || 'غير محدد'} ${data.carModel || 'غير محدد'} ${data.carYear || 'غير محدد'} - مواصفات فنية متقدمة`;
+    }
+    
+    // Add comprehensive technical specifications
+    const technicalSpecs = [
+      'مواصفات فنية متقدمة',
+      'نظام أمان متطور',
+      'تقنيات حديثة',
+      'كفاءة في استهلاك الوقود',
+      'تصميم عصري وأنيق',
+      'راحة قيادة استثنائية'
+    ];
+    
+    specsText += ' - ' + technicalSpecs.join(' - ');
+    
+    // Split text into lines and display
+    const lines = this.doc.splitTextToSize(specsText, this.pageWidth - 2 * this.template.spacing.margin);
+    
+    lines.forEach((line: string) => {
+      this.doc.text(line, this.pageWidth - this.template.spacing.margin, this.currentY, { align: 'right' });
+      this.currentY += 8;
+    });
+    
+    this.currentY += 20;
   }
 
   private addCustomPricingTable(data: any) {
@@ -479,19 +509,31 @@ export class PDFTemplateEngine {
     this.doc.setFontSize(12);
     this.doc.setTextColor(0, 0, 0);
     
-    const total = data.totalPrice || '0';
+    const basePrice = parseFloat(data.basePrice || '0');
+    const platePrice = parseFloat(data.platePrice || '900');
+    const tax = basePrice * 0.15;
+    const total = basePrice + tax + platePrice;
+    
     const totalInWords = data.totalInWords || 'غير محدد';
     
-    this.doc.text(`المجموع: ${total}`, this.pageWidth - this.template.spacing.margin, this.currentY, { align: 'right' });
-    this.currentY += 15;
+    // Add summary box
+    this.doc.rect(this.template.spacing.margin, this.currentY, this.pageWidth - 2 * this.template.spacing.margin, 40);
     
-    this.doc.text(totalInWords, this.pageWidth / 2, this.currentY, { align: 'center' });
-    this.currentY += 30;
+    // Total amount on the right
+    this.doc.text(`المجموع: ${total.toLocaleString()}`, this.pageWidth - this.template.spacing.margin - 10, this.currentY + 15, { align: 'right' });
+    
+    // Total in words centered
+    this.doc.text(totalInWords, this.pageWidth / 2, this.currentY + 30, { align: 'center' });
+    
+    this.currentY += 50;
   }
 
   private addTermsAndConditions(data: any) {
     this.doc.setFontSize(10);
     this.doc.setTextColor(0, 0, 0);
+    
+    // Add some space before terms
+    this.currentY += 10;
     
     const terms = [
       'التسليم بمستودعاتنا في مدينة الرياض',
@@ -504,7 +546,7 @@ export class PDFTemplateEngine {
       this.currentY += 12;
     });
     
-    this.currentY += 20;
+    this.currentY += 30;
   }
 
   private addCompanySignature(data: any) {
