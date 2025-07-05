@@ -337,6 +337,12 @@ Changelog:
   * Fixed PostgreSQL timestamp conversion issues with proper date handling
   * Implemented safe date processing to prevent "toISOString is not a function" errors
   * Quotation save functionality now works correctly with all data fields
+- July 05, 2025. Automatic Deadline Date Calculation:
+  * Connected deadline date with validity period for automatic calculation
+  * Added useEffect to calculate deadline date when issue date or validity period changes
+  * Made deadline date field read-only with clear indication it's automatically calculated
+  * Enhanced user interface with explanatory text for automatic date calculation
+  * Validity period field now automatically updates deadline date when changed
 ```
 
 ## User Preferences

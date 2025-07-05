@@ -281,6 +281,20 @@ const VehicleQuotation = () => {
     calculateTotal();
   }, [formData.basePrice, formData.quantity, formData.platePrice, formData.includesPlatesAndTax, formData.vatRate]);
 
+  // Calculate deadline date when issue date or validity period changes
+  useEffect(() => {
+    if (formData.issueDate && formData.validityPeriod) {
+      const issueDate = new Date(formData.issueDate);
+      const deadlineDate = new Date(issueDate.getTime() + formData.validityPeriod * 24 * 60 * 60 * 1000);
+      const formattedDeadlineDate = format(deadlineDate, "yyyy-MM-dd");
+      
+      setFormData(prev => ({
+        ...prev,
+        deadlineDate: formattedDeadlineDate
+      }));
+    }
+  }, [formData.issueDate, formData.validityPeriod]);
+
   // Handlers
   const handleInputChange = (name: string, value: any) => {
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -1180,13 +1194,17 @@ const VehicleQuotation = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="deadlineDate">تاريخ انتهاء العرض</Label>
+                  <Label htmlFor="deadlineDate">تاريخ انتهاء العرض (محسوب تلقائياً)</Label>
                   <Input
                     id="deadlineDate"
                     type="date"
                     value={formData.deadlineDate}
-                    onChange={(e) => handleInputChange('deadlineDate', e.target.value)}
+                    readOnly
+                    className="bg-gray-50 cursor-not-allowed"
                   />
+                  <p className="text-sm text-muted-foreground mt-1">
+                    يتم حساب تاريخ الانتهاء تلقائياً بناءً على تاريخ الإصدار ومدة الصلاحية
+                  </p>
                 </div>
               </CardContent>
             </Card>
