@@ -634,11 +634,13 @@ const VehicleQuotation = () => {
         detailedSpecs: formData.detailedSpecs || null,
       },
       company: {
+        id: formData.selectedCompanyId ? parseInt(formData.selectedCompanyId) : null,
         name: formData.companyName,
         address: formData.companyAddress || null,
         phone: formData.companyPhone || null,
         email: formData.companyEmail || null,
         logo: formData.companyLogo || null,
+        stamp: formData.companyStamp || null,
       },
       quotation: {
         quantity: formData.quantity,
