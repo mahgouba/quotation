@@ -355,6 +355,12 @@ Changelog:
   * Performed complete database cleanup using TRUNCATE CASCADE
   * Also removed associated quotations and sales representatives due to database constraints
   * System now has clean database ready for production use
+- July 05, 2025. Validation System Removal:
+  * Removed mandatory data validation for saving and PDF export as requested by user
+  * Eliminated validation checks that prevented saving incomplete quotations
+  * Removed visual indicators (*) for required fields from user interface
+  * System now allows saving and exporting quotations with any data provided
+  * Users can now save drafts and incomplete quotations without validation errors
 ```
 
 ## User Preferences

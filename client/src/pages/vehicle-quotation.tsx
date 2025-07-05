@@ -540,55 +540,6 @@ const VehicleQuotation = () => {
   };
   
   const handleSave = () => {
-    // Validate required fields with comprehensive checks
-    const validationErrors = [];
-
-    // Customer data validation
-    if (!formData.customerName || formData.customerName.trim() === '') {
-      validationErrors.push("• اسم العميل مطلوب");
-    }
-
-    if (!formData.customerPhone || formData.customerPhone.trim() === '') {
-      validationErrors.push("• رقم هاتف العميل مطلوب");
-    }
-
-    // Vehicle data validation
-    if (!formData.carMaker || formData.carMaker.trim() === '') {
-      validationErrors.push("• ماركة المركبة مطلوبة");
-    }
-
-    if (!formData.carModel || formData.carModel.trim() === '') {
-      validationErrors.push("• موديل المركبة مطلوب");
-    }
-
-    if (!formData.carYear || formData.carYear.trim() === '') {
-      validationErrors.push("• سنة صنع المركبة مطلوبة");
-    }
-
-    // Price validation
-    if (!formData.basePrice || formData.basePrice <= 0) {
-      validationErrors.push("• السعر الأساسي مطلوب ويجب أن يكون أكبر من صفر");
-    }
-
-    // Company validation
-    if (!formData.selectedCompanyId || formData.selectedCompanyId === '0') {
-      validationErrors.push("• يجب اختيار الشركة");
-    }
-
-    // Date validation
-    if (!formData.issueDate) {
-      validationErrors.push("• تاريخ إصدار العرض مطلوب");
-    }
-
-    // If there are validation errors, show them and return
-    if (validationErrors.length > 0) {
-      toast({
-        title: "بيانات غير مكتملة",
-        description: `يرجى إكمال البيانات التالية:\n${validationErrors.join('\n')}`,
-        variant: "destructive",
-      });
-      return;
-    }
 
 
 
@@ -641,37 +592,6 @@ const VehicleQuotation = () => {
   };
 
   const handleExportPDF = async () => {
-    // Validate required fields before PDF generation
-    const validationErrors = [];
-
-    if (!formData.customerName || formData.customerName.trim() === '') {
-      validationErrors.push("• اسم العميل مطلوب");
-    }
-
-    if (!formData.carMaker || formData.carMaker.trim() === '') {
-      validationErrors.push("• ماركة المركبة مطلوبة");
-    }
-
-    if (!formData.carModel || formData.carModel.trim() === '') {
-      validationErrors.push("• موديل المركبة مطلوب");
-    }
-
-    if (!formData.basePrice || formData.basePrice <= 0) {
-      validationErrors.push("• السعر الأساسي مطلوب");
-    }
-
-    if (!formData.selectedCompanyId || formData.selectedCompanyId === '0') {
-      validationErrors.push("• يجب اختيار الشركة");
-    }
-
-    if (validationErrors.length > 0) {
-      toast({
-        title: "لا يمكن تصدير PDF",
-        description: `يرجى إكمال البيانات التالية أولاً:\n${validationErrors.join('\n')}`,
-        variant: "destructive",
-      });
-      return;
-    }
 
     try {
       // Prepare data for PDF generation
@@ -972,7 +892,7 @@ const VehicleQuotation = () => {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="customerName">اسم العميل *</Label>
+                  <Label htmlFor="customerName">اسم العميل</Label>
                   <Input
                     id="customerName"
                     value={formData.customerName}
@@ -982,7 +902,7 @@ const VehicleQuotation = () => {
                   {errors.customerName && <span className="text-destructive text-sm">{errors.customerName}</span>}
                 </div>
                 <div>
-                  <Label htmlFor="customerPhone">رقم الهاتف *</Label>
+                  <Label htmlFor="customerPhone">رقم الهاتف</Label>
                   <Input
                     id="customerPhone"
                     type="tel"
@@ -1003,7 +923,7 @@ const VehicleQuotation = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="salesRepresentative">المندوب *</Label>
+                  <Label htmlFor="salesRepresentative">المندوب</Label>
                   <Select value={formData.salesRepresentativeId?.toString() || ""} onValueChange={handleSalesRepresentativeChange}>
                     <SelectTrigger>
                       <SelectValue placeholder="اختر المندوب" />
@@ -1028,7 +948,7 @@ const VehicleQuotation = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="carMaker">ماركة السيارة *</Label>
+                  <Label htmlFor="carMaker">ماركة السيارة</Label>
                   <Select value={formData.carMaker} onValueChange={handleMakerChange}>
                     <SelectTrigger>
                       <SelectValue placeholder="اختر الماركة" />
@@ -1045,7 +965,7 @@ const VehicleQuotation = () => {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="carModel">موديل السيارة *</Label>
+                  <Label htmlFor="carModel">موديل السيارة</Label>
                   <Select value={formData.carModel} onValueChange={handleModelChange}>
                     <SelectTrigger>
                       <SelectValue placeholder="اختر الموديل" />
@@ -1058,7 +978,7 @@ const VehicleQuotation = () => {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="carYear">سنة الصنع *</Label>
+                  <Label htmlFor="carYear">سنة الصنع</Label>
                   <Select value={formData.carYear} onValueChange={handleYearChange}>
                     <SelectTrigger>
                       <SelectValue placeholder="اختر السنة" />
@@ -1134,7 +1054,7 @@ const VehicleQuotation = () => {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <Label htmlFor="basePrice">السعر الأساسي (ريال) *</Label>
+                    <Label htmlFor="basePrice">السعر الأساسي (ريال)</Label>
                     <Input
                       id="basePrice"
                       type="number"
