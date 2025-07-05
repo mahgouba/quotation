@@ -15,12 +15,12 @@ export async function generateQuotationPDFFromHTML(element: HTMLElement): Promis
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
   
-  // Calculate image dimensions to fit A4
-  const imgWidth = pageWidth - 20; // 20mm margins
+  // Calculate image dimensions to fit A4 with minimal margins (5mm instead of 10mm)
+  const imgWidth = pageWidth - 10; // 5mm margins on each side
   const imgHeight = (canvas.height * imgWidth) / canvas.width;
   
-  // Add image to PDF
-  pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+  // Add image to PDF with reduced margins
+  pdf.addImage(imgData, 'PNG', 5, 5, imgWidth, imgHeight);
   
   return pdf;
 }
@@ -35,16 +35,17 @@ export function generateQuotationPDF(data: any): jsPDF {
   const darkTeal: [number, number, number] = [0, 98, 127]; // #00627F
   const gold: [number, number, number] = [199, 156, 69]; // #C79C45
   
-  let currentY = 15;
+  // Reduced margins for A4 printing - start from 5mm
+  let currentY = 5;
   
-  // Header Section with Dark Teal Background
+  // Header Section with Dark Teal Background - full width for A4
   doc.setFillColor(...darkTeal);
-  doc.rect(0, 0, pageWidth, 45, 'F');
+  doc.rect(0, 0, pageWidth, 40, 'F');
   
-  // Company logo on right (Arabic RTL) - Made larger
+  // Company logo on right (Arabic RTL) - Optimized for A4
   if (data.companyLogo) {
     try {
-      doc.addImage(data.companyLogo, 'JPEG', pageWidth - 60, 5, 50, 40);
+      doc.addImage(data.companyLogo, 'JPEG', pageWidth - 55, 3, 50, 34);
     } catch (error) {
       console.warn('Could not add logo to PDF');
     }
@@ -53,76 +54,76 @@ export function generateQuotationPDF(data: any): jsPDF {
   // Header text in Arabic
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(18);
-  doc.text('عرض سعر', pageWidth - 15, 25, { align: 'right' });
+  doc.text('عرض سعر', pageWidth - 8, 22, { align: 'right' });
   
   // Company name on left
   doc.setTextColor(199, 156, 69);
   doc.setFontSize(16);
-  doc.text(data.companyName || 'شركة البريمي', 15, 25);
+  doc.text(data.companyName || 'شركة البريمي', 8, 22);
   
   // Date and quotation number
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(10);
   const currentDate = new Date().toLocaleDateString('ar-SA');
   const quotationNumber = data.quotationNumber || `Q${Date.now()}`.slice(-6);
-  doc.text(`التاريخ: ${currentDate}`, pageWidth - 15, 35, { align: 'right' });
-  doc.text(`رقم العرض: ${quotationNumber}`, 15, 35);
+  doc.text(`التاريخ: ${currentDate}`, pageWidth - 8, 32, { align: 'right' });
+  doc.text(`رقم العرض: ${quotationNumber}`, 8, 32);
   
-  currentY = 55;
+  currentY = 45;
   
-  // Greeting section
+  // Greeting section - reduced margins
   doc.setFillColor(250, 250, 250);
-  doc.rect(15, currentY, pageWidth - 30, 15, 'F');
+  doc.rect(5, currentY, pageWidth - 10, 15, 'F');
   doc.setTextColor(0, 0, 0);
   doc.setFontSize(12);
-  doc.text('تحية طيبة وبعد،', pageWidth - 25, currentY + 10, { align: 'right' });
+  doc.text('تحية طيبة وبعد،', pageWidth - 15, currentY + 10, { align: 'right' });
   
-  currentY += 25;
+  currentY += 20;
   
-  // Customer and Vehicle Data (Two columns)
-  const colWidth = (pageWidth - 40) / 2;
+  // Customer and Vehicle Data (Two columns) - reduced margins
+  const colWidth = (pageWidth - 15) / 2;
   
   // Customer Info (Right column)
   doc.setFillColor(248, 248, 248);
-  doc.rect(pageWidth/2 + 10, currentY, colWidth, 50, 'F');
+  doc.rect(pageWidth/2 + 2.5, currentY, colWidth, 45, 'F');
   doc.setDrawColor(200, 200, 200);
-  doc.rect(pageWidth/2 + 10, currentY, colWidth, 50, 'S');
+  doc.rect(pageWidth/2 + 2.5, currentY, colWidth, 45, 'S');
   
   doc.setTextColor(0, 0, 0);
   doc.setFontSize(11);
-  doc.text('بيانات العميل', pageWidth - 20, currentY + 12, { align: 'right' });
+  doc.text('بيانات العميل', pageWidth - 10, currentY + 10, { align: 'right' });
   
   doc.setFontSize(9);
-  doc.text(`الاسم: ${data.customerName || 'غير محدد'}`, pageWidth - 20, currentY + 22, { align: 'right' });
-  doc.text(`رقم الهوية: ${data.customerIdNumber || 'غير محدد'}`, pageWidth - 20, currentY + 30, { align: 'right' });
-  doc.text(`رقم الهاتف: ${data.customerPhone || 'غير محدد'}`, pageWidth - 20, currentY + 38, { align: 'right' });
+  doc.text(`الاسم: ${data.customerName || 'غير محدد'}`, pageWidth - 10, currentY + 18, { align: 'right' });
+  doc.text(`رقم الهوية: ${data.customerIdNumber || 'غير محدد'}`, pageWidth - 10, currentY + 26, { align: 'right' });
+  doc.text(`رقم الهاتف: ${data.customerPhone || 'غير محدد'}`, pageWidth - 10, currentY + 34, { align: 'right' });
   
   // Vehicle Info (Left column)
   doc.setFillColor(248, 248, 248);
-  doc.rect(15, currentY, colWidth, 50, 'F');
+  doc.rect(5, currentY, colWidth, 45, 'F');
   doc.setDrawColor(200, 200, 200);
-  doc.rect(15, currentY, colWidth, 50, 'S');
+  doc.rect(5, currentY, colWidth, 45, 'S');
   
   doc.setFontSize(11);
-  doc.text('بيانات المركبة', pageWidth/2 - 10, currentY + 12, { align: 'right' });
+  doc.text('بيانات المركبة', pageWidth/2 - 5, currentY + 10, { align: 'right' });
   
   doc.setFontSize(9);
-  doc.text(`الماركة: ${data.carMaker || 'غير محدد'}`, pageWidth/2 - 10, currentY + 22, { align: 'right' });
-  doc.text(`الموديل: ${data.carModel || 'غير محدد'}`, pageWidth/2 - 10, currentY + 30, { align: 'right' });
-  doc.text(`السنة: ${data.carYear || 'غير محدد'}`, pageWidth/2 - 10, currentY + 38, { align: 'right' });
+  doc.text(`الماركة: ${data.carMaker || 'غير محدد'}`, pageWidth/2 - 5, currentY + 18, { align: 'right' });
+  doc.text(`الموديل: ${data.carModel || 'غير محدد'}`, pageWidth/2 - 5, currentY + 26, { align: 'right' });
+  doc.text(`السنة: ${data.carYear || 'غير محدد'}`, pageWidth/2 - 5, currentY + 34, { align: 'right' });
   doc.text(`رقم الهيكل: ${data.vinNumber || 'غير محدد'}`, pageWidth/2 - 10, currentY + 46, { align: 'right' });
   
-  currentY += 70;
+  currentY += 50;
   
-  // Vehicle Specifications Section
+  // Vehicle Specifications Section - reduced margins
   doc.setFillColor(252, 252, 252);
-  doc.rect(15, currentY, pageWidth - 30, 80, 'F');
+  doc.rect(5, currentY, pageWidth - 10, 75, 'F');
   doc.setDrawColor(...darkTeal);
-  doc.rect(15, currentY, pageWidth - 30, 80, 'S');
+  doc.rect(5, currentY, pageWidth - 10, 75, 'S');
   
   doc.setTextColor(...darkTeal);
   doc.setFontSize(12);
-  doc.text('المواصفات التفصيلية', pageWidth - 25, currentY + 15, { align: 'right' });
+  doc.text('المواصفات التفصيلية', pageWidth - 15, currentY + 15, { align: 'right' });
   
   // Add specifications text with proper Arabic formatting
   doc.setTextColor(0, 0, 0);
@@ -135,7 +136,7 @@ export function generateQuotationPDF(data: any): jsPDF {
   
   specLines.forEach((line: string) => {
     if (line.trim()) {
-      doc.text(line.trim(), pageWidth - 25, specY, { align: 'right' });
+      doc.text(line.trim(), pageWidth - 15, specY, { align: 'right' });
       specY += 8;
     }
   });
@@ -149,17 +150,17 @@ export function generateQuotationPDF(data: any): jsPDF {
     }
   }
   
-  currentY += 100;
+  currentY += 80;
   
-  // Offer Summary Section
+  // Offer Summary Section - reduced margins
   doc.setFillColor(250, 250, 250);
-  doc.rect(15, currentY, pageWidth - 30, 70, 'F');
+  doc.rect(5, currentY, pageWidth - 10, 65, 'F');
   doc.setDrawColor(...darkTeal);
-  doc.rect(15, currentY, pageWidth - 30, 70, 'S');
+  doc.rect(5, currentY, pageWidth - 10, 65, 'S');
   
   doc.setTextColor(...darkTeal);
   doc.setFontSize(12);
-  doc.text('ملخص العرض', pageWidth - 25, currentY + 15, { align: 'right' });
+  doc.text('ملخص العرض', pageWidth - 15, currentY + 15, { align: 'right' });
   
   // Calculate pricing
   const basePrice = parseFloat(data.basePrice || '0');
@@ -169,53 +170,53 @@ export function generateQuotationPDF(data: any): jsPDF {
   const tax = subtotal * 0.15;
   const total = subtotal + tax + platePrice;
   
-  // Create pricing table
+  // Create pricing table - optimized for A4
   doc.setFontSize(10);
   doc.setTextColor(0, 0, 0);
   let tableY = currentY + 25;
   
   // Table headers
-  doc.text('البيان', pageWidth - 25, tableY, { align: 'right' });
-  doc.text('المبلغ (ريال)', pageWidth - 80, tableY, { align: 'right' });
+  doc.text('البيان', pageWidth - 15, tableY, { align: 'right' });
+  doc.text('المبلغ (ريال)', pageWidth - 70, tableY, { align: 'right' });
   
   // Table rows
   tableY += 8;
-  doc.text(`السعر الإفرادي`, pageWidth - 25, tableY, { align: 'right' });
-  doc.text(`${basePrice.toLocaleString()}`, pageWidth - 80, tableY, { align: 'right' });
+  doc.text(`السعر الإفرادي`, pageWidth - 15, tableY, { align: 'right' });
+  doc.text(`${basePrice.toLocaleString()}`, pageWidth - 70, tableY, { align: 'right' });
   
   tableY += 6;
-  doc.text(`الكمية`, pageWidth - 25, tableY, { align: 'right' });
-  doc.text(`${quantity}`, pageWidth - 80, tableY, { align: 'right' });
+  doc.text(`الكمية`, pageWidth - 15, tableY, { align: 'right' });
+  doc.text(`${quantity}`, pageWidth - 70, tableY, { align: 'right' });
   
   tableY += 6;
-  doc.text(`الإجمالي قبل الضريبة`, pageWidth - 25, tableY, { align: 'right' });
-  doc.text(`${subtotal.toLocaleString()}`, pageWidth - 80, tableY, { align: 'right' });
+  doc.text(`الإجمالي قبل الضريبة`, pageWidth - 15, tableY, { align: 'right' });
+  doc.text(`${subtotal.toLocaleString()}`, pageWidth - 70, tableY, { align: 'right' });
   
   tableY += 6;
-  doc.text(`الضريبة المضافة (%15)`, pageWidth - 25, tableY, { align: 'right' });
-  doc.text(`${tax.toLocaleString()}`, pageWidth - 80, tableY, { align: 'right' });
+  doc.text(`الضريبة المضافة (%15)`, pageWidth - 15, tableY, { align: 'right' });
+  doc.text(`${tax.toLocaleString()}`, pageWidth - 70, tableY, { align: 'right' });
   
   tableY += 6;
-  doc.text(`المجموع النهائي`, pageWidth - 25, tableY, { align: 'right' });
-  doc.text(`${total.toLocaleString()}`, pageWidth - 80, tableY, { align: 'right' });
+  doc.text(`المجموع النهائي`, pageWidth - 15, tableY, { align: 'right' });
+  doc.text(`${total.toLocaleString()}`, pageWidth - 70, tableY, { align: 'right' });
   
   // Amount in words
   doc.setTextColor(...gold);
   doc.setFontSize(11);
-  doc.text(`المبلغ كتابة: ${total.toLocaleString()} ريال سعودي فقط لا غير`, pageWidth - 25, tableY + 12, { align: 'right' });
+  doc.text(`المبلغ كتابة: ${total.toLocaleString()} ريال سعودي فقط لا غير`, pageWidth - 15, tableY + 12, { align: 'right' });
   
-  currentY += 30;
+  currentY += 70;
   
-  // Terms and Conditions Section from Database
+  // Terms and Conditions Section from Database - reduced margins
   if (data.termsAndConditions && data.termsAndConditions.length > 0) {
     doc.setFillColor(245, 245, 245);
-    doc.rect(25, currentY, pageWidth - 50, 30, 'F');
+    doc.rect(5, currentY, pageWidth - 10, 25, 'F');
     doc.setDrawColor(...darkTeal);
-    doc.rect(25, currentY, pageWidth - 50, 30, 'S');
+    doc.rect(5, currentY, pageWidth - 10, 25, 'S');
     
     doc.setTextColor(...darkTeal);
     doc.setFontSize(10);
-    doc.text('ملاحظات هامة', pageWidth - 35, currentY + 8, { align: 'right' });
+    doc.text('ملاحظات هامة', pageWidth - 15, currentY + 8, { align: 'right' });
     
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(8);
@@ -232,7 +233,7 @@ export function generateQuotationPDF(data: any): jsPDF {
           termText = `• مدة صلاحية العرض: ${validityPeriod} يوم (ينتهي في: ${new Date(deadlineDate).toLocaleDateString('ar-SA')})`;
         }
         
-        doc.text(termText, pageWidth - 35, termsY, { align: 'right' });
+        doc.text(termText, pageWidth - 15, termsY, { align: 'right' });
         termsY += 4;
       }
     });
@@ -240,16 +241,16 @@ export function generateQuotationPDF(data: any): jsPDF {
     currentY += 35;
   }
   
-  // Single centered section: QR Code and Signature
+  // Single centered section: QR Code and Signature - optimized for A4
   const bottomY = currentY;
-  const sectionWidth = (pageWidth - 60) / 2;
+  const sectionWidth = (pageWidth - 20) / 2;
   const centerX = pageWidth / 2 - sectionWidth / 2;
   
   // QR Code and Signature (centered section)
   doc.setFillColor(240, 245, 255);
-  doc.rect(centerX, bottomY, sectionWidth, 50, 'F');
+  doc.rect(centerX, bottomY, sectionWidth, 45, 'F');
   doc.setDrawColor(...darkTeal);
-  doc.rect(centerX, bottomY, sectionWidth, 50, 'S');
+  doc.rect(centerX, bottomY, sectionWidth, 45, 'S');
   
   // Section title
   doc.setTextColor(...darkTeal);
