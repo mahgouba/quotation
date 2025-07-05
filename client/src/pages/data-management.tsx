@@ -90,6 +90,7 @@ export default function DataManagement() {
     registrationNumber: "",
     taxNumber: "",
     logo: "",
+    stamp: "",
     primaryColor: "#3b82f6",
     secondaryColor: "#1e40af",
     textColor: "#1f2937",
@@ -201,6 +202,20 @@ export default function DataManagement() {
   const handleDeleteSalesRep = (id: number) => {
     if (confirm("هل أنت متأكد من حذف هذا المندوب؟")) {
       deleteSalesRepMutation.mutate(id);
+    }
+  };
+
+  const handleDeleteSpec = (id: number) => {
+    if (confirm("هل أنت متأكد من حذف هذه المواصفات؟")) {
+      // Add delete spec mutation
+      fetch(`/api/vehicle-specs/${id}`, { method: 'DELETE' })
+        .then(() => {
+          queryClient.invalidateQueries({ queryKey: ['/api/vehicle-specs'] });
+          toast({ title: "تم حذف المواصفات بنجاح" });
+        })
+        .catch(() => {
+          toast({ title: "خطأ في الحذف", variant: "destructive" });
+        });
     }
   };
 
@@ -429,7 +444,11 @@ export default function DataManagement() {
                               <Button variant="outline" size="sm">
                                 <Edit className="w-4 h-4" />
                               </Button>
-                              <Button variant="outline" size="sm">
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => handleDeleteSpec(spec.id)}
+                              >
                                 <Trash2 className="w-4 h-4" />
                               </Button>
                             </div>
@@ -617,6 +636,36 @@ export default function DataManagement() {
                           <img 
                             src={companyForm.logo} 
                             alt="معاينة الشعار" 
+                            className="w-20 h-20 object-contain border rounded"
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    <div>
+                      <Label htmlFor="company-stamp">ختم الشركة</Label>
+                      <Input
+                        id="company-stamp"
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                              const result = e.target?.result as string;
+                              setCompanyForm({...companyForm, stamp: result});
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                        className="mb-2"
+                      />
+                      {companyForm.stamp && (
+                        <div className="mt-2">
+                          <img 
+                            src={companyForm.stamp} 
+                            alt="معاينة الختم" 
                             className="w-20 h-20 object-contain border rounded"
                           />
                         </div>

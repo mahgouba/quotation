@@ -382,10 +382,19 @@ export class PDFTemplateEngine {
       }
     }
     
-    // Signature area
-    this.doc.setDrawColor(...this.hexToRgb(this.template.colors.primary));
-    this.doc.line(this.pageWidth - 80, footerY + 10, this.pageWidth - this.template.spacing.margin, footerY + 10);
-    this.doc.text('توقيع المندوب', this.pageWidth - 50, footerY + 18, { align: 'center' });
+    // Company stamp
+    if (data.companyStamp) {
+      try {
+        const stampSize = 30;
+        const stampX = this.pageWidth - this.template.spacing.margin - stampSize - 10;
+        const stampY = footerY - 5;
+        
+        this.doc.addImage(data.companyStamp, 'JPEG', stampX, stampY, stampSize, stampSize);
+        this.doc.text('ختم الشركة', stampX + stampSize/2, stampY + stampSize + 8, { align: 'center' });
+      } catch (error) {
+        console.warn('Could not add company stamp to PDF');
+      }
+    }
   }
 
   public generatePDF(data: any): jsPDF {
@@ -413,6 +422,13 @@ export class PDFTemplateEngine {
       `اللون الخارجي: ${data.exteriorColor || 'غير محدد'}`,
       `اللون الداخلي: ${data.interiorColor || 'غير محدد'}`
     ]);
+    
+    // Add vehicle specifications if available
+    if (data.vehicleSpecifications) {
+      this.addSection('المواصفات التفصيلية', 
+        data.vehicleSpecifications.split('\n').filter((spec: string) => spec.trim())
+      );
+    }
     
     // Add sales representative section
     if (data.salesRepName) {

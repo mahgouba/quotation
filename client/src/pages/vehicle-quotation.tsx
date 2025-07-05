@@ -520,6 +520,7 @@ const VehicleQuotation = () => {
         salesRepPhone: formData.salesRepPhone || null,
         salesRepEmail: formData.salesRepEmail || null,
         salesRepresentativeId: formData.salesRepresentativeId,
+        vehicleSpecifications: vehicleSpecs?.specifications || formData.detailedSpecs || null,
 
         status: "draft",
       },
@@ -535,7 +536,12 @@ const VehicleQuotation = () => {
         ...formData,
         totalInWords: numberToArabicWords(formData.totalPrice),
         carYear: formData.carYear || new Date().getFullYear().toString(),
-        specifications: vehicleSpecs?.specifications || formData.detailedSpecs || '',
+        vehicleSpecifications: vehicleSpecs?.specifications || formData.detailedSpecs || '',
+        quotationNumber: `QT-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}${String(new Date().getDate()).padStart(2, '0')}-${String(Math.floor(Math.random() * 999) + 1).padStart(3, '0')}`,
+        companyStamp: formData.companyStamp,
+        salesRepName: formData.salesRepName,
+        salesRepPhone: formData.salesRepPhone,
+        salesRepEmail: formData.salesRepEmail,
       };
 
       // Generate PDF using advanced templating

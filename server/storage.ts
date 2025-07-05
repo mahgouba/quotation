@@ -9,7 +9,7 @@ import {
   type VehicleSpecification, type InsertVehicleSpecification
 } from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, and, gte, lte } from "drizzle-orm";
 
 export interface IStorage {
   // User methods
@@ -206,11 +206,41 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createQuotation(quotation: InsertQuotation): Promise<Quotation> {
+    // Generate quotation number if not provided
+    const quotationNumber = quotation.quotationNumber || await this.generateQuotationNumber();
+    
     const [newQuotation] = await db
       .insert(quotations)
-      .values(quotation)
+      .values({
+        ...quotation,
+        quotationNumber
+      })
       .returning();
     return newQuotation;
+  }
+
+  private async generateQuotationNumber(): Promise<string> {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    
+    // Get count of quotations today
+    const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+    
+    const todayQuotations = await db
+      .select()
+      .from(quotations)
+      .where(
+        and(
+          gte(quotations.issueDate, startOfDay),
+          lte(quotations.issueDate, endOfDay)
+        )
+      );
+    
+    const sequenceNumber = String(todayQuotations.length + 1).padStart(3, '0');
+    return `QT-${year}${month}${day}-${sequenceNumber}`;
   }
 
   async updateQuotation(id: number, quotation: Partial<InsertQuotation>): Promise<Quotation | undefined> {

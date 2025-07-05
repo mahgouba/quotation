@@ -652,27 +652,37 @@ export default function VehicleManagement() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredSpecs.map((spec: VehicleSpec) => (
+                      {filteredSpecs.map((spec: any) => (
                         <TableRow key={spec.id}>
                           <TableCell className="font-medium">{spec.make}</TableCell>
                           <TableCell>{spec.model}</TableCell>
                           <TableCell>{spec.year}</TableCell>
                           <TableCell>{spec.engine}</TableCell>
-                          <TableCell>{spec.horsepower}</TableCell>
-                          <TableCell>{spec.fuelType}</TableCell>
+                          <TableCell>
+                            <div className="max-w-xs truncate">
+                              {spec.specifications || 'غير محدد'}
+                            </div>
+                          </TableCell>
+                          <TableCell>-</TableCell>
                           <TableCell>
                             <div className="flex gap-1">
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => setEditingSpec(spec)}
+                                onClick={() => {
+                                  console.log("Edit clicked for spec:", spec);
+                                  setEditingSpec(spec);
+                                }}
                               >
                                 <Edit className="h-4 w-4" />
                               </Button>
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => handleDeleteSpec(spec.id)}
+                                onClick={() => {
+                                  console.log("Delete clicked for spec ID:", spec.id);
+                                  handleDeleteSpec(spec.id);
+                                }}
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>

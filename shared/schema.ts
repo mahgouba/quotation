@@ -61,6 +61,7 @@ export const vehicles = pgTable("vehicles", {
 
 export const quotations = pgTable("quotations", {
   id: serial("id").primaryKey(),
+  quotationNumber: text("quotation_number").notNull(),
   customerId: integer("customer_id").references(() => customers.id),
   companyId: integer("company_id").references(() => companies.id),
   vehicleId: integer("vehicle_id").references(() => vehicles.id),
@@ -85,6 +86,9 @@ export const quotations = pgTable("quotations", {
   salesRepName: text("sales_rep_name"),
   salesRepPhone: text("sales_rep_phone"),
   salesRepEmail: text("sales_rep_email"),
+  
+  // Vehicle specifications
+  vehicleSpecifications: text("vehicle_specifications"),
   
   // Vehicle specifications
   specifications: text("specifications"), // Additional specs input by user
