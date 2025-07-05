@@ -205,6 +205,13 @@ Changelog:
   * Integrated representative information, QR code, and terms/conditions
   * Included signature area and professional footer with contact information
   * Optimized for A4 printing with proper spacing and professional appearance
+- July 05, 2025. Vehicle Brand Logo PNG Upload System:
+  * Changed vehicle logo input from URL to PNG file upload in data management interface
+  * Added file validation to accept only PNG format for brand logos
+  * Enhanced vehicle specifications table to display uploaded brand logos
+  * Integrated logo upload functionality for both new and existing vehicle specifications
+  * Updated quotation preview to show brand logos from database entries
+  * Added visual feedback with logo preview in management interface
 ```
 
 ## User Preferences

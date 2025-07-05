@@ -184,6 +184,22 @@ export default function DataManagement() {
   const availableYears = Array.from(new Set(vehicleSpecs.map((spec: VehicleSpec) => spec.year)))
     .sort((a: number, b: number) => b - a);
 
+  const handleBrandLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.type !== 'image/png') {
+        toast({ title: "يرجى اختيار ملف PNG فقط", variant: "destructive" });
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSpecForm(prev => ({ ...prev, brandLogo: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSpecSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!specForm.make || !specForm.model || !specForm.year || !specForm.engine) {
@@ -247,6 +263,22 @@ export default function DataManagement() {
       specifications: spec.specifications || "",
       brandLogo: (spec as any).brandLogo || ""
     });
+  };
+
+  const handleBrandLogoUploadForEdit = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.type !== 'image/png') {
+        toast({ title: "يرجى اختيار ملف PNG فقط", variant: "destructive" });
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSpecForm(prev => ({ ...prev, brandLogo: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleUpdateSpec = () => {
@@ -424,14 +456,27 @@ export default function DataManagement() {
                       </div>
                     </div>
                     <div>
-                      <Label htmlFor="brandLogo">شعار الماركة</Label>
-                      <Input
-                        id="brandLogo"
-                        value={specForm.brandLogo}
-                        onChange={(e) => setSpecForm({...specForm, brandLogo: e.target.value})}
-                        placeholder="رابط شعار الماركة (URL)"
-                        type="url"
-                      />
+                      <Label htmlFor="brandLogo">شعار الماركة (PNG)</Label>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <Input
+                            id="brandLogo"
+                            type="file"
+                            accept=".png,image/png"
+                            onChange={handleBrandLogoUpload}
+                            className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                          />
+                        </div>
+                        {specForm.brandLogo && (
+                          <div className="mt-2">
+                            <img 
+                              src={specForm.brandLogo} 
+                              alt="شعار الماركة" 
+                              className="h-16 w-auto border rounded"
+                            />
+                          </div>
+                        )}
+                      </div>
                     </div>
                     <div>
                       <Label htmlFor="specifications">المواصفات الإضافية</Label>
@@ -568,6 +613,7 @@ export default function DataManagement() {
                         <TableHead>الموديل</TableHead>
                         <TableHead>السنة</TableHead>
                         <TableHead>المحرك</TableHead>
+                        <TableHead>الشعار</TableHead>
                         <TableHead>المواصفات</TableHead>
                         <TableHead>الإجراءات</TableHead>
                       </TableRow>
@@ -579,6 +625,17 @@ export default function DataManagement() {
                           <TableCell>{spec.model}</TableCell>
                           <TableCell>{spec.year}</TableCell>
                           <TableCell>{spec.engine}</TableCell>
+                          <TableCell>
+                            {(spec as any).brandLogo ? (
+                              <img 
+                                src={(spec as any).brandLogo} 
+                                alt={`شعار ${spec.make}`} 
+                                className="h-8 w-auto"
+                              />
+                            ) : (
+                              <span className="text-gray-400 text-sm">لا يوجد شعار</span>
+                            )}
+                          </TableCell>
                           <TableCell className="max-w-xs truncate">{spec.specifications || "لا توجد مواصفات إضافية"}</TableCell>
                           <TableCell>
                             <div className="flex gap-2">

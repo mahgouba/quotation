@@ -1238,10 +1238,10 @@ const VehicleQuotation = () => {
                   </div>
                   
                   {/* Brand Logo if available */}
-                  {vehicleSpecs?.brandLogo && (
+                  {(vehicleSpecs?.brandLogo || (vehicleSpecs as any)?.brandLogo) && (
                     <div className="absolute top-4 left-4">
                       <img 
-                        src={vehicleSpecs.brandLogo} 
+                        src={(vehicleSpecs?.brandLogo || (vehicleSpecs as any)?.brandLogo)} 
                         alt={`شعار ${formData.carMaker}`} 
                         className="h-12 w-auto opacity-80"
                       />
