@@ -170,6 +170,15 @@ Changelog:
   * Template customization includes header styles, table formats, spacing, and visual elements
   * PDF preview and export functionality with template-specific file naming
   * Sales representative integration with template system for personalized quotations
+- July 05, 2025. Enhanced PDF System & Data Management:
+  * Added automatic quotation numbering system to database schema and PDF generation
+  * Enhanced PDF templates with detailed vehicle specifications display
+  * Integrated sales representative data in PDF footer sections
+  * Added company stamp/seal upload functionality and positioning in PDF (bottom right)
+  * Removed signature fields and replaced with company seal integration
+  * Fixed action buttons functionality in data management interfaces
+  * Enhanced delete operations for vehicle specifications and sales representatives
+  * Improved PDF layout with better organization of specifications and company branding
 ```
 
 ## User Preferences
