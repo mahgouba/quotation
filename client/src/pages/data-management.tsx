@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Edit, Plus, Car, Users, Building, UserCheck, Filter, ArrowLeft } from "lucide-react";
+import { Trash2, Edit, Plus, Car, Users, Building, UserCheck, Filter, ArrowLeft, FileText } from "lucide-react";
 import { Link } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -73,6 +73,7 @@ export default function DataManagement() {
     engine: "",
     specifications: ""
   });
+  const [editingSpec, setEditingSpec] = useState<VehicleSpec | null>(null);
 
   // Sales Rep Form
   const [salesRepForm, setSalesRepForm] = useState({
@@ -96,6 +97,7 @@ export default function DataManagement() {
     textColor: "#1f2937",
     backgroundColor: "#ffffff"
   });
+  const [editingCompany, setEditingCompany] = useState<Company | null>(null);
 
   // Mutations
   const addSpecMutation = useMutation({
@@ -207,11 +209,84 @@ export default function DataManagement() {
 
   const handleDeleteSpec = (id: number) => {
     if (confirm("هل أنت متأكد من حذف هذه المواصفات؟")) {
-      // Add delete spec mutation
       fetch(`/api/vehicle-specs/${id}`, { method: 'DELETE' })
         .then(() => {
           queryClient.invalidateQueries({ queryKey: ['/api/vehicle-specs'] });
           toast({ title: "تم حذف المواصفات بنجاح" });
+        })
+        .catch(() => {
+          toast({ title: "خطأ في الحذف", variant: "destructive" });
+        });
+    }
+  };
+
+  const handleEditSpec = (spec: VehicleSpec) => {
+    setEditingSpec(spec);
+    setSpecForm({
+      make: spec.make,
+      model: spec.model,
+      year: spec.year.toString(),
+      engine: spec.engine,
+      specifications: spec.specifications || ""
+    });
+  };
+
+  const handleUpdateSpec = () => {
+    if (!editingSpec) return;
+    
+    const updatedSpec = {
+      make: specForm.make,
+      model: specForm.model,
+      year: parseInt(specForm.year),
+      engine: specForm.engine,
+      specifications: specForm.specifications
+    };
+
+    fetch(`/api/vehicle-specs/${editingSpec.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedSpec)
+    })
+    .then(() => {
+      queryClient.invalidateQueries({ queryKey: ['/api/vehicle-specs'] });
+      toast({ title: "تم تحديث المواصفات بنجاح" });
+      setEditingSpec(null);
+      setSpecForm({ make: "", model: "", year: "", engine: "", specifications: "" });
+    })
+    .catch(() => {
+      toast({ title: "خطأ في التحديث", variant: "destructive" });
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingSpec(null);
+    setSpecForm({ make: "", model: "", year: "", engine: "", specifications: "" });
+  };
+
+  const handleEditCompany = (company: Company) => {
+    setEditingCompany(company);
+    setCompanyForm({
+      name: company.name,
+      address: company.address || "",
+      phone: company.phone || "",
+      email: company.email || "",
+      registrationNumber: company.registrationNumber || "",
+      taxNumber: company.taxNumber || "",
+      logo: company.logo || "",
+      stamp: (company as any).stamp || "",
+      primaryColor: company.primaryColor || "#3b82f6",
+      secondaryColor: company.secondaryColor || "#1e40af",
+      textColor: company.textColor || "#1f2937",
+      backgroundColor: company.backgroundColor || "#ffffff"
+    });
+  };
+
+  const handleDeleteCompany = (id: number) => {
+    if (confirm("هل أنت متأكد من حذف هذه الشركة؟")) {
+      fetch(`/api/companies/${id}`, { method: 'DELETE' })
+        .then(() => {
+          queryClient.invalidateQueries({ queryKey: ['/api/companies'] });
+          toast({ title: "تم حذف الشركة بنجاح" });
         })
         .catch(() => {
           toast({ title: "خطأ في الحذف", variant: "destructive" });
@@ -261,12 +336,21 @@ export default function DataManagement() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Plus className="w-5 h-5" />
-                    إضافة مواصفات جديدة
+                    {editingSpec ? (
+                      <>
+                        <Edit className="w-5 h-5" />
+                        تعديل المواصفات
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-5 h-5" />
+                        إضافة مواصفات جديدة
+                      </>
+                    )}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <form onSubmit={handleSpecSubmit} className="space-y-4">
+                  <form onSubmit={editingSpec ? (e) => e.preventDefault() : handleSpecSubmit} className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="make">الماركة *</Label>
@@ -325,9 +409,31 @@ export default function DataManagement() {
                         className="resize-none"
                       />
                     </div>
-                    <Button type="submit" className="w-full" disabled={addSpecMutation.isPending}>
-                      {addSpecMutation.isPending ? "جاري الإضافة..." : "إضافة المواصفات"}
-                    </Button>
+                    <div className="flex gap-2">
+                      {editingSpec ? (
+                        <>
+                          <Button 
+                            type="button" 
+                            onClick={handleUpdateSpec}
+                            className="flex-1"
+                          >
+                            تحديث المواصفات
+                          </Button>
+                          <Button 
+                            type="button" 
+                            variant="outline"
+                            onClick={handleCancelEdit}
+                            className="flex-1"
+                          >
+                            إلغاء
+                          </Button>
+                        </>
+                      ) : (
+                        <Button type="submit" className="w-full" disabled={addSpecMutation.isPending}>
+                          {addSpecMutation.isPending ? "جاري الإضافة..." : "إضافة المواصفات"}
+                        </Button>
+                      )}
+                    </div>
                   </form>
                 </CardContent>
               </Card>
@@ -441,7 +547,11 @@ export default function DataManagement() {
                           <TableCell className="max-w-xs truncate">{spec.specifications || "لا توجد مواصفات إضافية"}</TableCell>
                           <TableCell>
                             <div className="flex gap-2">
-                              <Button variant="outline" size="sm">
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => handleEditSpec(spec)}
+                              >
                                 <Edit className="w-4 h-4" />
                               </Button>
                               <Button 
@@ -842,6 +952,19 @@ export default function DataManagement() {
                               </div>
                             )}
                           </TableCell>
+                          <TableCell>
+                            {(company as any).stamp ? (
+                              <img 
+                                src={(company as any).stamp} 
+                                alt={`ختم ${company.name}`}
+                                className="w-8 h-8 object-contain rounded"
+                              />
+                            ) : (
+                              <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
+                                <FileText className="w-4 h-4 text-gray-400" />
+                              </div>
+                            )}
+                          </TableCell>
                           <TableCell className="font-medium">{company.name}</TableCell>
                           <TableCell>{company.address || "غير محدد"}</TableCell>
                           <TableCell>{company.phone || "غير محدد"}</TableCell>
@@ -850,10 +973,18 @@ export default function DataManagement() {
                           <TableCell>{company.taxNumber || "غير محدد"}</TableCell>
                           <TableCell>
                             <div className="flex gap-2">
-                              <Button variant="outline" size="sm">
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => handleEditCompany(company)}
+                              >
                                 <Edit className="w-4 h-4" />
                               </Button>
-                              <Button variant="outline" size="sm">
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => handleDeleteCompany(company.id)}
+                              >
                                 <Trash2 className="w-4 h-4" />
                               </Button>
                             </div>

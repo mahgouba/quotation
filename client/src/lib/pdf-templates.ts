@@ -350,50 +350,64 @@ export class PDFTemplateEngine {
   }
 
   private addFooter(data: any) {
-    const footerY = this.pageHeight - 40;
+    const footerY = this.pageHeight - 60;
     
-    // Terms and conditions
-    this.doc.setTextColor(...this.hexToRgb(this.template.colors.text));
-    this.doc.setFontSize(this.template.fonts.footer.size);
+    // Add footer divider line
+    this.doc.setDrawColor(...this.hexToRgb(this.template.colors.primary));
+    this.doc.setLineWidth(1);
+    this.doc.line(this.template.spacing.margin, footerY - 10, this.pageWidth - this.template.spacing.margin, footerY - 10);
     
-    const terms = [
-      'الشروط والأحكام:',
-      '• عرض السعر صالح لمدة 15 يوماً من تاريخ الإصدار',
-      '• الأسعار شاملة ضريبة القيمة المضافة',
-      '• سعر اللوحات خاضع للكمية وغير خاضع للضريبة',
-      '• يتم التسليم خلال 7-10 أيام عمل من تاريخ التأكيد'
-    ];
-    
-    let currentFooterY = footerY - (terms.length * 8);
-    terms.forEach(term => {
-      this.doc.text(term, this.pageWidth - this.template.spacing.margin, currentFooterY, { align: 'right' });
-      currentFooterY += 8;
-    });
-    
-    // QR Code
+    // QR Code on the left
     if (this.template.elements.showQRCode) {
       const qrData = `عرض سعر - ${data.customerName} - ${data.carMaker} ${data.carModel} - ${data.totalPrice} ريال`;
       const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=${encodeURIComponent(qrData)}`;
       
       try {
-        this.doc.addImage(qrUrl, 'PNG', this.template.spacing.margin, footerY, 15, 15);
+        this.doc.addImage(qrUrl, 'PNG', this.template.spacing.margin, footerY, 20, 20);
+        this.doc.setTextColor(...this.hexToRgb(this.template.colors.text));
+        this.doc.setFontSize(8);
+        this.doc.text('رمز QR للبحث السريع', this.template.spacing.margin + 10, footerY + 25, { align: 'center' });
       } catch (error) {
         console.warn('Could not add QR code to PDF');
       }
     }
     
-    // Company stamp
+    // Company stamp on the right
     if (data.companyStamp) {
       try {
-        const stampSize = 30;
-        const stampX = this.pageWidth - this.template.spacing.margin - stampSize - 10;
-        const stampY = footerY - 5;
+        const stampSize = 25;
+        const stampX = this.pageWidth - this.template.spacing.margin - stampSize;
+        const stampY = footerY;
         
         this.doc.addImage(data.companyStamp, 'JPEG', stampX, stampY, stampSize, stampSize);
-        this.doc.text('ختم الشركة', stampX + stampSize/2, stampY + stampSize + 8, { align: 'center' });
+        this.doc.setTextColor(...this.hexToRgb(this.template.colors.text));
+        this.doc.setFontSize(8);
+        this.doc.text('ختم الشركة', stampX + stampSize/2, stampY + stampSize + 5, { align: 'center' });
       } catch (error) {
         console.warn('Could not add company stamp to PDF');
       }
+    }
+    
+    // Sales representative info in the center
+    if (data.salesRepName) {
+      this.doc.setTextColor(...this.hexToRgb(this.template.colors.text));
+      this.doc.setFontSize(this.template.fonts.footer.size);
+      
+      const centerX = this.pageWidth / 2;
+      this.doc.text(`المندوب: ${data.salesRepName}`, centerX, footerY + 5, { align: 'center' });
+      
+      if (data.salesRepPhone) {
+        this.doc.text(`هاتف: ${data.salesRepPhone}`, centerX, footerY + 12, { align: 'center' });
+      }
+      
+      // Date and validity
+      this.doc.setFontSize(this.template.fonts.footer.size - 1);
+      this.doc.text(
+        `تاريخ الإصدار: ${new Date().toLocaleDateString('ar-SA')}`,
+        centerX,
+        footerY + 20,
+        { align: 'center' }
+      );
     }
   }
 
@@ -425,9 +439,14 @@ export class PDFTemplateEngine {
     
     // Add vehicle specifications if available
     if (data.vehicleSpecifications) {
-      this.addSection('المواصفات التفصيلية', 
-        data.vehicleSpecifications.split('\n').filter((spec: string) => spec.trim())
-      );
+      const specs = data.vehicleSpecifications.split('\n').filter((spec: string) => spec.trim());
+      this.addSection('المواصفات التفصيلية للمركبة', specs);
+    }
+    
+    // Add additional vehicle details if available
+    if (data.detailedSpecs) {
+      const detailedSpecs = data.detailedSpecs.split('\n').filter((spec: string) => spec.trim());
+      this.addSection('المواصفات الفنية', detailedSpecs);
     }
     
     // Add sales representative section

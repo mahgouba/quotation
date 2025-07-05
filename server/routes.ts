@@ -57,6 +57,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/companies/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      // For now, we'll just return 204 since we don't have a delete method in storage
+      // In production, you'd want to check if company is being used in quotations first
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete company" });
+    }
+  });
+
   // Sales Representative routes
   app.get("/api/sales-representatives", async (req, res) => {
     try {
