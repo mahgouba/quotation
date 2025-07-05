@@ -206,51 +206,35 @@ export function generateQuotationPDF(data: any): jsPDF {
   
   currentY += 30;
   
-  // Two-column bottom section: Rep Info, QR Code & Price Summary
+  // Single centered section: QR Code and Signature
   const bottomY = currentY;
-  const sectionWidth = (pageWidth - 40) / 2;
-  const margin = 15;
+  const sectionWidth = (pageWidth - 60) / 2;
+  const centerX = pageWidth / 2 - sectionWidth / 2;
   
-  // Representative info (right section)
-  const repX = pageWidth - margin - sectionWidth;
-  doc.setFillColor(248, 250, 252);
-  doc.rect(repX, bottomY, sectionWidth, 50, 'F');
-  doc.setDrawColor(...darkTeal);
-  doc.rect(repX, bottomY, sectionWidth, 50, 'S');
-  
-  doc.setTextColor(...darkTeal);
-  doc.setFontSize(10);
-  doc.text('بيانات مندوب المبيعات', repX + sectionWidth - 5, bottomY + 10, { align: 'right' });
-  doc.setTextColor(0, 0, 0);
-  doc.setFontSize(8);
-  doc.text(`الاسم: ${data.salesRepName || 'غير محدد'}`, repX + sectionWidth - 5, bottomY + 18, { align: 'right' });
-  doc.text(`الهاتف: ${data.salesRepPhone || 'غير محدد'}`, repX + sectionWidth - 5, bottomY + 26, { align: 'right' });
-  doc.text(`البريد: ${data.salesRepEmail || 'غير محدد'}`, repX + sectionWidth - 5, bottomY + 34, { align: 'right' });
-  
-  // QR Code and Signature (left section)
+  // QR Code and Signature (centered section)
   doc.setFillColor(240, 245, 255);
-  doc.rect(margin, bottomY, sectionWidth, 50, 'F');
+  doc.rect(centerX, bottomY, sectionWidth, 50, 'F');
   doc.setDrawColor(...darkTeal);
-  doc.rect(margin, bottomY, sectionWidth, 50, 'S');
+  doc.rect(centerX, bottomY, sectionWidth, 50, 'S');
   
   // Section title
   doc.setTextColor(...darkTeal);
   doc.setFontSize(10);
-  doc.text('QR Code والتوقيع', margin + sectionWidth - 5, bottomY + 10, { align: 'right' });
+  doc.text('QR Code والتوقيع', centerX + sectionWidth - 5, bottomY + 10, { align: 'right' });
   
   // QR Code placeholder (larger)
   doc.setFillColor(255, 255, 255);
-  doc.rect(margin + 10, bottomY + 15, 30, 30, 'F');
+  doc.rect(centerX + 10, bottomY + 15, 30, 30, 'F');
   doc.setDrawColor(200, 200, 200);
-  doc.rect(margin + 10, bottomY + 15, 30, 30, 'S');
+  doc.rect(centerX + 10, bottomY + 15, 30, 30, 'S');
   doc.setTextColor(100, 100, 100);
   doc.setFontSize(8);
-  doc.text('QR Code', margin + 25, bottomY + 32, { align: 'center' });
+  doc.text('QR Code', centerX + 25, bottomY + 32, { align: 'center' });
   
   // Signature area
   doc.setTextColor(0, 0, 0);
   doc.setFontSize(8);
-  doc.text('ختم وتوقيع الشركة', margin + sectionWidth - 5, bottomY + 35, { align: 'right' });
+  doc.text('ختم وتوقيع الشركة', centerX + sectionWidth - 5, bottomY + 35, { align: 'right' });
   
   // Footer with Gold background
   doc.setFillColor(...gold);

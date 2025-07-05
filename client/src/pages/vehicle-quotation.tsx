@@ -547,13 +547,12 @@ const VehicleQuotation = () => {
         companyLogo: selectedComp?.logo || null,
         vehicleSpecifications: vehicleSpecs?.specifications || formData.detailedSpecs || 'مواصفات غير محددة',
         quotationNumber: `QT-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}${String(new Date().getDate()).padStart(2, '0')}-${String(Math.floor(Math.random() * 999) + 1).padStart(3, '0')}`,
-        salesRepName: selectedSalesRep?.name || 'غير محدد',
-        salesRepPhone: selectedSalesRep?.phone || 'غير محدد',
+
         companyName: selectedComp?.name || 'شركة البريمي',
         companyPhone: selectedComp?.phone || 'غير محدد',
         companyEmail: selectedComp?.email || 'غير محدد',
 
-        salesRepEmail: selectedSalesRep?.email || 'غير محدد'
+
       };
 
       // Try HTML to PDF approach for better Arabic support
@@ -1331,15 +1330,7 @@ const VehicleQuotation = () => {
                 </div>
               </div>
 
-              {/* Sales Representative Information */}
-              <div className="mt-8 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
-                <h4 className="font-semibold text-lg mb-2 text-right">بيانات المندوب</h4>
-                <div className="text-sm text-right space-y-1">
-                  <p><span className="font-medium">الاسم:</span> {formData.salesRepName || 'غير محدد'}</p>
-                  <p><span className="font-medium">الهاتف:</span> {formData.salesRepPhone || 'غير محدد'}</p>
-                  <p><span className="font-medium">البريد الإلكتروني:</span> {formData.salesRepEmail || 'غير محدد'}</p>
-                </div>
-              </div>
+
 
 
 

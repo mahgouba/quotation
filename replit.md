@@ -238,6 +238,12 @@ Changelog:
   * Cleaned up data structure to remove termsAndConditions field
   * Simplified quotation layout to focus on essential business data only
   * Updated notes section with more relevant business information
+- July 05, 2025. Sales Representative Information Removal:
+  * Removed sales representative section from PDF layout completely
+  * Eliminated sales representative information from quotation preview
+  * Cleaned up data structure removing salesRepName, salesRepPhone, salesRepEmail fields
+  * Simplified bottom section to single centered QR code and signature area
+  * Streamlined quotation to focus only on customer, vehicle, and company data
 ```
 
 ## User Preferences
