@@ -350,6 +350,11 @@ Changelog:
   * Added visual indicators (*) for required fields in the user interface
   * Improved error messages with detailed lists of missing required fields
   * Prevents saving incomplete quotations with clear feedback to users
+- July 05, 2025. Database Reset - Company Data Cleanup:
+  * Removed all test companies from database as requested by user
+  * Performed complete database cleanup using TRUNCATE CASCADE
+  * Also removed associated quotations and sales representatives due to database constraints
+  * System now has clean database ready for production use
 ```
 
 ## User Preferences
