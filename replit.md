@@ -367,6 +367,13 @@ Changelog:
   * Added proper event handlers and tooltips for all action buttons
   * Enhanced user interface with working buttons and cleaner layout
   * Improved quotations management with functional action buttons
+- July 05, 2025. Edit Quotation Navigation System:
+  * Added edit functionality that navigates to main page with quotation data
+  * Implemented localStorage-based data transfer for editing quotations
+  * Created useEffect hook to load editing data on main page
+  * Auto-populates all form fields with saved quotation data for editing
+  * Clears edit parameters and localStorage after successful data loading
+  * Enhanced user experience with seamless edit workflow from saved quotations list
 ```
 
 ## User Preferences

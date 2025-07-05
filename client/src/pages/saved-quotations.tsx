@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { Eye, Edit, Trash2, Search, Download, ArrowLeft } from 'lucide-react';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -32,6 +32,7 @@ export default function SavedQuotations() {
   const [statusFilter, setStatusFilter] = useState('all');
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
 
   // Fetch saved quotations
   const { data: quotations = [], isLoading } = useQuery({
@@ -94,11 +95,15 @@ export default function SavedQuotations() {
   };
 
   const handleEdit = (quotation: SavedQuotation) => {
-    // TODO: Navigate to edit page with quotation data
-    console.log('Edit quotation:', quotation);
+    // Store quotation data in localStorage for editing
+    localStorage.setItem('editingQuotation', JSON.stringify(quotation));
+    
+    // Navigate to main page with edit parameter
+    setLocation(`/?edit=${quotation.id}`);
+    
     toast({
       title: 'تحرير العرض',
-      description: `تحرير ${quotation.quotationNumber}`,
+      description: `تم التوجيه لتحرير ${quotation.quotationNumber}`,
     });
   };
 

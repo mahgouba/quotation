@@ -295,6 +295,78 @@ const VehicleQuotation = () => {
     }
   }, [formData.issueDate, formData.validityPeriod]);
 
+  // Load quotation data for editing
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const editId = urlParams.get('edit');
+    
+    if (editId) {
+      const savedQuotation = localStorage.getItem('editingQuotation');
+      if (savedQuotation) {
+        try {
+          const quotationData = JSON.parse(savedQuotation);
+          
+          // Load customer data
+          setFormData(prev => ({
+            ...prev,
+            customerTitle: quotationData.customer?.title || prev.customerTitle,
+            customerName: quotationData.customer?.name || '',
+            customerPhone: quotationData.customer?.phone || '',
+            customerEmail: quotationData.customer?.email || '',
+            
+            // Load vehicle data
+            carMaker: quotationData.vehicle?.maker || '',
+            carModel: quotationData.vehicle?.model || '',
+            carYear: quotationData.carYear || '',
+            exteriorColor: quotationData.vehicle?.exteriorColor || '',
+            interiorColor: quotationData.vehicle?.interiorColor || '',
+            vinNumber: quotationData.vehicle?.vinNumber || '',
+            detailedSpecs: quotationData.vehicleSpecifications || '',
+            
+            // Load pricing data
+            basePrice: parseFloat(quotationData.basePrice) || 0,
+            vatRate: parseFloat(quotationData.vatRate) || 15,
+            platePrice: parseFloat(quotationData.platePrice) || 0,
+            quantity: quotationData.quantity || 1,
+            
+            // Load dates and other data
+            issueDate: quotationData.issueDate ? format(new Date(quotationData.issueDate), "yyyy-MM-dd") : '',
+            deadlineDate: quotationData.deadlineDate ? format(new Date(quotationData.deadlineDate), "yyyy-MM-dd") : '',
+            validityPeriod: quotationData.validityPeriod || 30,
+            
+            // Load boolean flags
+            includesPlatesAndTax: quotationData.includesPlatesAndTax || false,
+            isWarrantied: quotationData.isWarrantied || false,
+            isRiyadhDelivery: quotationData.isRiyadhDelivery || false,
+            
+            // Load company and sales rep data
+            selectedCompanyId: quotationData.companyId?.toString() || '',
+            salesRepresentativeId: quotationData.salesRepresentativeId || null,
+          }));
+          
+          // Clear the localStorage after loading
+          localStorage.removeItem('editingQuotation');
+          
+          toast({
+            title: "تم تحميل البيانات",
+            description: `تم تحميل بيانات عرض السعر ${quotationData.quotationNumber} للتحرير`,
+          });
+          
+          // Remove edit parameter from URL
+          window.history.replaceState({}, '', window.location.pathname);
+          
+        } catch (error) {
+          console.error('Error loading quotation data:', error);
+          toast({
+            title: "خطأ في التحميل",
+            description: "فشل في تحميل بيانات عرض السعر",
+            variant: "destructive",
+          });
+        }
+      }
+    }
+  }, []);  // Run only once on component mount
+
   // Handlers
   const handleInputChange = (name: string, value: any) => {
     setFormData(prev => ({ ...prev, [name]: value }));
