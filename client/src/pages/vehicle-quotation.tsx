@@ -551,7 +551,9 @@ const VehicleQuotation = () => {
         salesRepPhone: selectedSalesRep?.phone || 'غير محدد',
         companyName: selectedComp?.name || 'شركة البريمي',
         companyPhone: selectedComp?.phone || 'غير محدد',
-        companyEmail: selectedComp?.email || 'غير محدد'
+        companyEmail: selectedComp?.email || 'غير محدد',
+        companyTerms: (selectedComp as any)?.termsAndConditions || 'الشروط والأحكام غير محددة',
+        salesRepEmail: selectedSalesRep?.email || 'غير محدد'
       };
 
       // Try HTML to PDF approach for better Arabic support
@@ -1343,12 +1345,13 @@ const VehicleQuotation = () => {
               <div className="mt-6 p-4 bg-gray-50 rounded-lg border">
                 <h4 className="font-semibold text-lg mb-3 text-right">الشروط والأحكام</h4>
                 <div className="text-sm text-right space-y-2">
-                  <p>• يجب على العميل دفع مقدم بنسبة 50% من إجمالي السعر</p>
-                  <p>• الباقي يُدفع عند استلام المركبة</p>
-                  <p>• مدة التسليم: 2-4 أسابيع من تاريخ تأكيد الطلب</p>
-                  <p>• ضمان الوكيل لمدة 3 سنوات أو 100,000 كم أيهما أقل</p>
-                  <p>• العرض لا يشمل التأمين ورسوم النقل</p>
-                  <p>• الشركة غير مسؤولة عن التأخير الناجم عن ظروف خارجة عن إرادتها</p>
+                  {((selectedCompany as any)?.termsAndConditions || 
+                    "• يجب على العميل دفع مقدم بنسبة 50% من إجمالي السعر\n• الباقي يُدفع عند استلام المركبة\n• مدة التسليم: 2-4 أسابيع من تاريخ تأكيد الطلب\n• ضمان الوكيل لمدة 3 سنوات أو 100,000 كم أيهما أقل\n• العرض لا يشمل التأمين ورسوم النقل\n• الشركة غير مسؤولة عن التأخير الناجم عن ظروف خارجة عن إرادتها")
+                    .split('\n')
+                    .map((term: string, index: number) => (
+                      <p key={index}>{term}</p>
+                    ))
+                  }
                 </div>
               </div>
 

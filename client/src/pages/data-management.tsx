@@ -48,6 +48,7 @@ export default function DataManagement() {
   const [selectedModel, setSelectedModel] = useState<string>("");
   const [selectedYear, setSelectedYear] = useState<string>("");
   const [activeTab, setActiveTab] = useState("vehicles");
+  const [selectedCompanyId, setSelectedCompanyId] = useState("");
   const queryClient = useQueryClient();
 
   // Vehicle Specifications
@@ -97,7 +98,8 @@ export default function DataManagement() {
     primaryColor: "#00627F",
     secondaryColor: "#C79C45",
     textColor: "#000000",
-    backgroundColor: "#FFFFFF"
+    backgroundColor: "#FFFFFF",
+    termsAndConditions: "• يجب على العميل دفع مقدم بنسبة 50% من إجمالي السعر\n• الباقي يُدفع عند استلام المركبة\n• مدة التسليم: 2-4 أسابيع من تاريخ تأكيد الطلب\n• ضمان الوكيل لمدة 3 سنوات أو 100,000 كم أيهما أقل\n• العرض لا يشمل التأمين ورسوم النقل\n• الشركة غير مسؤولة عن التأخير الناجم عن ظروف خارجة عن إرادتها"
   });
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
 
@@ -108,7 +110,7 @@ export default function DataManagement() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/vehicle-specs'] });
-      setSpecForm({ make: "", model: "", year: "", engine: "", specifications: "" });
+      setSpecForm({ make: "", model: "", year: "", engine: "", specifications: "", brandLogo: "" });
       toast({ title: "تم إضافة المواصفات بنجاح" });
     },
   });
@@ -137,14 +139,27 @@ export default function DataManagement() {
         email: "", 
         registrationNumber: "", 
         taxNumber: "", 
+        licenseNumber: "",
         logo: "",
         stamp: "",
-        primaryColor: "#3b82f6",
-        secondaryColor: "#1e40af", 
-        textColor: "#1f2937",
-        backgroundColor: "#ffffff"
+        primaryColor: "#00627F",
+        secondaryColor: "#C79C45", 
+        textColor: "#000000",
+        backgroundColor: "#FFFFFF",
+        termsAndConditions: "• يجب على العميل دفع مقدم بنسبة 50% من إجمالي السعر\n• الباقي يُدفع عند استلام المركبة\n• مدة التسليم: 2-4 أسابيع من تاريخ تأكيد الطلب\n• ضمان الوكيل لمدة 3 سنوات أو 100,000 كم أيهما أقل\n• العرض لا يشمل التأمين ورسوم النقل\n• الشركة غير مسؤولة عن التأخير الناجم عن ظروف خارجة عن إرادتها"
       });
       toast({ title: "تم إضافة الشركة بنجاح" });
+    },
+  });
+
+  const updateCompanyMutation = useMutation({
+    mutationFn: async (companyData: any) => {
+      const { id, ...data } = companyData;
+      return await apiRequest('PATCH', `/api/companies/${id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/companies'] });
+      toast({ title: "تم تحديث الشركة بنجاح" });
     },
   });
 
@@ -255,7 +270,7 @@ export default function DataManagement() {
       queryClient.invalidateQueries({ queryKey: ['/api/vehicle-specs'] });
       toast({ title: "تم تحديث المواصفات بنجاح" });
       setEditingSpec(null);
-      setSpecForm({ make: "", model: "", year: "", engine: "", specifications: "" });
+      setSpecForm({ make: "", model: "", year: "", engine: "", specifications: "", brandLogo: "" });
     })
     .catch(() => {
       toast({ title: "خطأ في التحديث", variant: "destructive" });
@@ -264,7 +279,7 @@ export default function DataManagement() {
 
   const handleCancelEdit = () => {
     setEditingSpec(null);
-    setSpecForm({ make: "", model: "", year: "", engine: "", specifications: "" });
+    setSpecForm({ make: "", model: "", year: "", engine: "", specifications: "", brandLogo: "" });
   };
 
   const handleEditCompany = (company: Company) => {
@@ -282,7 +297,8 @@ export default function DataManagement() {
       primaryColor: (company as any).primaryColor || "#00627F",
       secondaryColor: (company as any).secondaryColor || "#C79C45",
       textColor: (company as any).textColor || "#000000",
-      backgroundColor: (company as any).backgroundColor || "#FFFFFF"
+      backgroundColor: (company as any).backgroundColor || "#FFFFFF",
+      termsAndConditions: (company as any).termsAndConditions || ""
     });
   };
 
@@ -320,7 +336,7 @@ export default function DataManagement() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="vehicles" className="flex items-center gap-2">
               <Car className="w-4 h-4" />
               مواصفات المركبات
@@ -332,6 +348,10 @@ export default function DataManagement() {
             <TabsTrigger value="companies" className="flex items-center gap-2">
               <Building className="w-4 h-4" />
               الشركات
+            </TabsTrigger>
+            <TabsTrigger value="terms" className="flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              الشروط والأحكام
             </TabsTrigger>
           </TabsList>
 
@@ -928,6 +948,19 @@ export default function DataManagement() {
                         </div>
                       </div>
                     </div>
+
+                    {/* Terms and Conditions */}
+                    <div>
+                      <Label htmlFor="terms">الشروط والأحكام</Label>
+                      <Textarea
+                        id="terms"
+                        value={companyForm.termsAndConditions}
+                        onChange={(e) => setCompanyForm({...companyForm, termsAndConditions: e.target.value})}
+                        placeholder="أدخل الشروط والأحكام الخاصة بالشركة"
+                        rows={8}
+                        className="resize-none"
+                      />
+                    </div>
                     
                     <Button type="submit" className="w-full" disabled={addCompanyMutation.isPending}>
                       {addCompanyMutation.isPending ? "جاري الإضافة..." : "إضافة الشركة"}
@@ -1019,6 +1052,81 @@ export default function DataManagement() {
                       ))}
                     </TableBody>
                   </Table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="terms" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="w-5 h-5" />
+                  إدارة الشروط والأحكام
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <Label htmlFor="company-select">اختر الشركة</Label>
+                      <Select 
+                        value={selectedCompanyId} 
+                        onValueChange={(value) => {
+                          setSelectedCompanyId(value);
+                          const company = companies.find(c => c.id === parseInt(value));
+                          if (company) {
+                            setCompanyForm({
+                              ...companyForm,
+                              termsAndConditions: (company as any).termsAndConditions || ""
+                            });
+                          }
+                        }}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="اختر الشركة لتحرير الشروط والأحكام" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {companies.map((company) => (
+                            <SelectItem key={company.id} value={company.id.toString()}>
+                              {company.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="terms-editor">الشروط والأحكام</Label>
+                      <Textarea
+                        id="terms-editor"
+                        value={companyForm.termsAndConditions}
+                        onChange={(e) => setCompanyForm({...companyForm, termsAndConditions: e.target.value})}
+                        placeholder="أدخل الشروط والأحكام الخاصة بالشركة"
+                        rows={15}
+                        className="resize-none"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-end">
+                    <Button 
+                      onClick={() => {
+                        if (selectedCompanyId) {
+                          const company = companies.find(c => c.id === parseInt(selectedCompanyId));
+                          if (company) {
+                            updateCompanyMutation.mutate({
+                              id: company.id,
+                              ...companyForm,
+                              termsAndConditions: companyForm.termsAndConditions
+                            });
+                          }
+                        }
+                      }}
+                      disabled={!selectedCompanyId || updateCompanyMutation.isPending}
+                    >
+                      {updateCompanyMutation.isPending ? "جاري الحفظ..." : "حفظ الشروط والأحكام"}
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>

@@ -24,6 +24,7 @@ export const companies = pgTable("companies", {
   secondaryColor: text("secondary_color").default("#C79C45"),
   textColor: text("text_color").default("#000000"),
   backgroundColor: text("background_color").default("#FFFFFF"),
+  termsAndConditions: text("terms_and_conditions").default("• يجب على العميل دفع مقدم بنسبة 50% من إجمالي السعر\n• الباقي يُدفع عند استلام المركبة\n• مدة التسليم: 2-4 أسابيع من تاريخ تأكيد الطلب\n• ضمان الوكيل لمدة 3 سنوات أو 100,000 كم أيهما أقل\n• العرض لا يشمل التأمين ورسوم النقل\n• الشركة غير مسؤولة عن التأخير الناجم عن ظروف خارجة عن إرادتها"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
