@@ -404,6 +404,11 @@ Changelog:
   * Enlarged amount in words from 11pt to 14pt for better readability
   * Enhanced signature section title from 10pt to 14pt, signature text from 8pt to 12pt
   * Professional document with consistently larger, more readable fonts throughout
+- July 05, 2025. Arabic Text-Only Amount Display:
+  * Removed numbers from "المبلغ كتابة" (amount in words) section
+  * Modified formatPriceWithWords function to display only Arabic text without numeric values
+  * Cleaner Arabic text display showing amount in words without parentheses and numbers
+  * Enhanced PDF readability with pure Arabic text for amount representation
 ```
 
 ## User Preferences

@@ -122,16 +122,9 @@ export function currencyToArabicWords(amount: number, currency: string = "ريا
   return result;
 }
 
-// Format price with Arabic words
+// Format price with Arabic words only (no numbers)
 export function formatPriceWithWords(amount: number, currency: string = "ريال"): string {
-  const numericPrice = new Intl.NumberFormat('ar-SA', {
-    style: 'currency',
-    currency: 'SAR',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }).format(amount);
-  
   const wordsPrice = currencyToArabicWords(amount, currency);
   
-  return `${numericPrice} (${wordsPrice})`;
+  return wordsPrice;
 }
