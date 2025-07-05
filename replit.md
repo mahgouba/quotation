@@ -409,6 +409,17 @@ Changelog:
   * Modified formatPriceWithWords function to display only Arabic text without numeric values
   * Cleaner Arabic text display showing amount in words without parentheses and numbers
   * Enhanced PDF readability with pure Arabic text for amount representation
+- July 05, 2025. Further Font Size Enhancement for Better Readability:
+  * Increased header "عرض سعر" from 24pt to 30pt for maximum visibility
+  * Enlarged company name from 40pt to 48pt for prominent branding
+  * Enhanced date and quotation number fonts from 14pt to 18pt
+  * Increased greeting section font from 16pt to 20pt
+  * Enlarged customer and vehicle data titles from 14pt to 18pt, content from 12pt to 15pt
+  * Enhanced specifications section title from 16pt to 20pt, content from 13pt to 16pt
+  * Increased pricing summary title from 16pt to 20pt, table content from 13pt to 16pt
+  * Enlarged amount in words from 14pt to 18pt for maximum readability
+  * Enhanced signature section title from 14pt to 18pt, signature text from 12pt to 16pt
+  * All PDF text now significantly larger for improved readability and professional appearance
 ```
 
 ## User Preferences
