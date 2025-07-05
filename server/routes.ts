@@ -413,63 +413,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("=== POST vehicle-specs called ===");
       console.log("Request body:", JSON.stringify(req.body, null, 2));
       
-      // Convert detailed specs to single specifications field
-      const {
-        horsepower, torque, transmission, driveType, fuelType, fuelCapacity,
-        fuelConsumption, topSpeed, acceleration, length, width, height,
-        wheelbase, weight, seatingCapacity, trunkCapacity, safetyFeatures,
-        techFeatures, exteriorFeatures, interiorFeatures,
-        ...basicData
-      } = req.body;
+      const { make, model, year, engine, specifications, brandLogo } = req.body;
       
-      // Create comprehensive specifications string
-      const specifications = `
-المحرك: ${basicData.engine || 'غير محدد'}
-القوة: ${horsepower || 'غير محدد'} حصان
-عزم الدوران: ${torque || 'غير محدد'}
-ناقل الحركة: ${transmission || 'غير محدد'}
-نوع الدفع: ${driveType || 'غير محدد'}
-نوع الوقود: ${fuelType || 'غير محدد'}
-سعة خزان الوقود: ${fuelCapacity || 'غير محدد'}
-استهلاك الوقود: ${fuelConsumption || 'غير محدد'}
-السرعة القصوى: ${topSpeed || 'غير محدد'}
-التسارع: ${acceleration || 'غير محدد'}
-
-الأبعاد:
-الطول: ${length || 'غير محدد'}
-العرض: ${width || 'غير محدد'}
-الارتفاع: ${height || 'غير محدد'}
-قاعدة العجلات: ${wheelbase || 'غير محدد'}
-الوزن: ${weight || 'غير محدد'}
-
-السعة:
-عدد المقاعد: ${seatingCapacity || 'غير محدد'}
-سعة الصندوق: ${trunkCapacity || 'غير محدد'}
-
-ميزات الأمان: ${safetyFeatures || 'غير محدد'}
-الميزات التقنية: ${techFeatures || 'غير محدد'}
-المميزات الخارجية: ${exteriorFeatures || 'غير محدد'}
-المميزات الداخلية: ${interiorFeatures || 'غير محدد'}
-      `.trim();
+      // Check if this combination already exists
+      const existingSpecs = await storage.getVehicleSpecifications();
+      const existingSpec = existingSpecs.find(spec => 
+        spec.make === make && 
+        spec.model === model && 
+        spec.year === year
+      );
       
-      const specData = {
-        make: basicData.make,
-        model: basicData.model,
-        year: basicData.year,
-        engine: basicData.engine,
-        specifications: specifications
-      };
-      
-      console.log("Transformed data:", JSON.stringify(specData, null, 2));
-      
-      const parsedData = insertVehicleSpecificationSchema.parse(specData);
-      const spec = await storage.createVehicleSpecification(parsedData);
-      console.log("Created spec:", JSON.stringify(spec, null, 2));
-      
-      res.status(201).json(spec);
+      if (existingSpec) {
+        // Update existing specification
+        const updatedSpec = await storage.updateVehicleSpecification(existingSpec.id, {
+          engine: engine || existingSpec.engine,
+          specifications: specifications || existingSpec.specifications,
+          brandLogo: brandLogo || existingSpec.brandLogo
+        });
+        console.log("Updated existing spec:", JSON.stringify(updatedSpec, null, 2));
+        return res.json(updatedSpec);
+      } else {
+        // Create new specification
+        const specData = {
+          make,
+          model,
+          year: parseInt(year),
+          engine: engine || 'غير محدد',
+          specifications: specifications || '',
+          brandLogo: brandLogo || null
+        };
+        
+        console.log("Creating new spec:", JSON.stringify(specData, null, 2));
+        
+        const parsedData = insertVehicleSpecificationSchema.parse(specData);
+        const spec = await storage.createVehicleSpecification(parsedData);
+        console.log("Created new spec:", JSON.stringify(spec, null, 2));
+        
+        res.status(201).json(spec);
+      }
     } catch (error) {
-      console.error("Error creating vehicle spec:", error);
-      res.status(400).json({ error: "Invalid vehicle specification data" });
+      console.error("Error handling vehicle spec:", error);
+      res.status(400).json({ 
+        error: "Invalid vehicle specification data", 
+        details: error instanceof Error ? error.message : String(error)
+      });
     }
   });
 

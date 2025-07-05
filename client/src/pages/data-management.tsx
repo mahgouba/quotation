@@ -246,8 +246,9 @@ export default function DataManagement() {
   const handleBrandLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (file.type !== 'image/png') {
-        toast({ title: "يرجى اختيار ملف PNG فقط", variant: "destructive" });
+      // Accept any image format
+      if (!file.type.startsWith('image/')) {
+        toast({ title: "يرجى اختيار ملف صورة صالح", variant: "destructive" });
         return;
       }
       

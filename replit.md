@@ -296,6 +296,13 @@ Changelog:
   * Added visual feedback during auto-save process with toast notifications
   * Specifications are now automatically associated with specific vehicle combinations
   * System intelligently checks for existing specifications and only saves when changed
+- July 05, 2025. Enhanced Data Management & File Upload:
+  * Fixed payload size limitation by increasing Express server limit to 50MB for large image uploads
+  * Enhanced brand logo upload system to accept any image format (PNG, JPG, JPEG, GIF, etc.)
+  * Improved API endpoint for vehicle specifications with smart update/create logic
+  * Added better error handling and detailed error messages for debugging
+  * Enhanced vehicle specification system to handle brand logos with any image format
+  * Optimized database operations to update existing specs instead of creating duplicates
 ```
 
 ## User Preferences
