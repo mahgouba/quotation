@@ -349,6 +349,183 @@ export class PDFTemplateEngine {
     this.currentY += rowHeight + this.template.spacing.sectionGap;
   }
 
+  private addCustomHeader(data: any) {
+    // Add dates at top - issue date on right, deadline on left
+    this.doc.setTextColor(0, 0, 0);
+    this.doc.setFontSize(12);
+    
+    const issueDate = new Date().toLocaleDateString('ar-SA');
+    const deadlineDate = data.deadlineDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('ar-SA');
+    
+    this.doc.text(issueDate, this.pageWidth - this.template.spacing.margin, 20, { align: 'right' });
+    this.doc.text(deadlineDate, this.template.spacing.margin, 20, { align: 'left' });
+    
+    this.currentY = 40;
+  }
+
+  private addLogoAndQuotationNumber(data: any) {
+    // Add company logo on right
+    if (data.companyLogo) {
+      try {
+        this.doc.addImage(data.companyLogo, 'JPEG', this.pageWidth - 60, this.currentY, 40, 40);
+      } catch (error) {
+        console.warn('Could not add logo to PDF');
+      }
+    }
+    
+    // Add quotation number on left
+    this.doc.setFontSize(14);
+    this.doc.setTextColor(0, 0, 0);
+    this.doc.text(`رقم العرض: ${data.quotationNumber || 'غير محدد'}`, this.template.spacing.margin, this.currentY + 20, { align: 'left' });
+    
+    this.currentY += 60;
+  }
+
+  private addCustomerGreeting(data: any) {
+    this.doc.setFontSize(12);
+    this.doc.setTextColor(0, 0, 0);
+    
+    // Customer name aligned right
+    const customerName = `${data.customerTitle || 'السادة / '}${data.customerName || 'غير محدد'}`;
+    this.doc.text(customerName, this.pageWidth - this.template.spacing.margin, this.currentY, { align: 'right' });
+    
+    this.currentY += 15;
+    
+    // Greeting
+    this.doc.text('تحية طيبة وبعد،', this.pageWidth - this.template.spacing.margin, this.currentY, { align: 'right' });
+    
+    this.currentY += 15;
+    
+    // Introduction text
+    this.doc.text('يسرنا أن نقدم لكم عرض السعر التالي بناءً على طلبكم:', this.pageWidth - this.template.spacing.margin, this.currentY, { align: 'right' });
+    
+    this.currentY += 30;
+  }
+
+  private addVehicleDetailsCustom(data: any) {
+    this.doc.setFontSize(12);
+    this.doc.setTextColor(0, 0, 0);
+    
+    const vehicleDetails = `نوع السيارة: ${data.carMaker || 'غير محدد'} ${data.carModel || 'غير محدد'}     اللون: ${data.exteriorColor || 'غير محدد'}     داخلي: ${data.interiorColor || 'غير محدد'}`;
+    this.doc.text(vehicleDetails, this.pageWidth - this.template.spacing.margin, this.currentY, { align: 'right' });
+    
+    this.currentY += 20;
+  }
+
+  private addVehicleSpecificationsParagraph(data: any) {
+    if (data.vehicleSpecifications || data.detailedSpecs) {
+      this.doc.setFontSize(10);
+      this.doc.setTextColor(0, 0, 0);
+      
+      const specs = data.vehicleSpecifications || data.detailedSpecs || '';
+      const lines = this.doc.splitTextToSize(specs, this.pageWidth - 2 * this.template.spacing.margin);
+      
+      lines.forEach((line: string) => {
+        this.doc.text(line, this.pageWidth - this.template.spacing.margin, this.currentY, { align: 'right' });
+        this.currentY += 8;
+      });
+      
+      this.currentY += 20;
+    }
+  }
+
+  private addCustomPricingTable(data: any) {
+    const startY = this.currentY;
+    const tableWidth = this.pageWidth - 2 * this.template.spacing.margin;
+    const colWidths = [30, 25, 25, 30, 20, 30]; // Adjusted column widths
+    
+    // Table headers
+    const headers = ['الإجمالي', 'اللوحات', 'الضريبة (15%)', 'السعر الفردي', 'الكمية', 'الموديل'];
+    
+    this.doc.setFontSize(11);
+    this.doc.setTextColor(0, 0, 0);
+    
+    // Draw header row
+    let currentX = this.template.spacing.margin;
+    headers.forEach((header, index) => {
+      this.doc.rect(currentX, startY, colWidths[index], 15);
+      this.doc.text(header, currentX + colWidths[index]/2, startY + 10, { align: 'center' });
+      currentX += colWidths[index];
+    });
+    
+    // Data row
+    const dataY = startY + 15;
+    const basePrice = parseFloat(data.basePrice || '0');
+    const quantity = parseInt(data.quantity || '1');
+    const platePrice = parseFloat(data.platePrice || '900');
+    const tax = basePrice * 0.15;
+    const total = basePrice + tax + platePrice;
+    
+    const rowData = [
+      total.toLocaleString(),
+      platePrice.toLocaleString(),
+      tax.toLocaleString(),
+      basePrice.toLocaleString(),
+      quantity.toString(),
+      data.carYear || '2025'
+    ];
+    
+    currentX = this.template.spacing.margin;
+    rowData.forEach((data, index) => {
+      this.doc.rect(currentX, dataY, colWidths[index], 15);
+      this.doc.text(data, currentX + colWidths[index]/2, dataY + 10, { align: 'center' });
+      currentX += colWidths[index];
+    });
+    
+    this.currentY = dataY + 30;
+  }
+
+  private addTotalInWords(data: any) {
+    this.doc.setFontSize(12);
+    this.doc.setTextColor(0, 0, 0);
+    
+    const total = data.totalPrice || '0';
+    const totalInWords = data.totalInWords || 'غير محدد';
+    
+    this.doc.text(`المجموع: ${total}`, this.pageWidth - this.template.spacing.margin, this.currentY, { align: 'right' });
+    this.currentY += 15;
+    
+    this.doc.text(totalInWords, this.pageWidth / 2, this.currentY, { align: 'center' });
+    this.currentY += 30;
+  }
+
+  private addTermsAndConditions(data: any) {
+    this.doc.setFontSize(10);
+    this.doc.setTextColor(0, 0, 0);
+    
+    const terms = [
+      'التسليم بمستودعاتنا في مدينة الرياض',
+      'السيارة مضمونة لدى الوكيل العام بالمملكة العربية السعودية',
+      'السعر يشمل ضريبة القيمة المضافة واللوحات والاستمارة'
+    ];
+    
+    terms.forEach(term => {
+      this.doc.text(term, this.pageWidth - this.template.spacing.margin, this.currentY, { align: 'right' });
+      this.currentY += 12;
+    });
+    
+    this.currentY += 20;
+  }
+
+  private addCompanySignature(data: any) {
+    this.doc.setFontSize(12);
+    this.doc.setTextColor(0, 0, 0);
+    
+    this.doc.text('وتفضلوا بقبول فائق الاحترام،،،', this.pageWidth - this.template.spacing.margin, this.currentY, { align: 'right' });
+    this.currentY += 15;
+    
+    this.doc.text(data.companyName || 'اسم الشركة', this.pageWidth - this.template.spacing.margin, this.currentY, { align: 'right' });
+    
+    // Add company stamp if available
+    if (data.companyStamp) {
+      try {
+        this.doc.addImage(data.companyStamp, 'JPEG', this.template.spacing.margin, this.currentY - 20, 30, 30);
+      } catch (error) {
+        console.warn('Could not add company stamp to PDF');
+      }
+    }
+  }
+
   private addFooter(data: any) {
     const footerY = this.pageHeight - 60;
     
@@ -412,62 +589,32 @@ export class PDFTemplateEngine {
   }
 
   public generatePDF(data: any): jsPDF {
-    // Add background
-    this.addBackground();
+    // Add header with dates
+    this.addCustomHeader(data);
     
-    // Add header
-    this.addHeader(data);
+    // Add company logo and quotation number
+    this.addLogoAndQuotationNumber(data);
     
-    // Add quotation title
-    this.addQuotationTitle();
+    // Add customer greeting
+    this.addCustomerGreeting(data);
     
-    // Add customer section
-    this.addSection('بيانات العميل', [
-      `${data.customerTitle || ''}${data.customerName || 'غير محدد'}`,
-      `الهاتف: ${data.customerPhone || 'غير محدد'}`,
-      `البريد الإلكتروني: ${data.customerEmail || 'غير محدد'}`
-    ]);
+    // Add vehicle details in custom format
+    this.addVehicleDetailsCustom(data);
     
-    // Add vehicle section
-    this.addSection('بيانات المركبة', [
-      `الماركة: ${data.carMaker || 'غير محدد'}`,
-      `الموديل: ${data.carModel || 'غير محدد'}`,
-      `السنة: ${data.carYear || 'غير محدد'}`,
-      `اللون الخارجي: ${data.exteriorColor || 'غير محدد'}`,
-      `اللون الداخلي: ${data.interiorColor || 'غير محدد'}`
-    ]);
+    // Add vehicle specifications paragraph
+    this.addVehicleSpecificationsParagraph(data);
     
-    // Add vehicle specifications if available
-    if (data.vehicleSpecifications) {
-      const specs = data.vehicleSpecifications.split('\n').filter((spec: string) => spec.trim());
-      this.addSection('المواصفات التفصيلية للمركبة', specs);
-    }
-    
-    // Add additional vehicle details if available
-    if (data.detailedSpecs) {
-      const detailedSpecs = data.detailedSpecs.split('\n').filter((spec: string) => spec.trim());
-      this.addSection('المواصفات الفنية', detailedSpecs);
-    }
-    
-    // Add sales representative section
-    if (data.salesRepName) {
-      this.addSection('بيانات المندوب', [
-        `الاسم: ${data.salesRepName}`,
-        `الهاتف: ${data.salesRepPhone || 'غير محدد'}`,
-        `البريد الإلكتروني: ${data.salesRepEmail || 'غير محدد'}`
-      ]);
-    }
-    
-    // Add pricing table
-    this.addPricingTable(data);
+    // Add pricing table in custom format
+    this.addCustomPricingTable(data);
     
     // Add total in words
-    this.addSection('المبلغ كتاباً', [
-      data.totalInWords || 'غير محدد'
-    ]);
+    this.addTotalInWords(data);
     
-    // Add footer
-    this.addFooter(data);
+    // Add terms and conditions
+    this.addTermsAndConditions(data);
+    
+    // Add company signature
+    this.addCompanySignature(data);
     
     return this.doc;
   }
