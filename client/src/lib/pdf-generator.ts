@@ -39,14 +39,14 @@ export function generateQuotationPDF(data: any): jsPDF {
   // Reduced margins for A4 printing - start from 5mm
   let currentY = 5;
   
-  // Header Section with Dark Teal Background - made taller for larger elements
+  // Header Section with Dark Teal Background - made even taller for much larger logo
   doc.setFillColor(...darkTeal);
-  doc.rect(0, 0, pageWidth, 110, 'F');
+  doc.rect(0, 0, pageWidth, 200, 'F');
   
-  // Company logo on right (Arabic RTL) - Made even larger
+  // Company logo on right (Arabic RTL) - Made 3 times larger
   if (data.companyLogo) {
     try {
-      doc.addImage(data.companyLogo, 'JPEG', pageWidth - 180, 3, 200, 136);
+      doc.addImage(data.companyLogo, 'JPEG', pageWidth - 300, 3, 600, 408);
     } catch (error) {
       console.warn('Could not add logo to PDF');
     }
@@ -57,20 +57,20 @@ export function generateQuotationPDF(data: any): jsPDF {
   doc.setFontSize(30);
   doc.text('عرض سعر', pageWidth - 8, 22, { align: 'right' });
   
-  // Company name on left - Made much larger
+  // Company name in center - Made much larger
   doc.setTextColor(199, 156, 69);
   doc.setFontSize(48);
-  doc.text(data.companyName || 'شركة البريمي', 8, 60);
+  doc.text(data.companyName || 'شركة البريمي', pageWidth / 2, 100, { align: 'center' });
   
   // Issue date and quotation number only - made larger
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(18);
   const currentDate = new Date().toLocaleDateString('ar-SA');
   const quotationNumber = data.quotationNumber || `Q${Date.now()}`.slice(-6);
-  doc.text(`تاريخ الإصدار: ${currentDate}`, pageWidth - 8, 95, { align: 'right' });
-  doc.text(`رقم العرض: ${quotationNumber}`, 8, 95);
+  doc.text(`تاريخ الإصدار: ${currentDate}`, pageWidth - 8, 175, { align: 'right' });
+  doc.text(`رقم العرض: ${quotationNumber}`, 8, 175);
   
-  currentY = 115;
+  currentY = 205;
   
   // Add company logo as watermark in background
   if (data.companyLogo) {

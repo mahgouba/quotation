@@ -420,6 +420,13 @@ Changelog:
   * Enlarged amount in words from 14pt to 18pt for maximum readability
   * Enhanced signature section title from 14pt to 18pt, signature text from 12pt to 16pt
   * All PDF text now significantly larger for improved readability and professional appearance
+- July 05, 2025. Header Layout Redesign with Enlarged Logo:
+  * Tripled company logo size from 200×136 to 600×408 (3x larger) for maximum brand visibility
+  * Repositioned company name to center of header with 48pt font for balanced design
+  * Increased header height from 110 to 200 to accommodate much larger logo
+  * Adjusted date and quotation number positioning to match new layout
+  * Updated content start position to accommodate expanded header section
+  * Enhanced professional branding with prominent logo and centered company name
 ```
 
 ## User Preferences
