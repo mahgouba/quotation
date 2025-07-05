@@ -320,6 +320,14 @@ Changelog:
   * Changed header to show only "تاريخ الإصدار" (Issue Date) instead of generic "التاريخ"
   * Simplified date display for cleaner and more focused PDF header
   * Enhanced professional appearance with essential date information only
+- July 05, 2025. VIN Number Integration & Data Optimization:
+  * Added VIN number (رقم الهيكل) field to vehicle data interface in quotation form
+  * Updated database schema to include VIN number field for vehicles
+  * Implemented conditional display logic to hide undefined/empty data fields in PDF output
+  * Enhanced PDF generation to only show fields that contain actual data
+  * Added license plates section to quotation summary when plate price is specified
+  * Updated vehicle information display in both PDF and preview to include VIN number
+  * Improved data integrity by showing only relevant information without "غير محدد" placeholders
 ```
 
 ## User Preferences

@@ -94,9 +94,20 @@ export function generateQuotationPDF(data: any): jsPDF {
   doc.text('بيانات العميل', pageWidth - 10, currentY + 10, { align: 'right' });
   
   doc.setFontSize(9);
-  doc.text(`الاسم: ${data.customerName || 'غير محدد'}`, pageWidth - 10, currentY + 18, { align: 'right' });
-  doc.text(`رقم الهوية: ${data.customerIdNumber || 'غير محدد'}`, pageWidth - 10, currentY + 26, { align: 'right' });
-  doc.text(`رقم الهاتف: ${data.customerPhone || 'غير محدد'}`, pageWidth - 10, currentY + 34, { align: 'right' });
+  let customerInfoY = currentY + 18;
+  
+  if (data.customerName) {
+    doc.text(`الاسم: ${data.customerName}`, pageWidth - 10, customerInfoY, { align: 'right' });
+    customerInfoY += 8;
+  }
+  if (data.customerIdNumber) {
+    doc.text(`رقم الهوية: ${data.customerIdNumber}`, pageWidth - 10, customerInfoY, { align: 'right' });
+    customerInfoY += 8;
+  }
+  if (data.customerPhone) {
+    doc.text(`رقم الهاتف: ${data.customerPhone}`, pageWidth - 10, customerInfoY, { align: 'right' });
+    customerInfoY += 8;
+  }
   
   // Vehicle Info (Left column)
   doc.setFillColor(248, 248, 248);
@@ -108,10 +119,32 @@ export function generateQuotationPDF(data: any): jsPDF {
   doc.text('بيانات المركبة', pageWidth/2 - 5, currentY + 10, { align: 'right' });
   
   doc.setFontSize(9);
-  doc.text(`الماركة: ${data.carMaker || 'غير محدد'}`, pageWidth/2 - 5, currentY + 18, { align: 'right' });
-  doc.text(`الموديل: ${data.carModel || 'غير محدد'}`, pageWidth/2 - 5, currentY + 26, { align: 'right' });
-  doc.text(`السنة: ${data.carYear || 'غير محدد'}`, pageWidth/2 - 5, currentY + 34, { align: 'right' });
-  doc.text(`رقم الهيكل: ${data.vinNumber || 'غير محدد'}`, pageWidth/2 - 10, currentY + 46, { align: 'right' });
+  let vehicleInfoY = currentY + 18;
+  
+  if (data.carMaker) {
+    doc.text(`الماركة: ${data.carMaker}`, pageWidth/2 - 5, vehicleInfoY, { align: 'right' });
+    vehicleInfoY += 8;
+  }
+  if (data.carModel) {
+    doc.text(`الموديل: ${data.carModel}`, pageWidth/2 - 5, vehicleInfoY, { align: 'right' });
+    vehicleInfoY += 8;
+  }
+  if (data.carYear) {
+    doc.text(`السنة: ${data.carYear}`, pageWidth/2 - 5, vehicleInfoY, { align: 'right' });
+    vehicleInfoY += 8;
+  }
+  if (data.vinNumber) {
+    doc.text(`رقم الهيكل: ${data.vinNumber}`, pageWidth/2 - 5, vehicleInfoY, { align: 'right' });
+    vehicleInfoY += 8;
+  }
+  if (data.exteriorColor) {
+    doc.text(`اللون الخارجي: ${data.exteriorColor}`, pageWidth/2 - 5, vehicleInfoY, { align: 'right' });
+    vehicleInfoY += 8;
+  }
+  if (data.interiorColor) {
+    doc.text(`اللون الداخلي: ${data.interiorColor}`, pageWidth/2 - 5, vehicleInfoY, { align: 'right' });
+    vehicleInfoY += 8;
+  }
   
   currentY += 50;
   
@@ -195,6 +228,12 @@ export function generateQuotationPDF(data: any): jsPDF {
   tableY += 6;
   doc.text(`الضريبة المضافة (%15)`, pageWidth - 15, tableY, { align: 'right' });
   doc.text(`${tax.toLocaleString()}`, pageWidth - 70, tableY, { align: 'right' });
+  
+  if (platePrice > 0) {
+    tableY += 6;
+    doc.text(`اللوحات والرسوم`, pageWidth - 15, tableY, { align: 'right' });
+    doc.text(`${platePrice.toLocaleString()}`, pageWidth - 70, tableY, { align: 'right' });
+  }
   
   tableY += 6;
   doc.text(`المجموع النهائي`, pageWidth - 15, tableY, { align: 'right' });

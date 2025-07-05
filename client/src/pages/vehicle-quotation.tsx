@@ -139,6 +139,7 @@ const VehicleQuotation = () => {
     carYear: "",
     exteriorColor: "",
     interiorColor: "",
+    vinNumber: "",
     quantity: 1,
     basePrice: 0,
     vatRate: 15,
@@ -568,6 +569,7 @@ const VehicleQuotation = () => {
         model: formData.carModel,
         exteriorColor: formData.exteriorColor || null,
         interiorColor: formData.interiorColor || null,
+        vinNumber: formData.vinNumber || null,
         specifications: formData.specifications || null,
         detailedSpecs: formData.detailedSpecs || null,
       },
@@ -1026,6 +1028,17 @@ const VehicleQuotation = () => {
                     </SelectContent>
                   </Select>
                 </div>
+                <div>
+                  <Label htmlFor="vinNumber">رقم الهيكل (VIN)</Label>
+                  <Input
+                    id="vinNumber"
+                    type="text"
+                    value={formData.vinNumber}
+                    onChange={(e) => handleInputChange('vinNumber', e.target.value)}
+                    placeholder="أدخل رقم الهيكل"
+                    className="text-center"
+                  />
+                </div>
                 <div className="md:col-span-2">
                   <Label htmlFor="detailedSpecs">المواصفات التفصيلية</Label>
                   <Textarea
@@ -1322,7 +1335,9 @@ const VehicleQuotation = () => {
                     <p><span className="font-medium">الماركة:</span> {formData.carMaker || 'غير محدد'}</p>
                     <p><span className="font-medium">الموديل:</span> {formData.carModel || 'غير محدد'}</p>
                     <p><span className="font-medium">السنة:</span> {formData.carYear || 'غير محدد'}</p>
-                    <p><span className="font-medium">رقم الهيكل:</span> غير محدد</p>
+                    {formData.vinNumber && <p><span className="font-medium">رقم الهيكل:</span> {formData.vinNumber}</p>}
+                    {formData.exteriorColor && <p><span className="font-medium">اللون الخارجي:</span> {formData.exteriorColor}</p>}
+                    {formData.interiorColor && <p><span className="font-medium">اللون الداخلي:</span> {formData.interiorColor}</p>}
                   </div>
                   
                   {/* Brand Logo if available */}
@@ -1379,6 +1394,9 @@ const VehicleQuotation = () => {
                   <p><span className="font-medium">الكمية:</span> {formData.quantity || '1'}</p>
                   <p><span className="font-medium">الإجمالي قبل الضريبة:</span> {(parseFloat(formData.basePrice || '0') * parseInt(formData.quantity || '1')).toLocaleString()} ريال</p>
                   <p><span className="font-medium">الضريبة (%15):</span> {(parseFloat(formData.basePrice || '0') * 0.15).toLocaleString()} ريال</p>
+                  {parseFloat(formData.platePrice || '0') > 0 && (
+                    <p><span className="font-medium">اللوحات والرسوم:</span> {parseFloat(formData.platePrice || '0').toLocaleString()} ريال</p>
+                  )}
                   <p><span className="font-medium">سعر النهائي:</span> {(parseFloat(formData.basePrice || '0') * parseInt(formData.quantity || '1') * 1.15 + parseFloat(formData.platePrice || '0')).toLocaleString()} ريال</p>
                   
                   <div className="mt-4 text-lg font-bold" style={{ color: '#C79C45' }}>

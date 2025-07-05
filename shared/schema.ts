@@ -55,6 +55,7 @@ export const vehicles = pgTable("vehicles", {
   model: text("model").notNull(),
   exteriorColor: text("exterior_color"),
   interiorColor: text("interior_color"),
+  vinNumber: text("vin_number"), // VIN/Chassis number
   specifications: text("specifications"), // User-added specifications
   detailedSpecs: text("detailed_specs"), // Auto-generated detailed specifications
   createdAt: timestamp("created_at").defaultNow(),
