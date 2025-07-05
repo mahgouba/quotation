@@ -5,7 +5,6 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
 import { getVehicleSpecifications, getAvailableMakes, getModelsForMake, getYearsForMakeAndModel } from "@/data/vehicle-specifications";
-import { TemplateSelector } from "@/components/template-selector";
 import { generateCustomPDF, defaultTemplates, type PDFTemplate } from "@/lib/pdf-templates";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -32,8 +31,7 @@ import {
   Search,
   Home,
   Database,
-  Palette,
-  Eye
+
 } from "lucide-react";
 
 // SVG Icons
@@ -168,8 +166,7 @@ const VehicleQuotation = () => {
   const [availableYears, setAvailableYears] = useState<number[]>([]);
   const [vehicleSpecs, setVehicleSpecs] = useState<any>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [selectedTemplate, setSelectedTemplate] = useState<PDFTemplate>(defaultTemplates[0]);
-  const [showTemplateSelector, setShowTemplateSelector] = useState(false);
+  const selectedTemplate = defaultTemplates[0];
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -764,70 +761,7 @@ const VehicleQuotation = () => {
               <FaWhatsapp className="ml-2" />
               <span>واتساب</span>
             </Button>
-            <div className="relative">
-              <Button 
-                onClick={() => {
-                  setShowTemplateSelector(!showTemplateSelector);
-                }} 
-                className="bg-purple-600 hover:bg-purple-700 text-white"
-              >
-                <Palette className="ml-2 h-4 w-4" />
-                <span>قوالب PDF</span>
-              </Button>
-              
-              {showTemplateSelector && (
-                <div className="absolute top-full mt-2 right-0 bg-white border rounded-lg shadow-lg p-4 z-[1000] w-80">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-semibold">اختر قالب PDF</h3>
-                    <Button
-                      onClick={() => setShowTemplateSelector(false)}
-                      variant="ghost"
-                      size="sm"
-                      className="p-1"
-                    >
-                      ×
-                    </Button>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    {defaultTemplates.map((template) => (
-                      <Button
-                        key={template.id}
-                        onClick={() => {
-                          setSelectedTemplate(template);
-                          setShowTemplateSelector(false);
-                          toast({
-                            title: "تم اختيار القالب",
-                            description: template.name,
-                          });
-                        }}
-                        variant={selectedTemplate.id === template.id ? "default" : "outline"}
-                        className="h-auto p-3"
-                      >
-                        <div className="text-center">
-                          <div 
-                            className="w-12 h-8 rounded mb-2 mx-auto border"
-                            style={{ backgroundColor: template.colors.primary }}
-                          />
-                          <div className="text-xs">{template.name}</div>
-                        </div>
-                      </Button>
-                    ))}
-                  </div>
-                  <div className="mt-3 pt-3 border-t">
-                    <Button
-                      onClick={() => {
-                        handlePreviewPDF();
-                        setShowTemplateSelector(false);
-                      }}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                    >
-                      <FileText className="ml-2 h-4 w-4" />
-                      معاينة PDF
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </div>
+
           </div>
         </div>
       </div>
