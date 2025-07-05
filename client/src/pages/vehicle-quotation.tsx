@@ -5,7 +5,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
 import { getVehicleSpecifications, getAvailableMakes, getModelsForMake, getYearsForMakeAndModel } from "@/data/vehicle-specifications";
-import { generateQuotationPDF } from "@/lib/pdf-generator";
+import { generateQuotationPDF, generateQuotationPDFFromHTML } from "@/lib/pdf-generator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -526,30 +526,51 @@ const VehicleQuotation = () => {
     saveQuotationMutation.mutate(quotationData);
   };
 
-  const handleExportPDF = () => {
+  const handleExportPDF = async () => {
     try {
       // Prepare data for PDF generation
+      const selectedComp = companies?.find(c => c.id === parseInt(formData.selectedCompanyId || '0'));
+      const selectedSalesRep = salesRepresentatives?.find(r => r.id === parseInt(formData.salesRepresentativeId || '0'));
+      
       const pdfData = {
         ...formData,
-        totalInWords: numberToArabicWords(formData.totalPrice),
+        customerName: formData.customerName || 'عميل غير محدد',
+        customerPhone: formData.customerPhone || 'غير محدد',
+        customerIdNumber: formData.customerPhone || 'غير محدد',
+        carMaker: formData.carMaker || 'غير محدد',
+        carModel: formData.carModel || 'غير محدد',
         carYear: formData.carYear || new Date().getFullYear().toString(),
-        vehicleSpecifications: vehicleSpecs?.specifications || formData.detailedSpecs || '',
+        basePrice: formData.basePrice || '0',
+        quantity: formData.quantity || '1',
+        platePrice: formData.platePrice || '0',
+        companyLogo: selectedComp?.logo || null,
+        vehicleSpecifications: vehicleSpecs?.specifications || formData.detailedSpecs || 'مواصفات غير محددة',
         quotationNumber: `QT-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}${String(new Date().getDate()).padStart(2, '0')}-${String(Math.floor(Math.random() * 999) + 1).padStart(3, '0')}`,
-        companyStamp: formData.companyStamp,
-        salesRepName: formData.salesRepName,
-        salesRepPhone: formData.salesRepPhone,
-        salesRepEmail: formData.salesRepEmail,
+        salesRepName: selectedSalesRep?.name || 'غير محدد',
+        salesRepPhone: selectedSalesRep?.phone || 'غير محدد',
+        companyName: selectedComp?.name || 'شركة البريمي',
+        companyPhone: selectedComp?.phone || 'غير محدد',
+        companyEmail: selectedComp?.email || 'غير محدد'
       };
 
-      // Generate PDF using simplified generator
-      const pdf = generateQuotationPDF(pdfData);
+      // Try HTML to PDF approach for better Arabic support
+      const quotationElement = document.getElementById('quotation-preview');
+      let pdf;
       
-      // Save the PDF
-      pdf.save(`quotation-${formData.customerName || 'quote'}.pdf`);
+      if (quotationElement) {
+        // Generate PDF from HTML element (better Arabic support)
+        pdf = await generateQuotationPDFFromHTML(quotationElement);
+      } else {
+        // Fallback to improved text-based PDF with Arabic support
+        pdf = generateQuotationPDF(pdfData);
+      }
+      
+      // Save the PDF with A4 format
+      pdf.save(`عرض-سعر-${formData.customerName || 'عميل'}.pdf`);
       
       toast({
         title: "تم تصدير PDF بنجاح",
-        description: "تم إنشاء عرض السعر بنجاح",
+        description: "تم إنشاء عرض السعر بدعم كامل للغة العربية ومقاس A4",
       });
     } catch (error) {
       console.error("PDF generation failed:", error);
@@ -1115,7 +1136,7 @@ const VehicleQuotation = () => {
         </div>
 
         {/* Quotation Sheet - ALBARIMI Style */}
-        <Card id="quotation-sheet" className="mt-8 print:shadow-none print:bg-white">
+        <Card id="quotation-preview" className="mt-8 print:shadow-none print:bg-white">
           <CardContent className="p-0">
             {/* Header Section with Dark Teal Background */}
             <div className="bg-slate-800 text-white p-6 relative" style={{ backgroundColor: '#00627F' }}>
