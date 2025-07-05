@@ -220,6 +220,12 @@ Changelog:
   * Left column: Price summary with QR code and signature area
   * Improved spacing and alignment for better professional appearance
   * Enhanced readability with proper section titles and clear data organization
+- July 05, 2025. Removed Terms & Conditions Section:
+  * Removed terms and conditions section from PDF layout as requested by user
+  * Simplified bottom section to two columns instead of three
+  * Right column: Sales representative information (name, phone, email)
+  * Left column: Price summary with QR code and signature area (expanded width)
+  * Improved spacing with wider sections for better content display
 ```
 
 ## User Preferences

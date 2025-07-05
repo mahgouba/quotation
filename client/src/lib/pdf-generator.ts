@@ -225,10 +225,10 @@ export function generateQuotationPDF(data: any): jsPDF {
   
   currentY += 10;
   
-  // Three-column bottom section: Rep Info, Terms, QR Code & Price Summary
+  // Two-column bottom section: Rep Info, QR Code & Price Summary
   const bottomY = currentY;
-  const sectionWidth = (pageWidth - 50) / 3;
-  const margin = 10;
+  const sectionWidth = (pageWidth - 40) / 2;
+  const margin = 15;
   
   // Representative info (right section)
   const repX = pageWidth - margin - sectionWidth;
@@ -245,32 +245,6 @@ export function generateQuotationPDF(data: any): jsPDF {
   doc.text(`الاسم: ${data.salesRepName || 'غير محدد'}`, repX + sectionWidth - 5, bottomY + 18, { align: 'right' });
   doc.text(`الهاتف: ${data.salesRepPhone || 'غير محدد'}`, repX + sectionWidth - 5, bottomY + 26, { align: 'right' });
   doc.text(`البريد: ${data.salesRepEmail || 'غير محدد'}`, repX + sectionWidth - 5, bottomY + 34, { align: 'right' });
-  
-  // Terms summary (center section)
-  const termsX = pageWidth/2 - sectionWidth/2;
-  doc.setFillColor(255, 248, 220);
-  doc.rect(termsX, bottomY, sectionWidth, 50, 'F');
-  doc.setDrawColor(...gold);
-  doc.rect(termsX, bottomY, sectionWidth, 50, 'S');
-  
-  doc.setTextColor(...gold);
-  doc.setFontSize(10);
-  doc.text('الشروط والأحكام', termsX + sectionWidth - 5, bottomY + 10, { align: 'right' });
-  doc.setTextColor(0, 0, 0);
-  doc.setFontSize(7);
-  
-  // Display key terms in compact format
-  const mainTerms = [
-    '• مقدم 50% من السعر',
-    '• التسليم: 2-4 أسابيع',
-    '• ضمان الوكيل 3 سنوات',
-    '• العرض ساري 30 يوم'
-  ];
-  let termY = bottomY + 18;
-  mainTerms.forEach(term => {
-    doc.text(term, termsX + sectionWidth - 5, termY, { align: 'right' });
-    termY += 8;
-  });
   
   // QR Code and Price Summary (left section)
   doc.setFillColor(240, 245, 255);
