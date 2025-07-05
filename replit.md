@@ -268,6 +268,12 @@ Changelog:
   * Terms and conditions automatically sorted by display order and numbered sequentially
   * Only active terms with proper display order appear in quotations and PDFs
   * Complete integration between backend database and frontend display systems
+- July 05, 2025. Terms & Conditions Removal:
+  * Removed terms and conditions section from quotation preview interface as requested
+  * Eliminated terms and conditions from PDF export functionality
+  * Cleaned up quotation display to focus on essential business information only
+  * Maintained terms and conditions management system in data administration for future use
+  * Streamlined quotation layout for cleaner, more focused presentation
 ```
 
 ## User Preferences

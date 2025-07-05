@@ -555,9 +555,6 @@ const VehicleQuotation = () => {
         companyPhone: selectedComp?.phone || 'غير محدد',
         companyEmail: selectedComp?.email || 'غير محدد',
         companyStamp: selectedComp?.stamp || null,
-        
-        // Filter only active terms and conditions
-        termsAndConditions: termsAndConditions.filter(term => term.isActive).sort((a, b) => a.displayOrder - b.displayOrder),
       };
 
       // Try HTML to PDF approach for better Arabic support
@@ -1344,26 +1341,6 @@ const VehicleQuotation = () => {
 
 
 
-
-              {/* Terms and Conditions Section */}
-              {termsAndConditions && termsAndConditions.filter(term => term.isActive).length > 0 && (
-                <div className="bg-gray-50 border border-slate-600 rounded-lg p-6 mb-8">
-                  <h3 className="font-semibold text-lg mb-4 text-right" style={{ color: '#00627F' }}>
-                    الشروط والأحكام
-                  </h3>
-                  <div className="space-y-2 text-right text-sm">
-                    {termsAndConditions
-                      .filter(term => term.isActive)
-                      .sort((a, b) => a.displayOrder - b.displayOrder)
-                      .map((term, index) => (
-                        <div key={term.id} className="border-b border-gray-200 pb-2">
-                          <p className="font-medium text-gray-800">{index + 1}. {term.title}</p>
-                          <p className="text-gray-600 text-xs mt-1">{term.content}</p>
-                        </div>
-                      ))}
-                  </div>
-                </div>
-              )}
 
               {/* Signature Area with Company Stamp */}
               <div className="mt-8 flex justify-between items-end">
