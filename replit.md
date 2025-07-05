@@ -431,6 +431,18 @@ Changelog:
   * Reduced company stamp size from 120×90 to 113×71 (4cm width × 2.5cm height)
   * Adjusted stamp positioning to accommodate new dimensions
   * Maintained professional appearance with appropriately sized company seal
+- July 05, 2025. Comprehensive Font Size Enhancement:
+  * Increased "عرض سعر" header text from 30pt to 36pt for maximum visibility
+  * Enlarged company name from 48pt to 54pt for prominent branding
+  * Enhanced date and quotation number fonts from 18pt to 22pt
+  * Increased greeting section font from 20pt to 24pt
+  * Enlarged customer and vehicle data titles from 18pt to 22pt, content from 15pt to 18pt
+  * Enhanced specifications section title from 20pt to 24pt, content from 16pt to 19pt
+  * Increased pricing summary title from 20pt to 24pt, table content from 16pt to 19pt
+  * Enlarged amount in words from 18pt to 22pt for maximum readability
+  * Enhanced signature section title from 18pt to 22pt, signature text from 16pt to 20pt
+  * Increased footer text from 10pt to 14pt for better readability
+  * All PDF text now significantly larger for improved clarity and professional appearance
 ```
 
 ## User Preferences
