@@ -552,7 +552,7 @@ const VehicleQuotation = () => {
         companyName: selectedComp?.name || 'شركة البريمي',
         companyPhone: selectedComp?.phone || 'غير محدد',
         companyEmail: selectedComp?.email || 'غير محدد',
-        companyTerms: (selectedComp as any)?.termsAndConditions || 'الشروط والأحكام غير محددة',
+
         salesRepEmail: selectedSalesRep?.email || 'غير محدد'
       };
 
@@ -1327,7 +1327,7 @@ const VehicleQuotation = () => {
                   <p>• مدة صلاحية العرض: {formData.validityPeriod} يوم (ينتهي في: {format(new Date(formData.deadlineDate), "dd/MM/yyyy")})</p>
                   <p>• السعر لا يشمل رسوم التسجيل والتأمين</p>
                   <p>• يجب التأكد من التحويل البنكي</p>
-                  <p>• الشروط خاضعة للموافقة</p>
+                  <p>• جميع البيانات خاضعة للمراجعة والتأكيد</p>
                 </div>
               </div>
 
@@ -1341,19 +1341,7 @@ const VehicleQuotation = () => {
                 </div>
               </div>
 
-              {/* Terms and Conditions */}
-              <div className="mt-6 p-4 bg-gray-50 rounded-lg border">
-                <h4 className="font-semibold text-lg mb-3 text-right">الشروط والأحكام</h4>
-                <div className="text-sm text-right space-y-2">
-                  {((selectedCompany as any)?.termsAndConditions || 
-                    "• يجب على العميل دفع مقدم بنسبة 50% من إجمالي السعر\n• الباقي يُدفع عند استلام المركبة\n• مدة التسليم: 2-4 أسابيع من تاريخ تأكيد الطلب\n• ضمان الوكيل لمدة 3 سنوات أو 100,000 كم أيهما أقل\n• العرض لا يشمل التأمين ورسوم النقل\n• الشركة غير مسؤولة عن التأخير الناجم عن ظروف خارجة عن إرادتها")
-                    .split('\n')
-                    .map((term: string, index: number) => (
-                      <p key={index}>{term}</p>
-                    ))
-                  }
-                </div>
-              </div>
+
 
               {/* Signature Area with Company Stamp */}
               <div className="mt-8 flex justify-between items-end">

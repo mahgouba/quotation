@@ -232,6 +232,12 @@ Changelog:
   * Simplified bottom left section to focus on QR code and signature only
   * Cleaner, more professional PDF layout without repetitive information
   * Improved readability with better section organization
+- July 05, 2025. Complete Terms & Conditions Removal:
+  * Removed all remaining references to terms and conditions from PDF generator
+  * Eliminated terms and conditions section from quotation preview interface
+  * Cleaned up data structure to remove termsAndConditions field
+  * Simplified quotation layout to focus on essential business data only
+  * Updated notes section with more relevant business information
 ```
 
 ## User Preferences
