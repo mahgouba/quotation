@@ -347,13 +347,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         companyId = newCompany.id;
       }
 
-      // Create quotation
-      const newQuotation = await storage.createQuotation({
+      // Create quotation with safe date handling
+      const quotationData = {
         ...quotation,
         customerId,
         vehicleId,
         companyId,
-      });
+      };
+      
+      // Handle dates safely - only set if they exist and are valid
+      if (quotation.issueDate) {
+        const issueDate = new Date(quotation.issueDate);
+        if (!isNaN(issueDate.getTime())) {
+          quotationData.issueDate = issueDate;
+        }
+      }
+      
+      if (quotation.deadlineDate) {
+        const deadlineDate = new Date(quotation.deadlineDate);
+        if (!isNaN(deadlineDate.getTime())) {
+          quotationData.deadlineDate = deadlineDate;
+        }
+      }
+      
+      const newQuotation = await storage.createQuotation(quotationData);
 
       res.status(201).json(newQuotation);
     } catch (error) {

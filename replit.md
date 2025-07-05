@@ -334,6 +334,9 @@ Changelog:
   * Improved API endpoint to handle new vehicle fields including VIN number
   * Added proper null handling for optional vehicle fields
   * Resolved TypeScript errors in error handling code
+  * Fixed PostgreSQL timestamp conversion issues with proper date handling
+  * Implemented safe date processing to prevent "toISOString is not a function" errors
+  * Quotation save functionality now works correctly with all data fields
 ```
 
 ## User Preferences

@@ -586,8 +586,8 @@ const VehicleQuotation = () => {
         vatRate: formData.vatRate.toString(),
         platePrice: formData.platePrice.toString(),
         totalPrice: formData.totalPrice.toString(),
-        issueDate: new Date(formData.issueDate),
-        deadlineDate: new Date(formData.deadlineDate),
+        issueDate: formData.issueDate,
+        deadlineDate: formData.deadlineDate,
         includesPlatesAndTax: formData.includesPlatesAndTax,
         isWarrantied: formData.isWarrantied,
         isRiyadhDelivery: formData.isRiyadhDelivery,
@@ -607,8 +607,8 @@ const VehicleQuotation = () => {
   const handleExportPDF = async () => {
     try {
       // Prepare data for PDF generation
-      const selectedComp = companies?.find(c => c.id === parseInt(formData.selectedCompanyId || '0'));
-      const selectedSalesRep = salesRepresentatives?.find(r => r.id === parseInt(formData.salesRepresentativeId || '0'));
+      const selectedComp = companies?.find(c => c.id === parseInt(String(formData.selectedCompanyId || '0')));
+      const selectedSalesRep = salesRepresentatives?.find(r => r.id === parseInt(String(formData.salesRepresentativeId || '0')));
       
       const pdfData = {
         ...formData,
