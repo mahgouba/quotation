@@ -274,6 +274,14 @@ Changelog:
   * Cleaned up quotation display to focus on essential business information only
   * Maintained terms and conditions management system in data administration for future use
   * Streamlined quotation layout for cleaner, more focused presentation
+- July 05, 2025. Dynamic Terms Integration with Database:
+  * Connected static quotation notes with database-driven terms and conditions system
+  * Added standard terms to database: validity period, registration fees, bank transfer, data review
+  * Replaced hardcoded notes with dynamic content pulled from terms and conditions table
+  * Special handling for validity period to show actual dates from quotation data
+  * Enhanced PDF generation to include database terms with proper Arabic formatting
+  * Complete integration allowing terms modification through data management interface
+  * Fallback to default terms if database is empty for system reliability
 ```
 
 ## User Preferences

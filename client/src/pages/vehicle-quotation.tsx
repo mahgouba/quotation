@@ -555,6 +555,11 @@ const VehicleQuotation = () => {
         companyPhone: selectedComp?.phone || 'غير محدد',
         companyEmail: selectedComp?.email || 'غير محدد',
         companyStamp: selectedComp?.stamp || null,
+        
+        // Include terms and conditions from database
+        termsAndConditions: termsAndConditions.filter(term => term.isActive).sort((a, b) => a.displayOrder - b.displayOrder),
+        validityPeriod: formData.validityPeriod,
+        deadlineDate: formData.deadlineDate,
       };
 
       // Try HTML to PDF approach for better Arabic support
@@ -1329,12 +1334,32 @@ const VehicleQuotation = () => {
                   <p className="text-xs mt-1">QR Code</p>
                 </div>
 
-                {/* Notes */}
+                {/* Notes from Database Terms */}
                 <div className="text-right text-xs text-gray-600 space-y-1">
-                  <p>• مدة صلاحية العرض: {formData.validityPeriod} يوم (ينتهي في: {format(new Date(formData.deadlineDate), "dd/MM/yyyy")})</p>
-                  <p>• السعر لا يشمل رسوم التسجيل والتأمين</p>
-                  <p>• يجب التأكد من التحويل البنكي</p>
-                  <p>• جميع البيانات خاضعة للمراجعة والتأكيد</p>
+                  {termsAndConditions && termsAndConditions.filter(term => term.isActive).length > 0 ? (
+                    termsAndConditions
+                      .filter(term => term.isActive)
+                      .sort((a, b) => a.displayOrder - b.displayOrder)
+                      .map((term, index) => {
+                        // Special formatting for validity period
+                        if (term.title === 'مدة صلاحية العرض') {
+                          return (
+                            <p key={term.id}>• مدة صلاحية العرض: {formData.validityPeriod} يوم (ينتهي في: {format(new Date(formData.deadlineDate), "dd/MM/yyyy")})</p>
+                          );
+                        }
+                        return (
+                          <p key={term.id}>• {term.content}</p>
+                        );
+                      })
+                  ) : (
+                    // Fallback to default terms if none in database
+                    <>
+                      <p>• مدة صلاحية العرض: {formData.validityPeriod} يوم (ينتهي في: {format(new Date(formData.deadlineDate), "dd/MM/yyyy")})</p>
+                      <p>• السعر لا يشمل رسوم التسجيل والتأمين</p>
+                      <p>• يجب التأكد من التحويل البنكي</p>
+                      <p>• جميع البيانات خاضعة للمراجعة والتأكيد</p>
+                    </>
+                  )}
                 </div>
               </div>
 

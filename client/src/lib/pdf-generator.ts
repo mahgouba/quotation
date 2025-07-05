@@ -206,6 +206,40 @@ export function generateQuotationPDF(data: any): jsPDF {
   
   currentY += 30;
   
+  // Terms and Conditions Section from Database
+  if (data.termsAndConditions && data.termsAndConditions.length > 0) {
+    doc.setFillColor(245, 245, 245);
+    doc.rect(25, currentY, pageWidth - 50, 30, 'F');
+    doc.setDrawColor(...darkTeal);
+    doc.rect(25, currentY, pageWidth - 50, 30, 'S');
+    
+    doc.setTextColor(...darkTeal);
+    doc.setFontSize(10);
+    doc.text('ملاحظات هامة', pageWidth - 35, currentY + 8, { align: 'right' });
+    
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(8);
+    let termsY = currentY + 15;
+    
+    data.termsAndConditions.forEach((term: any, index: number) => {
+      if (termsY < currentY + 28) {
+        let termText = `• ${term.content}`;
+        
+        // Special handling for validity period
+        if (term.title === 'مدة صلاحية العرض') {
+          const validityPeriod = data.validityPeriod || 15;
+          const deadlineDate = data.deadlineDate || new Date(Date.now() + 15 * 24 * 60 * 60 * 1000);
+          termText = `• مدة صلاحية العرض: ${validityPeriod} يوم (ينتهي في: ${new Date(deadlineDate).toLocaleDateString('ar-SA')})`;
+        }
+        
+        doc.text(termText, pageWidth - 35, termsY, { align: 'right' });
+        termsY += 4;
+      }
+    });
+    
+    currentY += 35;
+  }
+  
   // Single centered section: QR Code and Signature
   const bottomY = currentY;
   const sectionWidth = (pageWidth - 60) / 2;
