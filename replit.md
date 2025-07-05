@@ -212,6 +212,14 @@ Changelog:
   * Integrated logo upload functionality for both new and existing vehicle specifications
   * Updated quotation preview to show brand logos from database entries
   * Added visual feedback with logo preview in management interface
+- July 05, 2025. PDF Layout Improvements and Three-Column Footer:
+  * Fixed company name display in PDF header to show proper Arabic names
+  * Redesigned bottom section with three organized columns in single row
+  * Right column: Sales representative information (name, phone, email)
+  * Center column: Terms and conditions summary with key points
+  * Left column: Price summary with QR code and signature area
+  * Improved spacing and alignment for better professional appearance
+  * Enhanced readability with proper section titles and clear data organization
 ```
 
 ## User Preferences

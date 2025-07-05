@@ -58,7 +58,7 @@ export function generateQuotationPDF(data: any): jsPDF {
   // Company name on left
   doc.setTextColor(199, 156, 69);
   doc.setFontSize(16);
-  doc.text(data.companyName || 'ALBARIMI', 15, 25);
+  doc.text(data.companyName || 'شركة البريمي', 15, 25);
   
   // Date and quotation number
   doc.setTextColor(255, 255, 255);
@@ -225,60 +225,87 @@ export function generateQuotationPDF(data: any): jsPDF {
   
   currentY += 10;
   
-  // Three-column bottom section: Rep Info, Price Summary, QR Code
+  // Three-column bottom section: Rep Info, Terms, QR Code & Price Summary
   const bottomY = currentY;
-  const sectionWidth = (pageWidth - 60) / 3;
+  const sectionWidth = (pageWidth - 50) / 3;
+  const margin = 10;
   
   // Representative info (right section)
+  const repX = pageWidth - margin - sectionWidth;
   doc.setFillColor(248, 250, 252);
-  doc.rect(pageWidth - 15 - sectionWidth, bottomY, sectionWidth, 45, 'F');
+  doc.rect(repX, bottomY, sectionWidth, 50, 'F');
   doc.setDrawColor(...darkTeal);
-  doc.rect(pageWidth - 15 - sectionWidth, bottomY, sectionWidth, 45, 'S');
+  doc.rect(repX, bottomY, sectionWidth, 50, 'S');
   
   doc.setTextColor(...darkTeal);
   doc.setFontSize(10);
-  doc.text('بيانات مندوب المبيعات', pageWidth - 20, bottomY + 10, { align: 'right' });
+  doc.text('بيانات مندوب المبيعات', repX + sectionWidth - 5, bottomY + 10, { align: 'right' });
   doc.setTextColor(0, 0, 0);
-  doc.setFontSize(9);
-  doc.text(`الاسم: ${data.salesRepName || 'غير محدد'}`, pageWidth - 20, bottomY + 18, { align: 'right' });
-  doc.text(`الهاتف: ${data.salesRepPhone || 'غير محدد'}`, pageWidth - 20, bottomY + 26, { align: 'right' });
-  doc.text(`البريد: ${data.salesRepEmail || 'غير محدد'}`, pageWidth - 20, bottomY + 34, { align: 'right' });
+  doc.setFontSize(8);
+  doc.text(`الاسم: ${data.salesRepName || 'غير محدد'}`, repX + sectionWidth - 5, bottomY + 18, { align: 'right' });
+  doc.text(`الهاتف: ${data.salesRepPhone || 'غير محدد'}`, repX + sectionWidth - 5, bottomY + 26, { align: 'right' });
+  doc.text(`البريد: ${data.salesRepEmail || 'غير محدد'}`, repX + sectionWidth - 5, bottomY + 34, { align: 'right' });
   
-  // Price summary (center section)
-  const centerX = pageWidth/2 - sectionWidth/2;
+  // Terms summary (center section)
+  const termsX = pageWidth/2 - sectionWidth/2;
   doc.setFillColor(255, 248, 220);
-  doc.rect(centerX, bottomY, sectionWidth, 45, 'F');
+  doc.rect(termsX, bottomY, sectionWidth, 50, 'F');
   doc.setDrawColor(...gold);
-  doc.rect(centerX, bottomY, sectionWidth, 45, 'S');
+  doc.rect(termsX, bottomY, sectionWidth, 50, 'S');
   
   doc.setTextColor(...gold);
   doc.setFontSize(10);
-  doc.text('ملخص الأسعار', centerX + sectionWidth/2, bottomY + 10, { align: 'center' });
+  doc.text('الشروط والأحكام', termsX + sectionWidth - 5, bottomY + 10, { align: 'right' });
   doc.setTextColor(0, 0, 0);
-  doc.setFontSize(9);
-  doc.text(`السعر الأساسي: ${data.basePrice || '0'} ريال`, centerX + sectionWidth - 5, bottomY + 18, { align: 'right' });
-  doc.text(`الكمية: ${data.quantity || 1}`, centerX + sectionWidth - 5, bottomY + 26, { align: 'right' });
-  doc.text(`الإجمالي: ${data.totalPrice || '0'} ريال`, centerX + sectionWidth - 5, bottomY + 34, { align: 'right' });
+  doc.setFontSize(7);
   
-  // QR Code and Signature (left section)
+  // Display key terms in compact format
+  const mainTerms = [
+    '• مقدم 50% من السعر',
+    '• التسليم: 2-4 أسابيع',
+    '• ضمان الوكيل 3 سنوات',
+    '• العرض ساري 30 يوم'
+  ];
+  let termY = bottomY + 18;
+  mainTerms.forEach(term => {
+    doc.text(term, termsX + sectionWidth - 5, termY, { align: 'right' });
+    termY += 8;
+  });
+  
+  // QR Code and Price Summary (left section)
   doc.setFillColor(240, 245, 255);
-  doc.rect(15, bottomY, sectionWidth, 45, 'F');
+  doc.rect(margin, bottomY, sectionWidth, 50, 'F');
   doc.setDrawColor(...darkTeal);
-  doc.rect(15, bottomY, sectionWidth, 45, 'S');
+  doc.rect(margin, bottomY, sectionWidth, 50, 'S');
   
-  // QR Code placeholder
+  // Section title
+  doc.setTextColor(...darkTeal);
+  doc.setFontSize(10);
+  doc.text('ملخص العرض', margin + sectionWidth - 5, bottomY + 10, { align: 'right' });
+  
+  // QR Code placeholder (smaller)
   doc.setFillColor(255, 255, 255);
-  doc.rect(20, bottomY + 5, 25, 25, 'F');
+  doc.rect(margin + 5, bottomY + 15, 20, 20, 'F');
   doc.setDrawColor(200, 200, 200);
-  doc.rect(20, bottomY + 5, 25, 25, 'S');
+  doc.rect(margin + 5, bottomY + 15, 20, 20, 'S');
   doc.setTextColor(100, 100, 100);
+  doc.setFontSize(6);
+  doc.text('QR', margin + 15, bottomY + 26, { align: 'center' });
+  
+  // Price summary next to QR
+  doc.setTextColor(0, 0, 0);
   doc.setFontSize(8);
-  doc.text('QR', 32.5, bottomY + 19, { align: 'center' });
+  const basePriceSummary = parseFloat(data.basePrice) || 0;
+  const quantitySummary = parseInt(data.quantity) || 1;
+  const totalSummary = basePriceSummary * quantitySummary;
+  
+  doc.text(`السعر: ${basePriceSummary.toLocaleString()} ريال`, margin + sectionWidth - 5, bottomY + 18, { align: 'right' });
+  doc.text(`الكمية: ${quantitySummary}`, margin + sectionWidth - 5, bottomY + 26, { align: 'right' });
+  doc.text(`المجموع: ${totalSummary.toLocaleString()} ريال`, margin + sectionWidth - 5, bottomY + 34, { align: 'right' });
   
   // Signature area
-  doc.setTextColor(0, 0, 0);
-  doc.setFontSize(8);
-  doc.text('ختم وتوقيع الشركة', 15 + sectionWidth/2, bottomY + 38, { align: 'center' });
+  doc.setFontSize(7);
+  doc.text('ختم وتوقيع الشركة', margin + sectionWidth/2, bottomY + 44, { align: 'center' });
   
   // Footer with Gold background
   doc.setFillColor(...gold);
@@ -286,7 +313,7 @@ export function generateQuotationPDF(data: any): jsPDF {
   
   doc.setTextColor(0, 0, 0);
   doc.setFontSize(10);
-  doc.text(`${data.companyName || 'ALBARIMI'}`, pageWidth - 15, pageHeight - 10, { align: 'right' });
+  doc.text(`${data.companyName || 'شركة البريمي'}`, pageWidth - 15, pageHeight - 10, { align: 'right' });
   doc.text(`الهاتف: ${data.companyPhone || 'غير محدد'}`, pageWidth/2, pageHeight - 10, { align: 'center' });
   doc.text(`البريد: ${data.companyEmail || 'غير محدد'}`, 15, pageHeight - 10);
   
