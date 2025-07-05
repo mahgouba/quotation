@@ -55,7 +55,8 @@ export function generateQuotationPDF(data: any): jsPDF {
   // Header text in Arabic - made even larger
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(36);
-  doc.text('عرض سعر', pageWidth - 8, 22, { align: 'right' });
+  const documentTitle = data.documentType === 'invoice' ? 'فاتورة' : 'عرض سعر';
+  doc.text(documentTitle, pageWidth - 8, 22, { align: 'right' });
   
   // Company name in center - Made much larger
   doc.setTextColor(199, 156, 69);
@@ -68,7 +69,8 @@ export function generateQuotationPDF(data: any): jsPDF {
   const currentDate = new Date().toLocaleDateString('ar-SA');
   const quotationNumber = data.quotationNumber || `Q${Date.now()}`.slice(-6);
   doc.text(`تاريخ الإصدار: ${currentDate}`, pageWidth - 8, 175, { align: 'right' });
-  doc.text(`رقم العرض: ${quotationNumber}`, 8, 175);
+  const documentNumber = data.documentType === 'invoice' ? 'رقم الفاتورة' : 'رقم العرض';
+  doc.text(`${documentNumber}: ${quotationNumber}`, 8, 175);
   
   currentY = 205;
   

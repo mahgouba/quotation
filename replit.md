@@ -443,6 +443,13 @@ Changelog:
   * Enhanced signature section title from 18pt to 22pt, signature text from 16pt to 20pt
   * Increased footer text from 10pt to 14pt for better readability
   * All PDF text now significantly larger for improved clarity and professional appearance
+- July 05, 2025. Invoice Conversion Feature:
+  * Added toggle button to convert quotations to invoices and vice versa
+  * When document type is set to invoice, deadline date is automatically hidden from display
+  * Dynamic header titles change from "عرض سعر" to "فاتورة" in both preview and PDF export
+  * Document numbers adapt accordingly ("رقم العرض" vs "رقم الفاتورة")
+  * PDF file names automatically reflect document type (فاتورة-عميل.pdf vs عرض-سعر-عميل.pdf)
+  * Complete integration with existing PDF generation system for both document types
 ```
 
 ## User Preferences

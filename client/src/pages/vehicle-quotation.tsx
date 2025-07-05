@@ -163,6 +163,7 @@ const VehicleQuotation = () => {
     whatsappNumber: "",
     selectedCompanyId: "",
     companyName: "اسم الشركة",
+    documentType: "quotation", // "quotation" or "invoice"
     companyAddress: "عنوان الشركة",
     companyPhone: "رقم هاتف الشركة",
     companyEmail: "البريد الإلكتروني للشركة",
@@ -697,6 +698,7 @@ const VehicleQuotation = () => {
         termsAndConditions: termsAndConditions.filter(term => term.isActive).sort((a, b) => a.displayOrder - b.displayOrder),
         validityPeriod: formData.validityPeriod,
         deadlineDate: formData.deadlineDate,
+        documentType: formData.documentType,
       };
 
       // Try HTML to PDF approach for better Arabic support
@@ -712,11 +714,12 @@ const VehicleQuotation = () => {
       }
       
       // Save the PDF with A4 format
-      pdf.save(`عرض-سعر-${formData.customerName || 'عميل'}.pdf`);
+      const documentName = formData.documentType === 'invoice' ? 'فاتورة' : 'عرض-سعر';
+      pdf.save(`${documentName}-${formData.customerName || 'عميل'}.pdf`);
       
       toast({
         title: "تم تصدير PDF بنجاح",
-        description: "تم إنشاء عرض السعر بدعم كامل للغة العربية ومقاس A4",
+        description: `تم إنشاء ${formData.documentType === 'invoice' ? 'الفاتورة' : 'عرض السعر'} بدعم كامل للغة العربية ومقاس A4`,
       });
     } catch (error) {
       console.error("PDF generation failed:", error);
@@ -936,6 +939,13 @@ const VehicleQuotation = () => {
             <Button onClick={handleWhatsAppShare} className="bg-green-500 hover:bg-green-600 text-white">
               <FaWhatsapp className="ml-2" />
               <span>واتساب</span>
+            </Button>
+            <Button 
+              onClick={() => handleInputChange('documentType', formData.documentType === 'quotation' ? 'invoice' : 'quotation')}
+              className={`${formData.documentType === 'invoice' ? 'bg-orange-600 hover:bg-orange-700' : 'bg-purple-600 hover:bg-purple-700'} text-white`}
+            >
+              <FaEdit className="ml-2" />
+              <span>{formData.documentType === 'quotation' ? 'تحويل إلى فاتورة' : 'تحويل إلى عرض سعر'}</span>
             </Button>
 
           </div>
@@ -1159,23 +1169,25 @@ const VehicleQuotation = () => {
                       onChange={(e) => handleInputChange('platePrice', parseFloat(e.target.value) || 0)}
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="validityPeriod">مدة صلاحية العرض (بالأيام)</Label>
-                    <Input
-                      id="validityPeriod"
-                      type="number"
-                      min="1"
-                      max="365"
-                      value={formData.validityPeriod}
-                      onChange={(e) => {
-                        const days = parseInt(e.target.value) || 15;
-                        handleInputChange('validityPeriod', days);
-                        // تحديث تاريخ انتهاء العرض تلقائياً
-                        const newDeadline = format(new Date(Date.now() + days * 24 * 60 * 60 * 1000), "yyyy-MM-dd");
-                        handleInputChange('deadlineDate', newDeadline);
-                      }}
-                    />
-                  </div>
+                  {formData.documentType === 'quotation' && (
+                    <div>
+                      <Label htmlFor="validityPeriod">مدة صلاحية العرض (بالأيام)</Label>
+                      <Input
+                        id="validityPeriod"
+                        type="number"
+                        min="1"
+                        max="365"
+                        value={formData.validityPeriod}
+                        onChange={(e) => {
+                          const days = parseInt(e.target.value) || 15;
+                          handleInputChange('validityPeriod', days);
+                          // تحديث تاريخ انتهاء العرض تلقائياً
+                          const newDeadline = format(new Date(Date.now() + days * 24 * 60 * 60 * 1000), "yyyy-MM-dd");
+                          handleInputChange('deadlineDate', newDeadline);
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
 
               </CardContent>
@@ -1242,19 +1254,21 @@ const VehicleQuotation = () => {
                     onChange={(e) => handleInputChange('issueDate', e.target.value)}
                   />
                 </div>
-                <div>
-                  <Label htmlFor="deadlineDate">تاريخ انتهاء العرض (محسوب تلقائياً)</Label>
-                  <Input
-                    id="deadlineDate"
-                    type="date"
-                    value={formData.deadlineDate}
-                    readOnly
-                    className="bg-gray-50 cursor-not-allowed"
-                  />
-                  <p className="text-sm text-muted-foreground mt-1">
-                    يتم حساب تاريخ الانتهاء تلقائياً بناءً على تاريخ الإصدار ومدة الصلاحية
-                  </p>
-                </div>
+                {formData.documentType === 'quotation' && (
+                  <div>
+                    <Label htmlFor="deadlineDate">تاريخ انتهاء العرض (محسوب تلقائياً)</Label>
+                    <Input
+                      id="deadlineDate"
+                      type="date"
+                      value={formData.deadlineDate}
+                      readOnly
+                      className="bg-gray-50 cursor-not-allowed"
+                    />
+                    <p className="text-sm text-muted-foreground mt-1">
+                      يتم حساب تاريخ الانتهاء تلقائياً بناءً على تاريخ الإصدار ومدة الصلاحية
+                    </p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -1354,11 +1368,13 @@ const VehicleQuotation = () => {
                 
                 {/* Header Metadata on Right */}
                 <div className="text-right">
-                  <h1 className="text-xl font-bold mb-2">عرض سعر</h1>
+                  <h1 className="text-xl font-bold mb-2">{formData.documentType === 'invoice' ? 'فاتورة' : 'عرض سعر'}</h1>
                   <div className="text-sm space-y-1">
                     <p>تاريخ الإصدار: {format(new Date(formData.issueDate), "dd/MM/yyyy")}</p>
-                    <p>تاريخ الانتهاء: {format(new Date(formData.deadlineDate), "dd/MM/yyyy")}</p>
-                    <p>رقم العرض: {Date.now().toString().slice(-4)}</p>
+                    {formData.documentType === 'quotation' && (
+                      <p>تاريخ الانتهاء: {format(new Date(formData.deadlineDate), "dd/MM/yyyy")}</p>
+                    )}
+                    <p>{formData.documentType === 'invoice' ? 'رقم الفاتورة' : 'رقم العرض'}: {Date.now().toString().slice(-4)}</p>
                   </div>
                 </div>
               </div>
