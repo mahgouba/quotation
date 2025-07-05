@@ -361,6 +361,12 @@ Changelog:
   * Removed visual indicators (*) for required fields from user interface
   * System now allows saving and exporting quotations with any data provided
   * Users can now save drafts and incomplete quotations without validation errors
+- July 05, 2025. Saved Quotations Interface Enhancement:
+  * Removed statistics cards (total quotes, sent quotes, accepted quotes, total value) from saved quotations page
+  * Fixed action buttons functionality for view, edit, download, and delete operations
+  * Added proper event handlers and tooltips for all action buttons
+  * Enhanced user interface with working buttons and cleaner layout
+  * Improved quotations management with functional action buttons
 ```
 
 ## User Preferences

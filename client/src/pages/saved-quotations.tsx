@@ -84,6 +84,41 @@ export default function SavedQuotations() {
     }
   };
 
+  const handleView = (quotation: SavedQuotation) => {
+    // TODO: Navigate to view page or open modal with quotation details
+    console.log('View quotation:', quotation);
+    toast({
+      title: 'عرض التفاصيل',
+      description: `عرض تفاصيل ${quotation.quotationNumber}`,
+    });
+  };
+
+  const handleEdit = (quotation: SavedQuotation) => {
+    // TODO: Navigate to edit page with quotation data
+    console.log('Edit quotation:', quotation);
+    toast({
+      title: 'تحرير العرض',
+      description: `تحرير ${quotation.quotationNumber}`,
+    });
+  };
+
+  const handleDownload = async (quotation: SavedQuotation) => {
+    try {
+      // TODO: Generate and download PDF
+      console.log('Download quotation:', quotation);
+      toast({
+        title: 'تحميل PDF',
+        description: `جاري تحميل ${quotation.quotationNumber}`,
+      });
+    } catch (error) {
+      toast({
+        title: 'فشل في التحميل',
+        description: 'حدث خطأ أثناء تحميل الملف',
+        variant: 'destructive',
+      });
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'draft': return 'bg-gray-100 text-gray-800';
@@ -164,47 +199,7 @@ export default function SavedQuotations() {
           </div>
         </div>
 
-        {/* Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">إجمالي العروض</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{quotations.length}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">العروض المرسلة</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {quotations.filter(q => q.status === 'sent').length}
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">العروض المقبولة</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">
-                {quotations.filter(q => q.status === 'accepted').length}
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">إجمالي القيمة</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {quotations.reduce((sum, q) => sum + parseFloat(q.totalPrice || '0'), 0).toLocaleString()} ريال
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+
 
         {/* Quotations Table */}
         {filteredQuotations.length === 0 ? (
@@ -263,13 +258,28 @@ export default function SavedQuotations() {
                         </td>
                         <td className="py-3 px-4">
                           <div className="flex gap-2">
-                            <Button variant="outline" size="sm">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => handleView(quotation)}
+                              title="عرض التفاصيل"
+                            >
                               <Eye className="h-4 w-4" />
                             </Button>
-                            <Button variant="outline" size="sm">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => handleEdit(quotation)}
+                              title="تحرير"
+                            >
                               <Edit className="h-4 w-4" />
                             </Button>
-                            <Button variant="outline" size="sm">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => handleDownload(quotation)}
+                              title="تحميل PDF"
+                            >
                               <Download className="h-4 w-4" />
                             </Button>
                             <Button 
@@ -277,6 +287,7 @@ export default function SavedQuotations() {
                               size="sm"
                               onClick={() => handleDelete(quotation.id)}
                               disabled={deleteQuotationMutation.isPending}
+                              title="حذف"
                             >
                               <Trash2 className="h-4 w-4 text-red-600" />
                             </Button>
