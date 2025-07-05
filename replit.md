@@ -328,6 +328,12 @@ Changelog:
   * Added license plates section to quotation summary when plate price is specified
   * Updated vehicle information display in both PDF and preview to include VIN number
   * Improved data integrity by showing only relevant information without "غير محدد" placeholders
+- July 05, 2025. Quotation Save Error Fix:
+  * Fixed quotation save error by properly including VIN number in vehicle data structure
+  * Enhanced error handling in complete quotation endpoint with detailed error messages
+  * Improved API endpoint to handle new vehicle fields including VIN number
+  * Added proper null handling for optional vehicle fields
+  * Resolved TypeScript errors in error handling code
 ```
 
 ## User Preferences

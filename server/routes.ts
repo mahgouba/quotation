@@ -327,12 +327,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         customerId = newCustomer.id;
       }
 
-      // Create vehicle with detailed specifications
-      const newVehicle = await storage.createVehicle({
+      // Create vehicle with detailed specifications including VIN number
+      const vehicleData = {
         ...vehicle,
         specifications: vehicle.specifications || null,
         detailedSpecs: vehicle.detailedSpecs || null,
-      });
+        vinNumber: vehicle.vinNumber || null,
+      };
+      const newVehicle = await storage.createVehicle(vehicleData);
       const vehicleId = newVehicle.id;
 
       // Create or update company
@@ -355,7 +357,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.status(201).json(newQuotation);
     } catch (error) {
-      res.status(400).json({ error: "Failed to create complete quotation" });
+      console.error("Error creating complete quotation:", error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+      res.status(500).json({ error: `Failed to create complete quotation: ${errorMessage}` });
     }
   });
 
