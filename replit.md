@@ -315,6 +315,11 @@ Changelog:
   * Kept only the issue date field in the PDF header
   * Cleaner PDF layout with focus on essential quotation information
   * Streamlined design for better readability and professional appearance
+- July 05, 2025. Date Field Simplification:
+  * Removed deadline/expiry date from PDF header
+  * Changed header to show only "تاريخ الإصدار" (Issue Date) instead of generic "التاريخ"
+  * Simplified date display for cleaner and more focused PDF header
+  * Enhanced professional appearance with essential date information only
 ```
 
 ## User Preferences

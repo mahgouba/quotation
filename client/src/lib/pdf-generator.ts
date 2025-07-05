@@ -61,12 +61,12 @@ export function generateQuotationPDF(data: any): jsPDF {
   doc.setFontSize(16);
   doc.text(data.companyName || 'شركة البريمي', 8, 22);
   
-  // Date and quotation number
+  // Issue date and quotation number only
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(10);
   const currentDate = new Date().toLocaleDateString('ar-SA');
   const quotationNumber = data.quotationNumber || `Q${Date.now()}`.slice(-6);
-  doc.text(`التاريخ: ${currentDate}`, pageWidth - 8, 32, { align: 'right' });
+  doc.text(`تاريخ الإصدار: ${currentDate}`, pageWidth - 8, 32, { align: 'right' });
   doc.text(`رقم العرض: ${quotationNumber}`, 8, 32);
   
   currentY = 45;
