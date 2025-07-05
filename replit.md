@@ -260,6 +260,14 @@ Changelog:
   * Integrated terms management tab in data administration panel with add/edit/delete functionality
   * Enhanced API endpoints for terms and conditions management
   * Improved PDF layout with larger visual elements for professional appearance
+- July 05, 2025. Complete Terms & Conditions Integration:
+  * Connected terms and conditions from data management to quotation display and PDF export
+  * Added automatic filtering to show only active terms and conditions
+  * Integrated terms display in quotation preview with proper Arabic RTL layout
+  * Enhanced PDF generator to include terms and conditions section with professional styling
+  * Terms and conditions automatically sorted by display order and numbered sequentially
+  * Only active terms with proper display order appear in quotations and PDFs
+  * Complete integration between backend database and frontend display systems
 ```
 
 ## User Preferences

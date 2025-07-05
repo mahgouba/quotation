@@ -206,6 +206,33 @@ export function generateQuotationPDF(data: any): jsPDF {
   
   currentY += 30;
   
+  // Terms and Conditions Section
+  if (data.termsAndConditions && data.termsAndConditions.length > 0) {
+    doc.setFillColor(245, 245, 245);
+    doc.rect(25, currentY, pageWidth - 50, 35, 'F');
+    doc.setDrawColor(...darkTeal);
+    doc.rect(25, currentY, pageWidth - 50, 35, 'S');
+    
+    doc.setTextColor(...darkTeal);
+    doc.setFontSize(12);
+    doc.text('الشروط والأحكام', pageWidth - 35, currentY + 10, { align: 'right' });
+    
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(9);
+    let termsY = currentY + 18;
+    
+    data.termsAndConditions.forEach((term: any, index: number) => {
+      if (termsY < currentY + 30) {
+        const termText = `${index + 1}. ${term.title}: ${term.content}`;
+        const lines = doc.splitTextToSize(termText, pageWidth - 70);
+        doc.text(lines[0], pageWidth - 35, termsY, { align: 'right' });
+        termsY += 5;
+      }
+    });
+    
+    currentY += 40;
+  }
+  
   // Single centered section: QR Code and Signature
   const bottomY = currentY;
   const sectionWidth = (pageWidth - 60) / 2;
