@@ -19,10 +19,11 @@ export const companies = pgTable("companies", {
   stamp: text("stamp"), // Base64 encoded company stamp
   registrationNumber: text("registration_number"),
   taxNumber: text("tax_number"),
-  primaryColor: text("primary_color").default("#3b82f6"),
-  secondaryColor: text("secondary_color").default("#1e40af"),
-  textColor: text("text_color").default("#1f2937"),
-  backgroundColor: text("background_color").default("#ffffff"),
+  licenseNumber: text("license_number"),
+  primaryColor: text("primary_color").default("#00627F"),
+  secondaryColor: text("secondary_color").default("#C79C45"),
+  textColor: text("text_color").default("#000000"),
+  backgroundColor: text("background_color").default("#FFFFFF"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

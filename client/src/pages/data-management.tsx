@@ -90,12 +90,13 @@ export default function DataManagement() {
     email: "",
     registrationNumber: "",
     taxNumber: "",
+    licenseNumber: "",
     logo: "",
     stamp: "",
-    primaryColor: "#3b82f6",
-    secondaryColor: "#1e40af",
-    textColor: "#1f2937",
-    backgroundColor: "#ffffff"
+    primaryColor: "#00627F",
+    secondaryColor: "#C79C45",
+    textColor: "#000000",
+    backgroundColor: "#FFFFFF"
   });
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
 
@@ -272,12 +273,13 @@ export default function DataManagement() {
       email: company.email || "",
       registrationNumber: company.registrationNumber || "",
       taxNumber: company.taxNumber || "",
+      licenseNumber: (company as any).licenseNumber || "",
       logo: company.logo || "",
       stamp: (company as any).stamp || "",
-      primaryColor: company.primaryColor || "#3b82f6",
-      secondaryColor: company.secondaryColor || "#1e40af",
-      textColor: company.textColor || "#1f2937",
-      backgroundColor: company.backgroundColor || "#ffffff"
+      primaryColor: (company as any).primaryColor || "#00627F",
+      secondaryColor: (company as any).secondaryColor || "#C79C45",
+      textColor: (company as any).textColor || "#000000",
+      backgroundColor: (company as any).backgroundColor || "#FFFFFF"
     });
   };
 
@@ -795,6 +797,15 @@ export default function DataManagement() {
                         />
                       </div>
                       <div>
+                        <Label htmlFor="license-number">رقم الرخصة</Label>
+                        <Input
+                          id="license-number"
+                          value={companyForm.licenseNumber}
+                          onChange={(e) => setCompanyForm({...companyForm, licenseNumber: e.target.value})}
+                          placeholder="LIC-123456"
+                        />
+                      </div>
+                      <div>
                         <Label htmlFor="tax-number">الرقم الضريبي</Label>
                         <Input
                           id="tax-number"
@@ -932,6 +943,7 @@ export default function DataManagement() {
                         <TableHead>الهاتف</TableHead>
                         <TableHead>البريد الإلكتروني</TableHead>
                         <TableHead>رقم السجل</TableHead>
+                        <TableHead>رقم الرخصة</TableHead>
                         <TableHead>الرقم الضريبي</TableHead>
                         <TableHead>الإجراءات</TableHead>
                       </TableRow>
@@ -970,6 +982,7 @@ export default function DataManagement() {
                           <TableCell>{company.phone || "غير محدد"}</TableCell>
                           <TableCell>{company.email || "غير محدد"}</TableCell>
                           <TableCell>{company.registrationNumber || "غير محدد"}</TableCell>
+                          <TableCell>{(company as any).licenseNumber || "غير محدد"}</TableCell>
                           <TableCell>{company.taxNumber || "غير محدد"}</TableCell>
                           <TableCell>
                             <div className="flex gap-2">

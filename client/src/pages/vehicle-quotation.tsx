@@ -674,6 +674,9 @@ const VehicleQuotation = () => {
     return words.join(" ") + " ريال سعودي فقط لا غير";
   };
 
+  // Get selected company for dynamic display
+  const selectedCompany = companies?.find(c => c.id === parseInt(formData.selectedCompanyId || '0'));
+
   return (
     <div className="bg-background min-h-screen" dir="rtl">
       {/* Navigation Header */}
@@ -1138,16 +1141,25 @@ const VehicleQuotation = () => {
         {/* Quotation Sheet - ALBARIMI Style */}
         <Card id="quotation-preview" className="mt-8 print:shadow-none print:bg-white">
           <CardContent className="p-0">
-            {/* Header Section with Dark Teal Background */}
-            <div className="bg-slate-800 text-white p-6 relative" style={{ backgroundColor: '#00627F' }}>
+            {/* Header Section with Dynamic Company Colors */}
+            <div 
+              className="bg-slate-800 text-white p-6 relative" 
+              style={{ 
+                backgroundColor: (selectedCompany as any)?.primaryColor || '#00627F',
+                color: (selectedCompany as any)?.textColor || '#FFFFFF'
+              }}
+            >
               <div className="flex justify-between items-start">
                 {/* Company Logo on Left */}
                 <div className="flex-shrink-0">
-                  {formData.companyLogo ? (
-                    <img src={formData.companyLogo} alt="لوجو الشركة" className="h-16 w-auto" />
+                  {selectedCompany?.logo ? (
+                    <img src={selectedCompany.logo} alt="لوجو الشركة" className="h-16 w-auto" />
                   ) : (
-                    <div className="text-yellow-400 font-bold text-lg" style={{ color: '#C79C45' }}>
-                      ALBARIMI
+                    <div 
+                      className="text-yellow-400 font-bold text-lg" 
+                      style={{ color: (selectedCompany as any)?.secondaryColor || '#C79C45' }}
+                    >
+                      {selectedCompany?.name || 'ALBARIMI'}
                     </div>
                   )}
                 </div>
@@ -1163,12 +1175,21 @@ const VehicleQuotation = () => {
               </div>
             </div>
 
-            {/* Top Bar with Labels */}
+            {/* Top Bar with Company Details */}
             <div className="bg-gray-100 px-6 py-3 border-b">
               <div className="flex justify-around text-sm text-gray-700">
-                <span>السجل</span>
-                <span>الرخصة</span>
-                <span>الرقم الضريبي</span>
+                <div className="text-center">
+                  <div className="font-medium">السجل التجاري</div>
+                  <div className="text-xs">{selectedCompany?.registrationNumber || 'غير محدد'}</div>
+                </div>
+                <div className="text-center">
+                  <div className="font-medium">رقم الرخصة</div>
+                  <div className="text-xs">{(selectedCompany as any)?.licenseNumber || 'غير محدد'}</div>
+                </div>
+                <div className="text-center">
+                  <div className="font-medium">الرقم الضريبي</div>
+                  <div className="text-xs">{selectedCompany?.taxNumber || 'غير محدد'}</div>
+                </div>
               </div>
             </div>
 
@@ -1278,27 +1299,44 @@ const VehicleQuotation = () => {
                 </div>
               </div>
 
-              {/* Signature Area */}
+              {/* Signature Area with Company Stamp */}
               <div className="mt-8 flex justify-between items-end">
-                <div className="bg-gray-100 p-4 rounded border text-center w-32">
-                  <p className="font-medium">الختم</p>
+                <div className="text-right">
+                  <p className="font-medium text-sm">ختم وتوقيع الشركة</p>
+                  <div className="mt-2">
+                    {(selectedCompany as any)?.stamp ? (
+                      <img 
+                        src={(selectedCompany as any).stamp} 
+                        alt="ختم الشركة" 
+                        className="h-20 w-auto"
+                      />
+                    ) : (
+                      <div className="bg-gray-100 p-4 rounded border text-center w-32">
+                        <p className="text-xs text-gray-500">ختم الشركة</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 
-                {formData.companyStamp && (
-                  <img 
-                    src={formData.companyStamp} 
-                    alt="ختم الشركة" 
-                    className="h-16 w-auto"
-                  />
-                )}
+                <div className="text-left">
+                  <p className="font-medium text-sm">{selectedCompany?.name || 'اسم الشركة'}</p>
+                  <p className="text-xs text-gray-600 mt-1">المدير العام</p>
+                </div>
               </div>
             </div>
 
-            {/* Footer with Gold Background */}
-            <div className="text-white text-center py-3 text-sm" style={{ backgroundColor: '#C79C45' }}>
+            {/* Footer with Dynamic Company Information */}
+            <div 
+              className="text-white text-center py-3 text-sm" 
+              style={{ 
+                backgroundColor: (selectedCompany as any)?.secondaryColor || '#C79C45',
+                color: (selectedCompany as any)?.textColor || '#FFFFFF'
+              }}
+            >
               <div className="flex justify-center space-x-8 space-x-reverse">
-                <span>العنوان</span>
-                <span>الإيميل</span>
+                <span>العنوان: {selectedCompany?.address || 'عنوان الشركة'}</span>
+                <span>الإيميل: {selectedCompany?.email || 'البريد الإلكتروني'}</span>
+                <span>الهاتف: {selectedCompany?.phone || 'رقم الهاتف'}</span>
               </div>
             </div>
           </CardContent>
