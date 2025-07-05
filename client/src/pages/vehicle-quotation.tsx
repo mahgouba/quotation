@@ -471,14 +471,7 @@ const VehicleQuotation = () => {
       return;
     }
 
-    if (!formData.salesRepresentativeId) {
-      toast({
-        title: "خطأ في البيانات",
-        description: "يرجى اختيار المندوب",
-        variant: "destructive",
-      });
-      return;
-    }
+
 
     // Prepare data for API
     const quotationData = {
@@ -705,6 +698,12 @@ const VehicleQuotation = () => {
                 <Button variant="ghost" size="sm" className="flex items-center gap-2">
                   <Database className="h-4 w-4" />
                   إدارة البيانات
+                </Button>
+              </Link>
+              <Link href="/saved-quotations">
+                <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                  <FaSave className="h-4 w-4" />
+                  عروض السعر المحفوظة
                 </Button>
               </Link>
             </div>

@@ -96,6 +96,21 @@ export const quotations = pgTable("quotations", {
   specifications: text("specifications"), // Additional specs input by user
   detailedSpecs: text("detailed_specs"), // Complete vehicle specifications based on make/model/year
   
+  // Complete quotation data
+  customerName: text("customer_name"),
+  customerPhone: text("customer_phone"),
+  customerIdNumber: text("customer_id_number"),
+  carMaker: text("car_maker"),
+  carModel: text("car_model"),
+  carYear: text("car_year"),
+  vinNumber: text("vin_number"),
+  whatsappNumber: text("whatsapp_number"),
+  validityPeriod: integer("validity_period").default(30),
+  
+  // Additional pricing fields
+  insurancePrice: decimal("insurance_price", { precision: 10, scale: 2 }).default("0.00"),
+  additionalServicesPrice: decimal("additional_services_price", { precision: 10, scale: 2 }).default("0.00"),
+  
   // Images
   stampImage: text("stamp_image"), // Base64 encoded
   signatureImage: text("signature_image"), // Base64 encoded
