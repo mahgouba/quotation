@@ -310,6 +310,11 @@ Changelog:
   * Optimized specifications and pricing sections for compact A4 layout
   * Enhanced footer and QR code areas with minimal margins
   * Professional A4-optimized layout for improved printing quality
+- July 05, 2025. Simplified PDF Layout:
+  * Removed terms and conditions box (important dates section) from PDF
+  * Kept only the issue date field in the PDF header
+  * Cleaner PDF layout with focus on essential quotation information
+  * Streamlined design for better readability and professional appearance
 ```
 
 ## User Preferences
