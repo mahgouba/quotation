@@ -39,14 +39,14 @@ export function generateQuotationPDF(data: any): jsPDF {
   // Reduced margins for A4 printing - start from 5mm
   let currentY = 5;
   
-  // Header Section with Dark Teal Background - full width for A4
+  // Header Section with Dark Teal Background - made taller for larger elements
   doc.setFillColor(...darkTeal);
-  doc.rect(0, 0, pageWidth, 40, 'F');
+  doc.rect(0, 0, pageWidth, 110, 'F');
   
-  // Company logo on right (Arabic RTL) - Optimized for A4
+  // Company logo on right (Arabic RTL) - Made 3x larger
   if (data.companyLogo) {
     try {
-      doc.addImage(data.companyLogo, 'JPEG', pageWidth - 55, 3, 50, 34);
+      doc.addImage(data.companyLogo, 'JPEG', pageWidth - 165, 3, 150, 102);
     } catch (error) {
       console.warn('Could not add logo to PDF');
     }
@@ -57,20 +57,20 @@ export function generateQuotationPDF(data: any): jsPDF {
   doc.setFontSize(18);
   doc.text('عرض سعر', pageWidth - 8, 22, { align: 'right' });
   
-  // Company name on left
+  // Company name on left - Made much larger
   doc.setTextColor(199, 156, 69);
-  doc.setFontSize(16);
-  doc.text(data.companyName || 'شركة البريمي', 8, 22);
+  doc.setFontSize(32);
+  doc.text(data.companyName || 'شركة البريمي', 8, 60);
   
   // Issue date and quotation number only
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(10);
   const currentDate = new Date().toLocaleDateString('ar-SA');
   const quotationNumber = data.quotationNumber || `Q${Date.now()}`.slice(-6);
-  doc.text(`تاريخ الإصدار: ${currentDate}`, pageWidth - 8, 32, { align: 'right' });
-  doc.text(`رقم العرض: ${quotationNumber}`, 8, 32);
+  doc.text(`تاريخ الإصدار: ${currentDate}`, pageWidth - 8, 95, { align: 'right' });
+  doc.text(`رقم العرض: ${quotationNumber}`, 8, 95);
   
-  currentY = 45;
+  currentY = 115;
   
   // Greeting section - reduced margins
   doc.setFillColor(250, 250, 250);
@@ -248,16 +248,16 @@ export function generateQuotationPDF(data: any): jsPDF {
   
   currentY += 70;
   
-  // Single centered section: QR Code and Signature - optimized for A4
+  // Single centered section: QR Code and Signature - made taller for larger stamp
   const bottomY = currentY;
   const sectionWidth = (pageWidth - 20) / 2;
   const centerX = pageWidth / 2 - sectionWidth / 2;
   
-  // QR Code and Signature (centered section)
+  // QR Code and Signature (centered section) - increased height for larger stamp
   doc.setFillColor(240, 245, 255);
-  doc.rect(centerX, bottomY, sectionWidth, 45, 'F');
+  doc.rect(centerX, bottomY, sectionWidth, 110, 'F');
   doc.setDrawColor(...darkTeal);
-  doc.rect(centerX, bottomY, sectionWidth, 45, 'S');
+  doc.rect(centerX, bottomY, sectionWidth, 110, 'S');
   
   // Section title
   doc.setTextColor(...darkTeal);
@@ -273,19 +273,19 @@ export function generateQuotationPDF(data: any): jsPDF {
   doc.setFontSize(8);
   doc.text('QR Code', centerX + 25, bottomY + 32, { align: 'center' });
   
-  // Company stamp (larger size)
+  // Company stamp (made 3x larger)
   if (data.companyStamp) {
     try {
-      doc.addImage(data.companyStamp, 'JPEG', centerX + sectionWidth - 45, bottomY + 15, 40, 30);
+      doc.addImage(data.companyStamp, 'JPEG', centerX + sectionWidth - 135, bottomY + 15, 120, 90);
     } catch (error) {
       console.warn('Could not add company stamp to PDF');
     }
   }
   
-  // Signature area
+  // Signature area - adjusted for larger stamp
   doc.setTextColor(0, 0, 0);
   doc.setFontSize(8);
-  doc.text('ختم وتوقيع الشركة', centerX + sectionWidth - 5, bottomY + 35, { align: 'right' });
+  doc.text('ختم وتوقيع الشركة', centerX + sectionWidth - 5, bottomY + 100, { align: 'right' });
   
   // Footer with Gold background
   doc.setFillColor(...gold);

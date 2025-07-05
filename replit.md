@@ -381,6 +381,13 @@ Changelog:
   * Enhanced PDF generation to display amounts in both numbers and Arabic words
   * Updated quotation preview interface to show amounts written in Arabic
   * Complete integration with "فقط لا غير" formatting for professional invoicing
+- July 05, 2025. Enhanced PDF Header Design:
+  * Enlarged company name in PDF header from 16pt to 32pt font size
+  * Increased company logo size from 50x34 to 150x102 (3x larger)
+  * Expanded company stamp size from 40x30 to 120x90 (3x larger)
+  * Extended header section height from 40 to 110 to accommodate larger elements
+  * Increased signature section height from 45 to 110 for larger stamp display
+  * Repositioned all header elements for better visual balance with larger sizes
 ```
 
 ## User Preferences
