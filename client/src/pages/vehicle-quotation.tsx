@@ -1114,350 +1114,171 @@ const VehicleQuotation = () => {
           </div>
         </div>
 
-        {/* Quotation Sheet */}
+        {/* Quotation Sheet - ALBARIMI Style */}
         <Card id="quotation-sheet" className="mt-8 print:shadow-none print:bg-white">
-          <CardContent className="p-8">
-            {/* Header with Company Info, Logo and QR Code */}
-            <div 
-              className="flex justify-between items-start mb-8 pb-6 border-b-2" 
-              style={{ 
-                backgroundColor: formData.companyBackgroundColor,
-                color: formData.companyTextColor,
-                borderColor: formData.companyPrimaryColor
-              }}
-            >
-              {/* Company Logo */}
-              <div className="flex-shrink-0">
-                {formData.companyLogo ? (
-                  <img src={formData.companyLogo} alt="لوجو الشركة" className="h-20 w-auto" />
-                ) : (
-                  <div 
-                    className="h-20 w-20 border-2 border-dashed rounded-lg flex items-center justify-center"
-                    style={{ 
-                      backgroundColor: formData.companyBackgroundColor,
-                      borderColor: formData.companyPrimaryColor
-                    }}
-                  >
-                    <span 
-                      className="text-xs"
-                      style={{ color: formData.companyPrimaryColor }}
-                    >
-                      لوجو الشركة
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* Company Information */}
-              <div className="text-center flex-grow mx-8 relative">
-                <h1 
-                  className="text-3xl font-bold mb-2"
-                  style={{ color: formData.companyPrimaryColor }}
-                >
-                  {formData.companyName}
-                </h1>
-                <div className="space-y-1" style={{ color: formData.companyTextColor }}>
-                  <p>{formData.companyAddress}</p>
-                  <p>هاتف: {formData.companyPhone} | بريد: {formData.companyEmail}</p>
-                </div>
-                <div className="mt-4">
-                  <h2 
-                    className="text-2xl font-bold"
-                    style={{ color: formData.companySecondaryColor }}
-                  >
-                    عرض سعر مركبة
-                  </h2>
-                  <p style={{ color: formData.companyTextColor }}>Vehicle Quotation</p>
+          <CardContent className="p-0">
+            {/* Header Section with Dark Teal Background */}
+            <div className="bg-slate-800 text-white p-6 relative" style={{ backgroundColor: '#00627F' }}>
+              <div className="flex justify-between items-start">
+                {/* Company Logo on Left */}
+                <div className="flex-shrink-0">
+                  {formData.companyLogo ? (
+                    <img src={formData.companyLogo} alt="لوجو الشركة" className="h-16 w-auto" />
+                  ) : (
+                    <div className="text-yellow-400 font-bold text-lg" style={{ color: '#C79C45' }}>
+                      ALBARIMI
+                    </div>
+                  )}
                 </div>
                 
-                {/* Company Stamp in Header (watermark style) */}
-                {formData.companyStamp && (
-                  <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
+                {/* Header Metadata on Right */}
+                <div className="text-right">
+                  <h1 className="text-xl font-bold mb-2">عرض سعر</h1>
+                  <div className="text-sm space-y-1">
+                    <p>تاريخ {new Date().toLocaleDateString('ar-SA')}</p>
+                    <p>رقم {Date.now().toString().slice(-4)}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Top Bar with Labels */}
+            <div className="bg-gray-100 px-6 py-3 border-b">
+              <div className="flex justify-around text-sm text-gray-700">
+                <span>السجل</span>
+                <span>الرخصة</span>
+                <span>الرقم الضريبي</span>
+              </div>
+            </div>
+
+            <div className="p-6">
+              {/* Customer and Vehicle Data (Two Columns) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                {/* Customer Info (Right Column) */}
+                <div className="bg-gray-50 p-4 rounded-lg border">
+                  <h3 className="font-semibold text-lg mb-3 text-right">بيانات العميل</h3>
+                  <div className="space-y-2 text-right text-sm">
+                    <p><span className="font-medium">الاسم:</span> {formData.customerName || 'غير محدد'}</p>
+                    <p><span className="font-medium">رقم الهوية:</span> غير محدد</p>
+                    <p><span className="font-medium">رقم الهاتف:</span> {formData.customerPhone || 'غير محدد'}</p>
+                  </div>
+                </div>
+
+                {/* Vehicle Info (Left Column) */}
+                <div className="bg-gray-50 p-4 rounded-lg border">
+                  <h3 className="font-semibold text-lg mb-3 text-right">بيانات المركبة</h3>
+                  <div className="space-y-2 text-right text-sm">
+                    <p><span className="font-medium">الماركة:</span> {formData.carMaker || 'غير محدد'}</p>
+                    <p><span className="font-medium">الموديل:</span> {formData.carModel || 'غير محدد'}</p>
+                    <p><span className="font-medium">السنة:</span> {formData.carYear || 'غير محدد'}</p>
+                    <p><span className="font-medium">رقم الهيكل:</span> غير محدد</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Detailed Specifications Section */}
+              <div className="bg-gray-50 border border-slate-600 rounded-lg p-6 mb-8 relative">
+                <h3 className="font-semibold text-lg mb-4 text-right" style={{ color: '#00627F' }}>
+                  المواصفات التفصيلية
+                </h3>
+                
+                {/* Mercedes logo placeholder if Mercedes */}
+                {(formData.carMaker?.toLowerCase().includes('مرسيدس') || formData.carMaker?.toLowerCase().includes('mercedes')) && (
+                  <div className="absolute top-4 left-4 w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                    <span className="text-gray-600 text-xs">★</span>
+                  </div>
+                )}
+                
+                {/* Large watermark logo in background */}
+                {formData.companyLogo && (
+                  <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
                     <img 
-                      src={formData.companyStamp} 
+                      src={formData.companyLogo} 
                       alt="ختم الشركة" 
-                      className="max-w-32 max-h-32"
+                      className="max-w-40 max-h-40"
                     />
                   </div>
                 )}
+                
+                <div className="text-right text-sm leading-relaxed">
+                  {vehicleSpecs?.specifications || formData.detailedSpecs || 'مواصفات السيارة التفصيلية'}
+                </div>
               </div>
 
-              {/* QR Code */}
-              <div className="flex-shrink-0 text-center">
-                <div 
-                  className="border-2 p-2 rounded-lg"
-                  style={{ borderColor: formData.companySecondaryColor }}
-                >
+              {/* Offer Summary Section */}
+              <div className="bg-gray-50 border border-slate-600 rounded-lg p-6 mb-8">
+                <h3 className="font-semibold text-lg mb-4 text-right" style={{ color: '#00627F' }}>
+                  ملخص العرض
+                </h3>
+                
+                <div className="text-right space-y-2 text-sm">
+                  <p><span className="font-medium">تفاصيل السعر:</span></p>
+                  <p><span className="font-medium">السعر الإفرادي:</span> {parseFloat(formData.basePrice || '0').toLocaleString()} ريال</p>
+                  <p><span className="font-medium">الكمية:</span> {formData.quantity || '1'}</p>
+                  <p><span className="font-medium">الإجمالي قبل الضريبة:</span> {(parseFloat(formData.basePrice || '0') * parseInt(formData.quantity || '1')).toLocaleString()} ريال</p>
+                  <p><span className="font-medium">الضريبة (%15):</span> {(parseFloat(formData.basePrice || '0') * 0.15).toLocaleString()} ريال</p>
+                  <p><span className="font-medium">سعر النهائي:</span> {(parseFloat(formData.basePrice || '0') * parseInt(formData.quantity || '1') * 1.15 + parseFloat(formData.platePrice || '0')).toLocaleString()} ريال</p>
+                  
+                  <div className="mt-4 text-lg font-bold" style={{ color: '#C79C45' }}>
+                    المبلغ كتابة: {(parseFloat(formData.basePrice || '0') * parseInt(formData.quantity || '1') * 1.15 + parseFloat(formData.platePrice || '0')).toLocaleString()} ريال سعودي فقط لا غير
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Section with Representative Info, QR Code and Notes */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Representative Info */}
+                <div className="bg-gray-50 p-4 rounded-lg border">
+                  <h4 className="font-semibold mb-2 text-right">بيانات مندوب</h4>
+                  <div className="text-right text-sm space-y-1">
+                    <p>{formData.salesRepName || 'غير محدد'}</p>
+                    <p>{formData.salesRepPhone || 'غير محدد'}</p>
+                  </div>
+                </div>
+
+                {/* QR Code */}
+                <div className="flex flex-col items-center">
+                  <div className="bg-gray-200 p-2 rounded">
+                    <img 
+                      src={generateQRCode(`عرض سعر مركبة - العميل: ${formData.customerName} - السيارة: ${formData.carMaker} ${formData.carModel} - السعر: ${(parseFloat(formData.basePrice || '0') * parseInt(formData.quantity || '1') * 1.15 + parseFloat(formData.platePrice || '0')).toLocaleString()} ريال`)}
+                      alt="QR Code"
+                      className="w-16 h-16"
+                    />
+                  </div>
+                  <p className="text-xs mt-1">QR Code</p>
+                </div>
+
+                {/* Notes */}
+                <div className="text-right text-xs text-gray-600 space-y-1">
+                  <p>• مدة صلاحية العرض: 15 يوم</p>
+                  <p>• السعر لا يشمل رسوم التسجيل والتأمين</p>
+                  <p>• يجب التأكد من التحويل البنكي</p>
+                  <p>• الشروط خاضعة للموافقة</p>
+                </div>
+              </div>
+
+              {/* Signature Area */}
+              <div className="mt-8 flex justify-between items-end">
+                <div className="bg-gray-100 p-4 rounded border text-center w-32">
+                  <p className="font-medium">الختم</p>
+                </div>
+                
+                {formData.companyStamp && (
                   <img 
-                    src={generateQRCode(`عرض سعر مركبة - العميل: ${formData.customerName} - السيارة: ${formData.carMaker} ${formData.carModel} - السعر: ${formData.totalPrice.toFixed(2)} ريال`)}
-                    alt="QR Code"
-                    className="w-20 h-20"
+                    src={formData.companyStamp} 
+                    alt="ختم الشركة" 
+                    className="h-16 w-auto"
                   />
-                </div>
-                <p 
-                  className="text-xs mt-1"
-                  style={{ color: formData.companyTextColor }}
-                >
-                  رمز QR
-                </p>
+                )}
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-              <div>
-                <h3 
-                  className="text-lg font-semibold mb-4 border-b pb-2"
-                  style={{ 
-                    color: formData.companyPrimaryColor,
-                    borderColor: formData.companySecondaryColor
-                  }}
-                >
-                  بيانات العميل
-                </h3>
-                <div className="space-y-3">
-                  <div className="flex">
-                    <span className="w-24" style={{ color: formData.companyTextColor }}>الاسم:</span>
-                    <span className="font-medium" style={{ color: formData.companyTextColor }}>{formData.customerTitle}{formData.customerName || "غير محدد"}</span>
-                  </div>
-                  <div className="flex">
-                    <span className="w-24" style={{ color: formData.companyTextColor }}>الهاتف:</span>
-                    <span className="font-medium" style={{ color: formData.companyTextColor }}>{formData.customerPhone || "غير محدد"}</span>
-                  </div>
-                  <div className="flex">
-                    <span className="w-24" style={{ color: formData.companyTextColor }}>البريد:</span>
-                    <span className="font-medium" style={{ color: formData.companyTextColor }}>{formData.customerEmail || "غير محدد"}</span>
-                  </div>
-                </div>
+            {/* Footer with Gold Background */}
+            <div className="text-white text-center py-3 text-sm" style={{ backgroundColor: '#C79C45' }}>
+              <div className="flex justify-center space-x-8 space-x-reverse">
+                <span>العنوان</span>
+                <span>الإيميل</span>
               </div>
-              <div>
-                <h3 
-                  className="text-lg font-semibold mb-4 border-b pb-2"
-                  style={{ 
-                    color: formData.companyPrimaryColor,
-                    borderColor: formData.companySecondaryColor
-                  }}
-                >
-                  بيانات المركبة
-                </h3>
-                <div className="space-y-3">
-                  <div className="flex">
-                    <span className="w-24" style={{ color: formData.companyTextColor }}>الماركة:</span>
-                    <span className="font-medium" style={{ color: formData.companyTextColor }}>{formData.carMaker || "غير محدد"}</span>
-                  </div>
-                  <div className="flex">
-                    <span className="w-24" style={{ color: formData.companyTextColor }}>الموديل:</span>
-                    <span className="font-medium" style={{ color: formData.companyTextColor }}>{formData.carModel || "غير محدد"}</span>
-                  </div>
-                  <div className="flex">
-                    <span className="w-24" style={{ color: formData.companyTextColor }}>اللون:</span>
-                    <span className="font-medium" style={{ color: formData.companyTextColor }}>{formData.exteriorColor || "غير محدد"} / {formData.interiorColor || "غير محدد"}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="mb-8">
-              <h3 
-                className="text-lg font-semibold mb-4"
-                style={{ color: formData.companyPrimaryColor }}
-              >
-                تفاصيل الأسعار
-              </h3>
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse border" style={{ borderColor: formData.companySecondaryColor }}>
-                  <thead>
-                    <tr style={{ backgroundColor: formData.companySecondaryColor }}>
-                      <th 
-                        className="border px-4 py-2 text-right text-white"
-                        style={{ borderColor: formData.companySecondaryColor }}
-                      >
-                        البيان
-                      </th>
-                      <th 
-                        className="border px-4 py-2 text-right text-white"
-                        style={{ borderColor: formData.companySecondaryColor }}
-                      >
-                        المبلغ
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td 
-                        className="border px-4 py-2"
-                        style={{ 
-                          borderColor: formData.companySecondaryColor,
-                          color: formData.companyTextColor
-                        }}
-                      >
-                        سعر السيارة
-                      </td>
-                      <td 
-                        className="border px-4 py-2 font-medium"
-                        style={{ 
-                          borderColor: formData.companySecondaryColor,
-                          color: formData.companyTextColor
-                        }}
-                      >
-                        {formData.basePrice.toFixed(2)} ريال
-                      </td>
-                    </tr>
-                    <tr>
-                      <td 
-                        className="border px-4 py-2"
-                        style={{ 
-                          borderColor: formData.companySecondaryColor,
-                          color: formData.companyTextColor
-                        }}
-                      >
-                        الكمية
-                      </td>
-                      <td 
-                        className="border px-4 py-2 font-medium"
-                        style={{ 
-                          borderColor: formData.companySecondaryColor,
-                          color: formData.companyTextColor
-                        }}
-                      >
-                        {formData.quantity}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td 
-                        className="border px-4 py-2"
-                        style={{ 
-                          borderColor: formData.companySecondaryColor,
-                          color: formData.companyTextColor
-                        }}
-                      >
-                        الإجمالي قبل الضريبة
-                      </td>
-                      <td 
-                        className="border px-4 py-2 font-medium"
-                        style={{ 
-                          borderColor: formData.companySecondaryColor,
-                          color: formData.companyTextColor
-                        }}
-                      >
-                        {formData._display.subTotal.toFixed(2)} ريال
-                      </td>
-                    </tr>
-                    <tr>
-                      <td 
-                        className="border px-4 py-2"
-                        style={{ 
-                          borderColor: formData.companySecondaryColor,
-                          color: formData.companyTextColor
-                        }}
-                      >
-                        الضريبة المضافة ({formData.vatRate}%)
-                      </td>
-                      <td 
-                        className="border px-4 py-2 font-medium"
-                        style={{ 
-                          borderColor: formData.companySecondaryColor,
-                          color: formData.companyTextColor
-                        }}
-                      >
-                        {formData._display.vat.toFixed(2)} ريال
-                      </td>
-                    </tr>
-                    <tr>
-                      <td 
-                        className="border px-4 py-2"
-                        style={{ 
-                          borderColor: formData.companySecondaryColor,
-                          color: formData.companyTextColor
-                        }}
-                      >
-                        سعر اللوحة
-                      </td>
-                      <td 
-                        className="border px-4 py-2 font-medium"
-                        style={{ 
-                          borderColor: formData.companySecondaryColor,
-                          color: formData.companyTextColor
-                        }}
-                      >
-                        {formData.platePrice.toFixed(2)} ريال
-                      </td>
-                    </tr>
-                    <tr style={{ backgroundColor: formData.companyPrimaryColor + '20' }}>
-                      <td 
-                        className="border px-4 py-2 font-semibold"
-                        style={{ 
-                          borderColor: formData.companySecondaryColor,
-                          color: formData.companyTextColor
-                        }}
-                      >
-                        الإجمالي النهائي
-                      </td>
-                      <td 
-                        className="border px-4 py-2 font-bold"
-                        style={{ 
-                          borderColor: formData.companySecondaryColor,
-                          color: formData.companyPrimaryColor
-                        }}
-                      >
-                        {formData.totalPrice.toFixed(2)} ريال
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <div className="mb-8">
-              <h3 
-                className="text-lg font-semibold mb-4"
-                style={{ color: formData.companyPrimaryColor }}
-              >
-                الشروط والأحكام
-              </h3>
-              <div 
-                className="p-4 rounded-lg border"
-                style={{ 
-                  backgroundColor: formData.companyBackgroundColor,
-                  borderColor: formData.companySecondaryColor
-                }}
-              >
-                <ul className="space-y-2 text-sm" style={{ color: formData.companyTextColor }}>
-                  <li>• هذا العرض ساري لمدة 15 يوماً من تاريخ الإصدار</li>
-                  <li>• الأسعار شاملة الضريبة المضافة</li>
-                  <li>• سعر اللوحات خاضع للكمة وغير خاضع للضريبة</li>
-                  <li>• يتم التسليم خلال 30 يوماً من تاريخ تأكيد الطلب</li>
-                  <li>• الضمان وفقاً لشروط الوكيل المعتمد</li>
-                  <li>• الدفع نقداً أو بالتقسيط حسب الاتفاق</li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
-              <div className="text-center">
-                <div 
-                  className="border-b-2 pb-2 mb-2 h-20 flex items-center justify-center"
-                  style={{ borderColor: formData.companySecondaryColor }}
-                >
-
-                </div>
-                <p className="text-sm" style={{ color: formData.companyTextColor }}>توقيع العميل</p>
-              </div>
-              <div className="text-center">
-                <div 
-                  className="border-b-2 pb-2 mb-2 h-20 flex items-center justify-center"
-                  style={{ borderColor: formData.companySecondaryColor }}
-                >
-                  {formData.companyStamp && (
-                    <img src={formData.companyStamp} alt="ختم الشركة" className="max-h-16" />
-                  )}
-                </div>
-                <p className="text-sm" style={{ color: formData.companyTextColor }}>ختم الشركة</p>
-              </div>
-            </div>
-
-            <div className="mt-8 text-center text-sm" style={{ color: formData.companyTextColor }}>
-              <p>تم إنشاء هذا العرض بواسطة نظام عروض الأسعار الإلكتروني</p>
-              <p>تاريخ الإصدار: {formData.issueDate} | انتهاء العرض: {formData.deadlineDate}</p>
             </div>
           </CardContent>
         </Card>
