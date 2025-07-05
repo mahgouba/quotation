@@ -32,6 +32,7 @@ import {
   Search,
   Home,
   Database,
+  Plus,
 
 } from "lucide-react";
 
@@ -608,6 +609,67 @@ const VehicleQuotation = () => {
   };
 
   // Action Functions
+  const handleNewQuotation = () => {
+    const confirmNew = confirm("هل تريد إنشاء عرض سعر جديد؟ سيتم مسح جميع البيانات المدخلة.");
+    if (confirmNew) {
+      // Reset all form data to initial values
+      setFormData({
+        // Customer Information
+        customerName: '',
+        customerPhone: '',
+        customerEmail: '',
+        
+        // Vehicle Information
+        carMaker: '',
+        carModel: '',
+        carYear: '',
+        vinNumber: '',
+        exteriorColor: '',
+        interiorColor: '',
+        specifications: '',
+        detailedSpecs: '',
+        vehicleSpecifications: '',
+        
+        // Pricing
+        basePrice: 0,
+        quantity: 1,
+        vatRate: 15,
+        platePrice: 0,
+        totalPrice: 0,
+        includesPlatesAndTax: false,
+        
+        // Dates and validity
+        issueDate: new Date().toISOString().split('T')[0],
+        validityPeriod: 15,
+        deadlineDate: format(new Date(Date.now() + 15 * 24 * 60 * 60 * 1000), "yyyy-MM-dd"),
+        
+        // Document type
+        documentType: 'quotation',
+        
+        // Company information
+        selectedCompanyId: '',
+        
+        // Contact
+        whatsappNumber: '',
+        
+        // Display values
+        _display: {
+          subTotal: 0,
+          vat: 0
+        }
+      });
+      
+      // Clear any errors
+      setErrors({});
+      
+      // Show success message
+      toast({
+        title: "عرض سعر جديد",
+        description: "تم إنشاء عرض سعر جديد بنجاح",
+      });
+    }
+  };
+
   const handlePrint = () => {
     // Generate PDF first, then print it
     handleExportPDF();
@@ -836,6 +898,15 @@ const VehicleQuotation = () => {
               <h1 className="text-xl font-bold text-gray-900">نظام عروض أسعار المركبات</h1>
             </div>
             <div className="flex items-center gap-2">
+              <Button 
+                onClick={handleNewQuotation}
+                variant="outline" 
+                size="sm" 
+                className="flex items-center gap-2 bg-green-50 hover:bg-green-100 text-green-700 border-green-200"
+              >
+                <Plus className="h-4 w-4" />
+                إنشاء عرض جديد
+              </Button>
               <Link href="/">
                 <Button variant="ghost" size="sm" className="flex items-center gap-2">
                   <Home className="h-4 w-4" />

@@ -456,6 +456,13 @@ Changelog:
   * Invoice mode now completely removes all quote-specific fields for cleaner document
   * Terms and conditions from database are automatically filtered out in invoice preview and PDF
   * Complete separation between quotation and invoice display modes for professional documentation
+- July 05, 2025. New Quotation Creation Button:
+  * Added prominent "إنشاء عرض جديد" (Create New Quotation) button in main interface header
+  * Button styled with green theme to highlight new creation functionality
+  * Includes confirmation dialog to prevent accidental data loss
+  * Resets all form fields to default values and clears any validation errors
+  * Provides user feedback with success toast notification
+  * Improves workflow efficiency for creating multiple quotations
 ```
 
 ## User Preferences
