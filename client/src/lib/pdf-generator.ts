@@ -54,18 +54,18 @@ export function generateQuotationPDF(data: any): jsPDF {
   
   // Header text in Arabic - made even larger
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(36);
+  doc.setFontSize(108);
   const documentTitle = data.documentType === 'invoice' ? 'فاتورة' : 'عرض سعر';
   doc.text(documentTitle, pageWidth - 8, 22, { align: 'right' });
   
   // Company name in center - Made much larger
   doc.setTextColor(199, 156, 69);
-  doc.setFontSize(54);
+  doc.setFontSize(162);
   doc.text(data.companyName || 'شركة البريمي', pageWidth / 2, 100, { align: 'center' });
   
   // Issue date and quotation number only - made larger
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(22);
+  doc.setFontSize(66);
   const currentDate = new Date().toLocaleDateString('ar-SA');
   const quotationNumber = data.quotationNumber || `Q${Date.now()}`.slice(-6);
   doc.text(`تاريخ الإصدار: ${currentDate}`, pageWidth - 8, 175, { align: 'right' });
@@ -94,7 +94,7 @@ export function generateQuotationPDF(data: any): jsPDF {
   doc.setFillColor(250, 250, 250);
   doc.rect(5, currentY, pageWidth - 10, 22, 'F');
   doc.setTextColor(0, 0, 0);
-  doc.setFontSize(24);
+  doc.setFontSize(72);
   doc.text('تحية طيبة وبعد،', pageWidth - 15, currentY + 14, { align: 'right' });
   
   currentY += 20;
@@ -109,10 +109,10 @@ export function generateQuotationPDF(data: any): jsPDF {
   doc.rect(pageWidth/2 + 2.5, currentY, colWidth, 45, 'S');
   
   doc.setTextColor(0, 0, 0);
-  doc.setFontSize(22);
+  doc.setFontSize(66);
   doc.text('بيانات العميل', pageWidth - 10, currentY + 10, { align: 'right' });
   
-  doc.setFontSize(18);
+  doc.setFontSize(54);
   let customerInfoY = currentY + 18;
   
   if (data.customerName) {
@@ -134,10 +134,10 @@ export function generateQuotationPDF(data: any): jsPDF {
   doc.setDrawColor(200, 200, 200);
   doc.rect(5, currentY, colWidth, 45, 'S');
   
-  doc.setFontSize(22);
+  doc.setFontSize(66);
   doc.text('بيانات المركبة', pageWidth/2 - 5, currentY + 10, { align: 'right' });
   
-  doc.setFontSize(18);
+  doc.setFontSize(54);
   let vehicleInfoY = currentY + 18;
   
   if (data.carMaker) {
@@ -174,12 +174,12 @@ export function generateQuotationPDF(data: any): jsPDF {
   doc.rect(5, currentY, pageWidth - 10, 75, 'S');
   
   doc.setTextColor(...darkTeal);
-  doc.setFontSize(24);
+  doc.setFontSize(72);
   doc.text('المواصفات التفصيلية', pageWidth - 15, currentY + 15, { align: 'right' });
   
   // Add specifications text with proper Arabic formatting - much larger font
   doc.setTextColor(0, 0, 0);
-  doc.setFontSize(19);
+  doc.setFontSize(57);
   const specs = data.vehicleSpecifications || data.detailedSpecs || 'مواصفات السيارة التفصيلية';
   
   // Split specifications into lines for better display
@@ -211,7 +211,7 @@ export function generateQuotationPDF(data: any): jsPDF {
   doc.rect(5, currentY, pageWidth - 10, 65, 'S');
   
   doc.setTextColor(...darkTeal);
-  doc.setFontSize(24);
+  doc.setFontSize(72);
   doc.text('ملخص العرض', pageWidth - 15, currentY + 15, { align: 'right' });
   
   // Calculate pricing
@@ -223,7 +223,7 @@ export function generateQuotationPDF(data: any): jsPDF {
   const total = subtotal + tax + platePrice;
   
   // Create pricing table - optimized for A4 with much larger fonts
-  doc.setFontSize(19);
+  doc.setFontSize(57);
   doc.setTextColor(0, 0, 0);
   let tableY = currentY + 25;
   
@@ -260,7 +260,7 @@ export function generateQuotationPDF(data: any): jsPDF {
   
   // Amount in words - much larger font
   doc.setTextColor(...gold);
-  doc.setFontSize(22);
+  doc.setFontSize(66);
   const amountInWords = formatPriceWithWords(total, 'ريال سعودي');
   doc.text(`المبلغ كتابة: ${amountInWords} فقط لا غير`, pageWidth - 15, tableY + 12, { align: 'right' });
   
@@ -279,7 +279,7 @@ export function generateQuotationPDF(data: any): jsPDF {
   
   // Section title - much larger font
   doc.setTextColor(...darkTeal);
-  doc.setFontSize(22);
+  doc.setFontSize(66);
   doc.text('QR Code والتوقيع', centerX + sectionWidth - 5, bottomY + 10, { align: 'right' });
   
   // QR Code placeholder (larger)
@@ -302,7 +302,7 @@ export function generateQuotationPDF(data: any): jsPDF {
   
   // Signature area - adjusted for larger stamp with much bigger font
   doc.setTextColor(0, 0, 0);
-  doc.setFontSize(20);
+  doc.setFontSize(60);
   doc.text('ختم وتوقيع الشركة', centerX + sectionWidth - 5, bottomY + 100, { align: 'right' });
   
   // Footer with Gold background
@@ -310,7 +310,7 @@ export function generateQuotationPDF(data: any): jsPDF {
   doc.rect(0, pageHeight - 20, pageWidth, 20, 'F');
   
   doc.setTextColor(0, 0, 0);
-  doc.setFontSize(14);
+  doc.setFontSize(42);
   doc.text(`${data.companyName || 'شركة البريمي'}`, pageWidth - 15, pageHeight - 10, { align: 'right' });
   doc.text(`الهاتف: ${data.companyPhone || 'غير محدد'}`, pageWidth/2, pageHeight - 10, { align: 'center' });
   doc.text(`البريد: ${data.companyEmail || 'غير محدد'}`, 15, pageHeight - 10);
