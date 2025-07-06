@@ -6,7 +6,8 @@ import {
   insertVehicleSchema, insertQuotationSchema,
   insertSalesRepresentativeSchema,
   insertVehicleSpecificationSchema,
-  insertTermsAndConditionsSchema
+  insertTermsAndConditionsSchema,
+  insertPdfCustomizationSchema
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -554,6 +555,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ error: "Failed to delete terms and conditions" });
+    }
+  });
+
+  // PDF Customization routes
+  app.get("/api/pdf-customizations", async (req, res) => {
+    try {
+      const customizations = await storage.getPdfCustomizations();
+      res.json(customizations);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get PDF customizations" });
+    }
+  });
+
+  app.get("/api/pdf-customizations/default", async (req, res) => {
+    try {
+      const defaultCustomization = await storage.getDefaultPdfCustomization();
+      res.json(defaultCustomization);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get default PDF customization" });
+    }
+  });
+
+  app.get("/api/pdf-customizations/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const customization = await storage.getPdfCustomization(id);
+      if (!customization) {
+        return res.status(404).json({ error: "PDF customization not found" });
+      }
+      res.json(customization);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get PDF customization" });
+    }
+  });
+
+  app.post("/api/pdf-customizations", async (req, res) => {
+    try {
+      const customizationData = insertPdfCustomizationSchema.parse(req.body);
+      const customization = await storage.createPdfCustomization(customizationData);
+      res.status(201).json(customization);
+    } catch (error) {
+      console.error('PDF Customization creation error:', error);
+      res.status(400).json({ error: "Invalid PDF customization data" });
+    }
+  });
+
+  app.put("/api/pdf-customizations/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const customizationData = insertPdfCustomizationSchema.partial().parse(req.body);
+      const updatedCustomization = await storage.updatePdfCustomization(id, customizationData);
+      if (!updatedCustomization) {
+        return res.status(404).json({ error: "PDF customization not found" });
+      }
+      res.json(updatedCustomization);
+    } catch (error) {
+      console.error('PDF Customization update error:', error);
+      res.status(400).json({ error: "Invalid PDF customization data" });
+    }
+  });
+
+  app.delete("/api/pdf-customizations/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deletePdfCustomization(id);
+      if (!success) {
+        return res.status(404).json({ error: "PDF customization not found" });
+      }
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete PDF customization" });
+    }
+  });
+
+  app.post("/api/pdf-customizations/:id/set-default", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.setDefaultPdfCustomization(id);
+      if (!success) {
+        return res.status(404).json({ error: "PDF customization not found" });
+      }
+      res.status(200).json({ message: "Default PDF customization set successfully" });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to set default PDF customization" });
     }
   });
 

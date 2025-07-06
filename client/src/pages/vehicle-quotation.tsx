@@ -931,6 +931,12 @@ const VehicleQuotation = () => {
                   عروض السعر المحفوظة
                 </Button>
               </Link>
+              <Link href="/pdf-customization">
+                <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                  <Printer className="h-4 w-4" />
+                  تخصيص PDF
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

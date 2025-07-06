@@ -8,6 +8,7 @@ import SearchQuotations from "@/pages/search-quotations";
 import VehicleManagement from "@/pages/vehicle-management";
 import DataManagement from "@/pages/data-management";
 import SavedQuotations from "@/pages/saved-quotations";
+import PdfCustomizationSimple from "@/pages/pdf-customization-simple";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -18,6 +19,7 @@ function Router() {
       <Route path="/management" component={VehicleManagement} />
       <Route path="/data-management" component={DataManagement} />
       <Route path="/saved-quotations" component={SavedQuotations} />
+      <Route path="/pdf-customization" component={PdfCustomizationSimple} />
       <Route path="/quotation/:id" component={VehicleQuotation} />
       <Route component={NotFound} />
     </Switch>

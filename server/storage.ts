@@ -1,5 +1,5 @@
 import { 
-  users, companies, customers, vehicles, quotations, salesRepresentatives, vehicleSpecifications, termsAndConditions,
+  users, companies, customers, vehicles, quotations, salesRepresentatives, vehicleSpecifications, termsAndConditions, pdfCustomization,
   type User, type InsertUser,
   type Company, type InsertCompany,
   type Customer, type InsertCustomer,
@@ -7,7 +7,8 @@ import {
   type Quotation, type InsertQuotation,
   type SalesRepresentative, type InsertSalesRepresentative,
   type VehicleSpecification, type InsertVehicleSpecification,
-  type TermsAndConditions, type InsertTermsAndConditions
+  type TermsAndConditions, type InsertTermsAndConditions,
+  type PdfCustomization, type InsertPdfCustomization
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gte, lte } from "drizzle-orm";
@@ -64,6 +65,15 @@ export interface IStorage {
   createTermsAndConditions(terms: InsertTermsAndConditions): Promise<TermsAndConditions>;
   updateTermsAndConditions(id: number, terms: Partial<InsertTermsAndConditions>): Promise<TermsAndConditions | undefined>;
   deleteTermsAndConditions(id: number): Promise<boolean>;
+  
+  // PDF Customization methods
+  getPdfCustomizations(): Promise<PdfCustomization[]>;
+  getPdfCustomization(id: number): Promise<PdfCustomization | undefined>;
+  getDefaultPdfCustomization(): Promise<PdfCustomization | undefined>;
+  createPdfCustomization(customization: InsertPdfCustomization): Promise<PdfCustomization>;
+  updatePdfCustomization(id: number, customization: Partial<InsertPdfCustomization>): Promise<PdfCustomization | undefined>;
+  deletePdfCustomization(id: number): Promise<boolean>;
+  setDefaultPdfCustomization(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -346,6 +356,65 @@ export class DatabaseStorage implements IStorage {
 
   async deleteTermsAndConditions(id: number): Promise<boolean> {
     const result = await db.delete(termsAndConditions).where(eq(termsAndConditions.id, id));
+    return (result.rowCount || 0) > 0;
+  }
+
+  // PDF Customization methods
+  async getPdfCustomizations(): Promise<PdfCustomization[]> {
+    return await db.select().from(pdfCustomization);
+  }
+
+  async getPdfCustomization(id: number): Promise<PdfCustomization | undefined> {
+    const [customization] = await db.select().from(pdfCustomization).where(eq(pdfCustomization.id, id));
+    return customization || undefined;
+  }
+
+  async getDefaultPdfCustomization(): Promise<PdfCustomization | undefined> {
+    const [customization] = await db.select().from(pdfCustomization).where(eq(pdfCustomization.isDefault, true));
+    return customization || undefined;
+  }
+
+  async createPdfCustomization(customizationData: InsertPdfCustomization): Promise<PdfCustomization> {
+    // If this is set as default, remove default from others
+    if (customizationData.isDefault) {
+      await db.update(pdfCustomization).set({ isDefault: false });
+    }
+    
+    const [customization] = await db
+      .insert(pdfCustomization)
+      .values(customizationData)
+      .returning();
+    return customization;
+  }
+
+  async updatePdfCustomization(id: number, customizationData: Partial<InsertPdfCustomization>): Promise<PdfCustomization | undefined> {
+    // If this is set as default, remove default from others
+    if (customizationData.isDefault) {
+      await db.update(pdfCustomization).set({ isDefault: false }).where(eq(pdfCustomization.id, id));
+    }
+    
+    const [updatedCustomization] = await db
+      .update(pdfCustomization)
+      .set({ ...customizationData, updatedAt: new Date() })
+      .where(eq(pdfCustomization.id, id))
+      .returning();
+    return updatedCustomization || undefined;
+  }
+
+  async deletePdfCustomization(id: number): Promise<boolean> {
+    const result = await db.delete(pdfCustomization).where(eq(pdfCustomization.id, id));
+    return (result.rowCount || 0) > 0;
+  }
+
+  async setDefaultPdfCustomization(id: number): Promise<boolean> {
+    // Remove default from all others
+    await db.update(pdfCustomization).set({ isDefault: false });
+    
+    // Set the specified one as default
+    const result = await db.update(pdfCustomization)
+      .set({ isDefault: true, updatedAt: new Date() })
+      .where(eq(pdfCustomization.id, id));
+    
     return (result.rowCount || 0) > 0;
   }
 }

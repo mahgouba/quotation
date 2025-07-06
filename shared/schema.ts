@@ -254,3 +254,76 @@ export const insertTermsAndConditionsSchema = createInsertSchema(termsAndConditi
 
 export type InsertTermsAndConditions = z.infer<typeof insertTermsAndConditionsSchema>;
 export type TermsAndConditions = typeof termsAndConditions.$inferSelect;
+
+// PDF Customization Settings
+export const pdfCustomization = pgTable("pdf_customization", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(), // Setting template name
+  
+  // Font Settings
+  headerFontSize: integer("header_font_size").default(108),
+  companyNameFontSize: integer("company_name_font_size").default(162),
+  dateFontSize: integer("date_font_size").default(66),
+  greetingFontSize: integer("greeting_font_size").default(72),
+  sectionTitleFontSize: integer("section_title_font_size").default(66),
+  contentFontSize: integer("content_font_size").default(54),
+  specificationsTitleFontSize: integer("specifications_title_font_size").default(72),
+  specificationsContentFontSize: integer("specifications_content_font_size").default(57),
+  pricingTitleFontSize: integer("pricing_title_font_size").default(72),
+  pricingContentFontSize: integer("pricing_content_font_size").default(57),
+  amountWordsFontSize: integer("amount_words_font_size").default(66),
+  signatureFontSize: integer("signature_font_size").default(60),
+  footerFontSize: integer("footer_font_size").default(42),
+  
+  // Color Settings
+  headerBackgroundColor: text("header_background_color").default("#00627F"),
+  headerTextColor: text("header_text_color").default("#FFFFFF"),
+  companyNameColor: text("company_name_color").default("#C79C45"),
+  contentTextColor: text("content_text_color").default("#000000"),
+  sectionTitleColor: text("section_title_color").default("#00627F"),
+  amountWordsColor: text("amount_words_color").default("#C79C45"),
+  footerBackgroundColor: text("footer_background_color").default("#C79C45"),
+  footerTextColor: text("footer_text_color").default("#000000"),
+  
+  // Logo Settings
+  logoWidth: integer("logo_width").default(600),
+  logoHeight: integer("logo_height").default(408),
+  logoPositionX: integer("logo_position_x").default(-300), // Relative to right edge
+  logoPositionY: integer("logo_position_y").default(3),
+  showWatermark: boolean("show_watermark").default(true),
+  watermarkOpacity: decimal("watermark_opacity", { precision: 3, scale: 2 }).default("0.08"),
+  
+  // Stamp Settings
+  stampWidth: integer("stamp_width").default(113),
+  stampHeight: integer("stamp_height").default(71),
+  stampPositionX: integer("stamp_position_x").default(-125), // Relative to section
+  stampPositionY: integer("stamp_position_y").default(15),
+  
+  // Layout Settings
+  headerHeight: integer("header_height").default(200),
+  sectionSpacing: integer("section_spacing").default(20),
+  marginTop: integer("margin_top").default(5),
+  marginLeft: integer("margin_left").default(5),
+  marginRight: integer("margin_right").default(5),
+  marginBottom: integer("margin_bottom").default(5),
+  
+  // Element Positions
+  datePositionX: integer("date_position_x").default(-8),
+  datePositionY: integer("date_position_y").default(175),
+  quotationNumberPositionX: integer("quotation_number_position_x").default(8),
+  quotationNumberPositionY: integer("quotation_number_position_y").default(175),
+  greetingPositionY: integer("greeting_position_y").default(14),
+  
+  isDefault: boolean("is_default").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertPdfCustomizationSchema = createInsertSchema(pdfCustomization).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertPdfCustomization = z.infer<typeof insertPdfCustomizationSchema>;
+export type PdfCustomization = typeof pdfCustomization.$inferSelect;
