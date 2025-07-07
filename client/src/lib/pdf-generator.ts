@@ -233,6 +233,16 @@ export function generateQuotationPDF(data: any): jsPDF {
     compress: true,
     userUnit: 1.0
   });
+
+  // Add Arabic font support for better Arabic text rendering
+  try {
+    // Set default font that supports Arabic (if available)
+    doc.setFont('helvetica');
+    // Enable better Unicode and RTL support
+    doc.setLanguage('ar');
+  } catch (error) {
+    console.warn('Could not set Arabic language support');
+  }
   
   // Explicit A4 dimensions in mm to ensure consistency
   const pageWidth = 210;
@@ -261,22 +271,40 @@ export function generateQuotationPDF(data: any): jsPDF {
   // Header text in Arabic - optimized size for clarity
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(24);
+  doc.setFont('helvetica', 'bold');
   const documentTitle = data.documentType === 'invoice' ? 'فاتورة' : 'عرض سعر';
-  doc.text(documentTitle, pageWidth - 8, 25, { align: 'right' });
+  doc.text(documentTitle, pageWidth - 8, 25, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   
   // Company name in center - optimized size
   doc.setTextColor(199, 156, 69);
   doc.setFontSize(18);
-  doc.text(data.companyName || 'شركة البريمي للسيارات', pageWidth / 2, 35, { align: 'center' });
+  doc.setFont('helvetica', 'bold');
+  doc.text(data.companyName || 'شركة البريمي للسيارات', pageWidth / 2, 35, { 
+    align: 'center',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   
   // Issue date and quotation number - readable size
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(12);
+  doc.setFont('helvetica', 'normal');
   const currentDate = new Date().toLocaleDateString('ar-SA');
   const quotationNumber = data.quotationNumber || `Q${Date.now()}`.slice(-6);
-  doc.text(`تاريخ الإصدار: ${currentDate}`, pageWidth - 8, 50, { align: 'right' });
+  doc.text(`تاريخ الإصدار: ${currentDate}`, pageWidth - 8, 50, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   const documentNumber = data.documentType === 'invoice' ? 'رقم الفاتورة' : 'رقم العرض';
-  doc.text(`${documentNumber}: ${quotationNumber}`, 8, 50);
+  doc.text(`${documentNumber}: ${quotationNumber}`, 8, 50, {
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   
   currentY = 70;
   
@@ -301,7 +329,12 @@ export function generateQuotationPDF(data: any): jsPDF {
   doc.rect(5, currentY, pageWidth - 10, 15, 'F');
   doc.setTextColor(0, 0, 0);
   doc.setFontSize(12);
-  doc.text('تحية طيبة وبعد،', pageWidth - 15, currentY + 10, { align: 'right' });
+  doc.setFont('helvetica', 'normal');
+  doc.text('تحية طيبة وبعد،', pageWidth - 15, currentY + 10, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   
   currentY += 20;
   
@@ -316,21 +349,39 @@ export function generateQuotationPDF(data: any): jsPDF {
   
   doc.setTextColor(0, 0, 0);
   doc.setFontSize(14);
-  doc.text('بيانات العميل', pageWidth - 10, currentY + 8, { align: 'right' });
+  doc.setFont('helvetica', 'bold');
+  doc.text('بيانات العميل', pageWidth - 10, currentY + 8, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   
   doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
   let customerInfoY = currentY + 15;
   
   if (data.customerName) {
-    doc.text(`الاسم: ${data.customerName}`, pageWidth - 10, customerInfoY, { align: 'right' });
+    doc.text(`الاسم: ${data.customerName}`, pageWidth - 10, customerInfoY, { 
+      align: 'right',
+      lang: 'ar',
+      renderingMode: 'fill'
+    });
     customerInfoY += 5;
   }
   if (data.customerIdNumber) {
-    doc.text(`رقم الهوية: ${data.customerIdNumber}`, pageWidth - 10, customerInfoY, { align: 'right' });
+    doc.text(`رقم الهوية: ${data.customerIdNumber}`, pageWidth - 10, customerInfoY, { 
+      align: 'right',
+      lang: 'ar',
+      renderingMode: 'fill'
+    });
     customerInfoY += 5;
   }
   if (data.customerPhone) {
-    doc.text(`رقم الهاتف: ${data.customerPhone}`, pageWidth - 10, customerInfoY, { align: 'right' });
+    doc.text(`رقم الهاتف: ${data.customerPhone}`, pageWidth - 10, customerInfoY, { 
+      align: 'right',
+      lang: 'ar',
+      renderingMode: 'fill'
+    });
     customerInfoY += 5;
   }
   
@@ -341,33 +392,63 @@ export function generateQuotationPDF(data: any): jsPDF {
   doc.rect(5, currentY, colWidth, 45, 'S');
   
   doc.setFontSize(14);
-  doc.text('بيانات المركبة', pageWidth/2 - 5, currentY + 8, { align: 'right' });
+  doc.setFont('helvetica', 'bold');
+  doc.text('بيانات المركبة', pageWidth/2 - 5, currentY + 8, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   
   doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
   let vehicleInfoY = currentY + 15;
   
   if (data.carMaker) {
-    doc.text(`الماركة: ${data.carMaker}`, pageWidth/2 - 5, vehicleInfoY, { align: 'right' });
+    doc.text(`الماركة: ${data.carMaker}`, pageWidth/2 - 5, vehicleInfoY, { 
+      align: 'right',
+      lang: 'ar',
+      renderingMode: 'fill'
+    });
     vehicleInfoY += 5;
   }
   if (data.carModel) {
-    doc.text(`الموديل: ${data.carModel}`, pageWidth/2 - 5, vehicleInfoY, { align: 'right' });
+    doc.text(`الموديل: ${data.carModel}`, pageWidth/2 - 5, vehicleInfoY, { 
+      align: 'right',
+      lang: 'ar',
+      renderingMode: 'fill'
+    });
     vehicleInfoY += 5;
   }
   if (data.carYear) {
-    doc.text(`السنة: ${data.carYear}`, pageWidth/2 - 5, vehicleInfoY, { align: 'right' });
+    doc.text(`السنة: ${data.carYear}`, pageWidth/2 - 5, vehicleInfoY, { 
+      align: 'right',
+      lang: 'ar',
+      renderingMode: 'fill'
+    });
     vehicleInfoY += 5;
   }
   if (data.vinNumber) {
-    doc.text(`رقم الهيكل: ${data.vinNumber}`, pageWidth/2 - 5, vehicleInfoY, { align: 'right' });
+    doc.text(`رقم الهيكل: ${data.vinNumber}`, pageWidth/2 - 5, vehicleInfoY, { 
+      align: 'right',
+      lang: 'ar',
+      renderingMode: 'fill'
+    });
     vehicleInfoY += 5;
   }
   if (data.exteriorColor) {
-    doc.text(`اللون الخارجي: ${data.exteriorColor}`, pageWidth/2 - 5, vehicleInfoY, { align: 'right' });
+    doc.text(`اللون الخارجي: ${data.exteriorColor}`, pageWidth/2 - 5, vehicleInfoY, { 
+      align: 'right',
+      lang: 'ar',
+      renderingMode: 'fill'
+    });
     vehicleInfoY += 5;
   }
   if (data.interiorColor) {
-    doc.text(`اللون الداخلي: ${data.interiorColor}`, pageWidth/2 - 5, vehicleInfoY, { align: 'right' });
+    doc.text(`اللون الداخلي: ${data.interiorColor}`, pageWidth/2 - 5, vehicleInfoY, { 
+      align: 'right',
+      lang: 'ar',
+      renderingMode: 'fill'
+    });
     vehicleInfoY += 5;
   }
   
@@ -381,11 +462,17 @@ export function generateQuotationPDF(data: any): jsPDF {
   
   doc.setTextColor(...darkTeal);
   doc.setFontSize(14);
-  doc.text('المواصفات التفصيلية', pageWidth - 15, currentY + 12, { align: 'right' });
+  doc.setFont('helvetica', 'bold');
+  doc.text('المواصفات التفصيلية', pageWidth - 15, currentY + 12, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   
   // Add specifications text with proper Arabic formatting
   doc.setTextColor(0, 0, 0);
   doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
   const specs = data.vehicleSpecifications || data.detailedSpecs || 'مواصفات السيارة التفصيلية';
   
   // Split specifications into lines for better display
@@ -394,7 +481,11 @@ export function generateQuotationPDF(data: any): jsPDF {
   
   specLines.forEach((line: string) => {
     if (line.trim()) {
-      doc.text(line.trim(), pageWidth - 15, specY, { align: 'right' });
+      doc.text(line.trim(), pageWidth - 15, specY, { 
+        align: 'right',
+        lang: 'ar',
+        renderingMode: 'fill'
+      });
       specY += 4;
     }
   });
@@ -418,7 +509,12 @@ export function generateQuotationPDF(data: any): jsPDF {
   
   doc.setTextColor(...darkTeal);
   doc.setFontSize(14);
-  doc.text('ملخص العرض', pageWidth - 15, currentY + 12, { align: 'right' });
+  doc.setFont('helvetica', 'bold');
+  doc.text('ملخص العرض', pageWidth - 15, currentY + 12, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   
   // Calculate pricing
   const basePrice = parseFloat(data.basePrice || '0');
@@ -431,44 +527,82 @@ export function generateQuotationPDF(data: any): jsPDF {
   // Create pricing table - optimized for readability
   doc.setFontSize(10);
   doc.setTextColor(0, 0, 0);
+  doc.setFont('helvetica', 'normal');
   let tableY = currentY + 20;
   
   // Table headers
-  doc.text('البيان', pageWidth - 15, tableY, { align: 'right' });
-  doc.text('المبلغ (ريال)', pageWidth - 70, tableY, { align: 'right' });
+  doc.text('البيان', pageWidth - 15, tableY, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
+  doc.text('المبلغ (ريال)', pageWidth - 70, tableY, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   
   // Table rows
   tableY += 5;
-  doc.text(`السعر الإفرادي`, pageWidth - 15, tableY, { align: 'right' });
+  doc.text(`السعر الإفرادي`, pageWidth - 15, tableY, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   doc.text(`${basePrice.toLocaleString()}`, pageWidth - 70, tableY, { align: 'right' });
   
   tableY += 4;
-  doc.text(`الكمية`, pageWidth - 15, tableY, { align: 'right' });
+  doc.text(`الكمية`, pageWidth - 15, tableY, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   doc.text(`${quantity}`, pageWidth - 70, tableY, { align: 'right' });
   
   tableY += 4;
-  doc.text(`الإجمالي قبل الضريبة`, pageWidth - 15, tableY, { align: 'right' });
+  doc.text(`الإجمالي قبل الضريبة`, pageWidth - 15, tableY, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   doc.text(`${subtotal.toLocaleString()}`, pageWidth - 70, tableY, { align: 'right' });
   
   tableY += 4;
-  doc.text(`الضريبة المضافة (%15)`, pageWidth - 15, tableY, { align: 'right' });
+  doc.text(`الضريبة المضافة (%15)`, pageWidth - 15, tableY, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   doc.text(`${tax.toLocaleString()}`, pageWidth - 70, tableY, { align: 'right' });
   
   if (platePrice > 0) {
     tableY += 4;
-    doc.text(`اللوحات والرسوم`, pageWidth - 15, tableY, { align: 'right' });
+    doc.text(`اللوحات والرسوم`, pageWidth - 15, tableY, { 
+      align: 'right',
+      lang: 'ar',
+      renderingMode: 'fill'
+    });
     doc.text(`${platePrice.toLocaleString()}`, pageWidth - 70, tableY, { align: 'right' });
   }
   
   tableY += 4;
-  doc.text(`المجموع النهائي`, pageWidth - 15, tableY, { align: 'right' });
+  doc.text(`المجموع النهائي`, pageWidth - 15, tableY, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   doc.text(`${total.toLocaleString()}`, pageWidth - 70, tableY, { align: 'right' });
   
   // Amount in words - readable font
   doc.setTextColor(...gold);
   doc.setFontSize(11);
+  doc.setFont('helvetica', 'bold');
   const amountInWords = formatPriceWithWords(total, 'ريال سعودي');
-  doc.text(`المبلغ كتابة: ${amountInWords} فقط لا غير`, pageWidth - 15, tableY + 8, { align: 'right' });
+  doc.text(`المبلغ كتابة: ${amountInWords} فقط لا غير`, pageWidth - 15, tableY + 8, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   
   currentY += 50;
   
@@ -486,7 +620,12 @@ export function generateQuotationPDF(data: any): jsPDF {
   // Section title - readable font
   doc.setTextColor(...darkTeal);
   doc.setFontSize(12);
-  doc.text('QR Code والتوقيع', centerX + sectionWidth - 5, bottomY + 8, { align: 'right' });
+  doc.setFont('helvetica', 'bold');
+  doc.text('QR Code والتوقيع', centerX + sectionWidth - 5, bottomY + 8, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   
   // QR Code placeholder
   doc.setFillColor(255, 255, 255);
@@ -509,7 +648,12 @@ export function generateQuotationPDF(data: any): jsPDF {
   // Signature area - readable font
   doc.setTextColor(0, 0, 0);
   doc.setFontSize(10);
-  doc.text('ختم وتوقيع الشركة', centerX + sectionWidth - 5, bottomY + 35, { align: 'right' });
+  doc.setFont('helvetica', 'normal');
+  doc.text('ختم وتوقيع الشركة', centerX + sectionWidth - 5, bottomY + 35, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   
   // Footer with Gold background
   doc.setFillColor(...gold);
@@ -517,9 +661,21 @@ export function generateQuotationPDF(data: any): jsPDF {
   
   doc.setTextColor(0, 0, 0);
   doc.setFontSize(9);
-  doc.text(`${data.companyName || 'شركة البريمي للسيارات'}`, pageWidth - 8, pageHeight - 8, { align: 'right' });
-  doc.text(`الهاتف: ${data.companyPhone || '0112345678'}`, pageWidth/2, pageHeight - 8, { align: 'center' });
-  doc.text(`البريد: ${data.companyEmail || 'info@albarimi.com'}`, 8, pageHeight - 8);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`${data.companyName || 'شركة البريمي للسيارات'}`, pageWidth - 8, pageHeight - 8, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
+  doc.text(`الهاتف: ${data.companyPhone || '0112345678'}`, pageWidth/2, pageHeight - 8, { 
+    align: 'center',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
+  doc.text(`البريد: ${data.companyEmail || 'info@albarimi.com'}`, 8, pageHeight - 8, {
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   
   return doc;
 }

@@ -513,6 +513,15 @@ Changelog:
   * Reduced signature section height and stamp size for proportional display
   * Fixed footer height to 15mm with 9pt font for clear contact information
   * All elements now properly fit A4 page dimensions with clear, readable text
+- July 07, 2025. Enhanced Arabic Language Support in PDF Generation:
+  * Added comprehensive Arabic language support with lang='ar' attribute for all text elements
+  * Implemented proper font configuration with helvetica font family for Arabic text compatibility
+  * Enhanced text rendering with renderingMode='fill' for better Arabic character display
+  * Applied RTL (right-to-left) formatting consistently throughout the PDF document
+  * Improved Arabic text clarity in headers, content sections, pricing tables, and footer
+  * Added proper Arabic font styling with bold/normal variants for better text hierarchy
+  * Enhanced document language settings for optimal Arabic text rendering and printing
+  * All Arabic text now displays correctly in printed PDF format with proper character support
 ```
 
 ## User Preferences
