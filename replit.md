@@ -485,6 +485,15 @@ Changelog:
   * Enhanced color controls for all PDF elements including section titles, amount words, and footer
   * Database schema updated with font family fields and all new customization options
   * Complete control over every visual aspect of PDF generation with real-time preview
+- July 07, 2025. A4 PDF Format Optimization for All Devices:
+  * Enhanced PDF generation with explicit A4 dimensions (210mm x 297mm) for consistent output
+  * Added comprehensive print media queries with forced A4 page size for mobile and desktop
+  * Implemented responsive quotation preview with maintained A4 aspect ratio on all screen sizes
+  * Added automatic content scaling to ensure PDF fits within A4 dimensions
+  * Enhanced html2canvas configuration with explicit A4 pixel dimensions (794x1123px)
+  * Improved CSS print styles with proper A4 formatting, color adjustment, and Arabic text rendering
+  * Added mobile-responsive preview with A4 aspect ratio maintenance
+  * Enhanced PDF creation with compression and optimization for better quality and smaller file sizes
 ```
 
 ## User Preferences

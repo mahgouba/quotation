@@ -60,26 +60,51 @@ async function fetchPdfCustomization() {
   };
 }
 
-// Helper function to create PDF from HTML element
+// Helper function to create PDF from HTML element with explicit A4 formatting
 export async function generateQuotationPDFFromHTML(element: HTMLElement): Promise<jsPDF> {
   const canvas = await html2canvas(element, {
     scale: 2,
     useCORS: true,
     allowTaint: true,
-    backgroundColor: '#ffffff'
+    backgroundColor: '#ffffff',
+    width: 794, // A4 width in pixels at 96 DPI (210mm = 794px)
+    height: 1123, // A4 height in pixels at 96 DPI (297mm = 1123px)
+    foreignObjectRendering: true,
+    logging: false
   });
   
   const imgData = canvas.toDataURL('image/png');
-  const pdf = new jsPDF('p', 'mm', 'a4');
-  const pageWidth = pdf.internal.pageSize.getWidth();
-  const pageHeight = pdf.internal.pageSize.getHeight();
   
-  // Calculate image dimensions to fit A4 with minimal margins (5mm instead of 10mm)
+  // Create PDF with explicit A4 dimensions
+  const pdf = new jsPDF({
+    orientation: 'portrait',
+    unit: 'mm',
+    format: 'a4',
+    putOnlyUsedFonts: true,
+    compress: true
+  });
+  
+  // A4 dimensions in mm
+  const pageWidth = 210;
+  const pageHeight = 297;
+  
+  // Calculate image dimensions to fit A4 with minimal margins (5mm each side)
   const imgWidth = pageWidth - 10; // 5mm margins on each side
   const imgHeight = (canvas.height * imgWidth) / canvas.width;
   
-  // Add image to PDF with reduced margins
-  pdf.addImage(imgData, 'PNG', 5, 5, imgWidth, imgHeight);
+  // Ensure content fits within A4 page height
+  if (imgHeight > pageHeight - 10) {
+    const scaleFactor = (pageHeight - 10) / imgHeight;
+    const scaledWidth = imgWidth * scaleFactor;
+    const scaledHeight = imgHeight * scaleFactor;
+    
+    // Center the scaled image
+    const xOffset = (pageWidth - scaledWidth) / 2;
+    pdf.addImage(imgData, 'PNG', xOffset, 5, scaledWidth, scaledHeight);
+  } else {
+    // Add image to PDF with 5mm margins
+    pdf.addImage(imgData, 'PNG', 5, 5, imgWidth, imgHeight);
+  }
   
   return pdf;
 }
@@ -95,13 +120,23 @@ function hexToRgb(hex: string): [number, number, number] {
 }
 
 // Alternative text-based PDF generator with better Arabic support
-// Async PDF generator that uses customization settings
+// Async PDF generator that uses customization settings with explicit A4 formatting
 export async function generateCustomizedQuotationPDF(data: any): Promise<jsPDF> {
   const customization = await fetchPdfCustomization();
   
-  const doc = new jsPDF('p', 'mm', 'a4');
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
+  // Create PDF with explicit A4 configuration for consistent output across devices
+  const doc = new jsPDF({
+    orientation: 'portrait',
+    unit: 'mm',
+    format: 'a4',
+    putOnlyUsedFonts: true,
+    compress: true,
+    userUnit: 1.0
+  });
+  
+  // Explicit A4 dimensions in mm to ensure consistency
+  const pageWidth = 210;
+  const pageHeight = 297;
   
   // Convert colors from customization
   const headerBgColor = hexToRgb(customization.headerBackgroundColor);
@@ -187,11 +222,21 @@ export async function generateCustomizedQuotationPDF(data: any): Promise<jsPDF> 
   return doc;
 }
 
-// Keep the original function for backward compatibility
+// Keep the original function for backward compatibility with enhanced A4 formatting
 export function generateQuotationPDF(data: any): jsPDF {
-  const doc = new jsPDF('p', 'mm', 'a4');
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
+  // Create PDF with explicit A4 configuration for consistent output across devices
+  const doc = new jsPDF({
+    orientation: 'portrait',
+    unit: 'mm',
+    format: 'a4',
+    putOnlyUsedFonts: true,
+    compress: true,
+    userUnit: 1.0
+  });
+  
+  // Explicit A4 dimensions in mm to ensure consistency
+  const pageWidth = 210;
+  const pageHeight = 297;
   
   // Colors - Dark Teal and Gold
   const darkTeal: [number, number, number] = [0, 98, 127]; // #00627F

@@ -93,4 +93,88 @@
   .no-print { 
     display: none !important; 
   }
+  
+  /* Force A4 page dimensions for all devices */
+  @page {
+    size: A4;
+    margin: 5mm;
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+  }
+  
+  /* Ensure proper A4 layout on mobile and desktop */
+  html, body {
+    width: 210mm !important;
+    height: 297mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 12pt !important;
+    line-height: 1.2 !important;
+  }
+  
+  /* PDF container should match A4 dimensions */
+  .pdf-container, .quotation-preview {
+    width: 210mm !important;
+    height: 297mm !important;
+    max-width: 210mm !important;
+    max-height: 297mm !important;
+    margin: 0 auto !important;
+    padding: 5mm !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    page-break-inside: avoid !important;
+  }
+  
+  /* Prevent content from breaking across pages */
+  .pdf-section {
+    page-break-inside: avoid !important;
+  }
+  
+  /* Ensure Arabic text renders properly in print */
+  * {
+    -webkit-font-feature-settings: "liga" 1, "kern" 1;
+    font-feature-settings: "liga" 1, "kern" 1;
+    text-rendering: optimizeLegibility !important;
+  }
+}
+
+/* General A4 responsive styles for better PDF preview */
+.quotation-preview {
+  width: 210mm;
+  min-height: 297mm;
+  max-width: 100%;
+  margin: 0 auto;
+  background: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 5mm;
+  box-sizing: border-box;
+}
+
+/* Mobile responsive adjustments while maintaining A4 aspect ratio */
+@media (max-width: 768px) {
+  .quotation-preview {
+    width: 100%;
+    max-width: 100vw;
+    /* Maintain A4 aspect ratio on mobile: 210/297 = 0.707 */
+    aspect-ratio: 210/297;
+    padding: 2mm;
+    font-size: 0.9rem;
+  }
+}
+
+/* Desktop adjustments */
+@media (min-width: 769px) {
+  .quotation-preview {
+    width: 210mm;
+    max-width: 210mm;
+    font-size: 1rem;
+  }
+}
+
+/* Ensure PDF content fits A4 dimensions */
+.pdf-content {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
 }
