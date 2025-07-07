@@ -314,6 +314,11 @@ export const pdfCustomization = pgTable("pdf_customization", {
   quotationNumberPositionY: integer("quotation_number_position_y").default(175),
   greetingPositionY: integer("greeting_position_y").default(14),
   
+  // Font Family Settings
+  headerFontFamily: text("header_font_family").default("Arial"),
+  contentFontFamily: text("content_font_family").default("Arial"),
+  arabicFontFamily: text("arabic_font_family").default("Arial"),
+  
   isDefault: boolean("is_default").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
