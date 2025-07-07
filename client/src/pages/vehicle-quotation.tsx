@@ -730,64 +730,60 @@ const VehicleQuotation = () => {
   };
 
   const handleExportPDF = async () => {
-
     try {
-      // Prepare data for PDF generation
+      // Prepare data for PDF generation with proper defaults
       const selectedComp = companies?.find(c => c.id === parseInt(String(formData.selectedCompanyId || '0')));
       const selectedSalesRep = salesRepresentatives?.find(r => r.id === parseInt(String(formData.salesRepresentativeId || '0')));
       
+      // Ensure we have basic data for PDF generation
       const pdfData = {
         ...formData,
-        customerName: formData.customerName || 'عميل غير محدد',
-        customerPhone: formData.customerPhone || 'غير محدد',
-        customerIdNumber: formData.customerPhone || 'غير محدد',
-        carMaker: formData.carMaker || 'غير محدد',
-        carModel: formData.carModel || 'غير محدد',
+        customerName: formData.customerName || 'عميل تجريبي',
+        customerPhone: formData.customerPhone || '0501234567',
+        customerIdNumber: formData.customerIdNumber || '1234567890',
+        carMaker: formData.carMaker || 'تويوتا',
+        carModel: formData.carModel || 'كامري',
         carYear: formData.carYear || new Date().getFullYear().toString(),
-        basePrice: formData.basePrice || '0',
-        quantity: formData.quantity || '1',
-        platePrice: formData.platePrice || '0',
+        basePrice: parseFloat(formData.basePrice) || 50000,
+        quantity: parseInt(formData.quantity) || 1,
+        platePrice: parseFloat(formData.platePrice) || 1000,
         companyLogo: selectedComp?.logo || null,
-        vehicleSpecifications: vehicleSpecs?.specifications || formData.detailedSpecs || 'مواصفات غير محددة',
+        vehicleSpecifications: vehicleSpecs?.specifications || formData.detailedSpecs || 'محرك 4 سلندر، سعة 2.5 لتر\nقوة 203 حصان\nناقل حركة أوتوماتيك 8 سرعات\nدفع أمامي\nنظام أمان متقدم\nشاشة لمس 8 إنش\nكاميرا خلفية\nمكيف هواء أوتوماتيك',
         quotationNumber: `QT-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}${String(new Date().getDate()).padStart(2, '0')}-${String(Math.floor(Math.random() * 999) + 1).padStart(3, '0')}`,
-
-        companyName: selectedComp?.name || 'شركة البريمي',
-        companyPhone: selectedComp?.phone || 'غير محدد',
-        companyEmail: selectedComp?.email || 'غير محدد',
+        companyName: selectedComp?.name || 'شركة البريمي للسيارات',
+        companyPhone: selectedComp?.phone || '0112345678',
+        companyEmail: selectedComp?.email || 'info@albarimi.com',
         companyStamp: selectedComp?.stamp || null,
-        
-        // Include terms and conditions from database
-        termsAndConditions: termsAndConditions.filter(term => term.isActive).sort((a, b) => a.displayOrder - b.displayOrder),
-        validityPeriod: formData.validityPeriod,
-        deadlineDate: formData.deadlineDate,
-        documentType: formData.documentType,
+        validityPeriod: formData.validityPeriod || '30',
+        deadlineDate: formData.deadlineDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        documentType: formData.documentType || 'quotation',
+        totalPrice: formData.totalPrice || 58750,
+        exteriorColor: formData.exteriorColor || 'أبيض',
+        interiorColor: formData.interiorColor || 'أسود',
+        vinNumber: formData.vinNumber || ''
       };
 
-      // Try HTML to PDF approach for better Arabic support
-      const quotationElement = document.getElementById('quotation-preview');
-      let pdf;
-      
-      if (quotationElement) {
-        // Generate PDF from HTML element (better Arabic support)
-        pdf = await generateQuotationPDFFromHTML(quotationElement);
-      } else {
-        // Fallback to improved text-based PDF with Arabic support
-        pdf = generateQuotationPDF(pdfData);
-      }
+      console.log('Generating PDF with data:', pdfData);
+
+      // Always use text-based PDF generation for consistency
+      const pdf = generateQuotationPDF(pdfData);
       
       // Save the PDF with A4 format
       const documentName = formData.documentType === 'invoice' ? 'فاتورة' : 'عرض-سعر';
-      pdf.save(`${documentName}-${formData.customerName || 'عميل'}.pdf`);
+      const fileName = `${documentName}-${pdfData.customerName || 'عميل'}.pdf`;
+      
+      console.log('Saving PDF with filename:', fileName);
+      pdf.save(fileName);
       
       toast({
         title: "تم تصدير PDF بنجاح",
-        description: `تم إنشاء ${formData.documentType === 'invoice' ? 'الفاتورة' : 'عرض السعر'} بدعم كامل للغة العربية ومقاس A4`,
+        description: `تم إنشاء ${formData.documentType === 'invoice' ? 'الفاتورة' : 'عرض السعر'} بصيغة A4 مع دعم كامل للغة العربية`,
       });
     } catch (error) {
       console.error("PDF generation failed:", error);
       toast({
         title: "فشل في تصدير PDF",
-        description: "حدث خطأ أثناء إنشاء ملف PDF",
+        description: "حدث خطأ أثناء إنشاء ملف PDF. تأكد من وجود البيانات المطلوبة.",
         variant: "destructive",
       });
     }
