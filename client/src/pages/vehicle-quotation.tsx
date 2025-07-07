@@ -5,7 +5,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
 import { getVehicleSpecifications, getAvailableMakes, getModelsForMake, getYearsForMakeAndModel } from "@/data/vehicle-specifications";
-import { generateQuotationPDF, generateQuotationPDFFromHTML } from "@/lib/pdf-generator";
+import { generateQuotationPDF, generateQuotationPDFFromHTML, generateCustomizedQuotationPDF } from "@/lib/pdf-generator";
 import { formatPriceWithWords } from "@/lib/number-to-words";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -765,8 +765,8 @@ const VehicleQuotation = () => {
 
       console.log('Generating PDF with data:', pdfData);
 
-      // Always use text-based PDF generation for consistency
-      const pdf = generateQuotationPDF(pdfData);
+      // Use customized PDF generation that applies PDF customization settings with company data
+      const pdf = await generateCustomizedQuotationPDF(pdfData);
       
       // Save the PDF with A4 format
       const documentName = formData.documentType === 'invoice' ? 'فاتورة' : 'عرض-سعر';

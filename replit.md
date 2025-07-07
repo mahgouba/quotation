@@ -522,6 +522,14 @@ Changelog:
   * Added proper Arabic font styling with bold/normal variants for better text hierarchy
   * Enhanced document language settings for optimal Arabic text rendering and printing
   * All Arabic text now displays correctly in printed PDF format with proper character support
+- July 07, 2025. Dynamic Company Color Integration with PDF Customization:
+  * Integrated PDF customization system with selected company data for complete branding consistency
+  * Enhanced PDF generator to apply company-specific colors (primary, secondary, text) throughout document
+  * Updated quotation preview interface to display company colors in real-time
+  * Company header, footer, and accent colors now automatically apply from selected company data
+  * PDF customization settings combine with company branding for professional, consistent appearance
+  * Header background uses company primary color, footer uses secondary color, text uses company text color
+  * Complete integration between company management, PDF customization, and document generation systems
 ```
 
 ## User Preferences

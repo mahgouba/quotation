@@ -151,8 +151,9 @@ export async function generateCustomizedQuotationPDF(data: any): Promise<jsPDF> 
   // Start from customizable margins
   let currentY = customization.marginTop;
   
-  // Header Section with customizable height and colors
-  doc.setFillColor(...headerBgColor);
+  // Header Section with customizable height and colors (apply company colors from selected company)
+  const selectedHeaderBgColor = data.companyPrimaryColor ? hexToRgb(data.companyPrimaryColor) : headerBgColor;
+  doc.setFillColor(...selectedHeaderBgColor);
   doc.rect(0, 0, pageWidth, customization.headerHeight, 'F');
   
   // Company logo with customizable size and position
@@ -171,19 +172,21 @@ export async function generateCustomizedQuotationPDF(data: any): Promise<jsPDF> 
     }
   }
   
-  // Header text with customizable font size
-  doc.setTextColor(...headerTextColor);
+  // Header text with customizable font size (apply company text color from selected company)
+  const selectedHeaderTextColor = data.companyTextColor ? hexToRgb(data.companyTextColor) : headerTextColor;
+  doc.setTextColor(...selectedHeaderTextColor);
   doc.setFontSize(customization.headerFontSize / 3); // Scale down for reasonable size
   const documentTitle = data.documentType === 'invoice' ? 'فاتورة' : 'عرض سعر';
   doc.text(documentTitle, pageWidth + customization.datePositionX, 22, { align: 'right' });
   
-  // Company name with customizable color and size
-  doc.setTextColor(...companyNameColor);
+  // Company name with customizable color and size (apply company colors from selected company)
+  const selectedCompanyNameColor = data.companyPrimaryColor ? hexToRgb(data.companyPrimaryColor) : companyNameColor;
+  doc.setTextColor(...selectedCompanyNameColor);
   doc.setFontSize(customization.companyNameFontSize / 5); // Scale down
   doc.text(data.companyName || 'شركة البريمي', pageWidth / 2, 60, { align: 'center' });
   
-  // Date and quotation number with customizable positioning
-  doc.setTextColor(...headerTextColor);
+  // Date and quotation number with customizable positioning (apply company text color)
+  doc.setTextColor(...selectedHeaderTextColor);
   doc.setFontSize(customization.dateFontSize / 3); // Scale down
   const currentDate = new Date().toLocaleDateString('ar-SA');
   const quotationNumber = data.quotationNumber || `Q${Date.now()}`.slice(-6);
@@ -655,11 +658,13 @@ export function generateQuotationPDF(data: any): jsPDF {
     renderingMode: 'fill'
   });
   
-  // Footer with Gold background
-  doc.setFillColor(...gold);
+  // Footer with company secondary color (or default gold)
+  const selectedFooterBgColor = data.companySecondaryColor ? hexToRgb(data.companySecondaryColor) : gold;
+  const selectedFooterTextColor = data.companyTextColor ? hexToRgb(data.companyTextColor) : [0, 0, 0];
+  doc.setFillColor(...selectedFooterBgColor);
   doc.rect(0, pageHeight - 15, pageWidth, 15, 'F');
   
-  doc.setTextColor(0, 0, 0);
+  doc.setTextColor(...selectedFooterTextColor);
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
   doc.text(`${data.companyName || 'شركة البريمي للسيارات'}`, pageWidth - 8, pageHeight - 8, { 
