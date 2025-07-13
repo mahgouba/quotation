@@ -138,6 +138,24 @@
   }
 }
 
+/* ===== A4 PDF OPTIMIZED STYLES ===== */
+
+/* Fixed A4 dimensions for consistent PDF output */
+.quotation-container {
+  width: 210mm;
+  height: 297mm;
+  margin: 0 auto;
+  background: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 5mm;
+  box-sizing: border-box;
+  overflow: hidden;
+  position: relative;
+  font-size: 12pt;
+  line-height: 1.4;
+  font-family: 'Inter', sans-serif;
+}
+
 /* General A4 responsive styles for better PDF preview */
 .quotation-preview {
   width: 210mm;
@@ -177,4 +195,69 @@
   height: 100%;
   overflow: hidden;
   position: relative;
+}
+
+/* ===== PRINT STYLES FOR CONSISTENT A4 OUTPUT ===== */
+@media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+  
+  @page {
+    size: A4;
+    margin: 5mm;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  html, body {
+    width: 210mm;
+    height: 297mm;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+    font-size: 12pt !important;
+    line-height: 1.4 !important;
+  }
+  
+  .quotation-container, .quotation-preview {
+    width: 210mm !important;
+    height: 297mm !important;
+    margin: 0 !important;
+    padding: 5mm !important;
+    box-sizing: border-box !important;
+    background: white !important;
+    box-shadow: none !important;
+    page-break-inside: avoid !important;
+    font-size: 12pt !important;
+    line-height: 1.4 !important;
+  }
+  
+  /* Hide elements that shouldn't print */
+  .no-print, .print-hidden {
+    display: none !important;
+  }
+  
+  /* Show print-only elements */
+  .print-visible {
+    display: block !important;
+  }
+  
+  /* Ensure text doesn't break across pages */
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid !important;
+  }
+  
+  /* Ensure tables don't break */
+  table {
+    page-break-inside: avoid !important;
+  }
+  
+  /* Prevent orphans and widows */
+  p {
+    orphans: 3 !important;
+    widows: 3 !important;
+  }
 }

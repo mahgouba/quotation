@@ -60,53 +60,124 @@ async function fetchPdfCustomization() {
   };
 }
 
+// Create a fixed-size virtual A4 canvas for consistent PDF output
+function createFixedA4Canvas(): HTMLCanvasElement {
+  const canvas = document.createElement('canvas');
+  // A4 dimensions at 300 DPI for high quality (210mm x 297mm)
+  const dpi = 300;
+  const mmToPx = dpi / 25.4; // Convert mm to pixels at 300 DPI
+  
+  canvas.width = Math.floor(210 * mmToPx); // 2480px width
+  canvas.height = Math.floor(297 * mmToPx); // 3508px height
+  
+  return canvas;
+}
+
 // Helper function to create PDF from HTML element with explicit A4 formatting
 export async function generateQuotationPDFFromHTML(element: HTMLElement): Promise<jsPDF> {
-  const canvas = await html2canvas(element, {
-    scale: 2,
-    useCORS: true,
-    allowTaint: true,
-    backgroundColor: '#ffffff',
-    width: 794, // A4 width in pixels at 96 DPI (210mm = 794px)
-    height: 1123, // A4 height in pixels at 96 DPI (297mm = 1123px)
-    foreignObjectRendering: true,
-    logging: false
-  });
+  // Create a fixed-size container to ensure consistent output
+  const fixedContainer = document.createElement('div');
+  fixedContainer.style.cssText = `
+    position: fixed;
+    top: -9999px;
+    left: -9999px;
+    width: 210mm;
+    height: 297mm;
+    padding: 5mm;
+    box-sizing: border-box;
+    background: white;
+    font-size: 12pt;
+    line-height: 1.4;
+    transform: scale(1);
+    transform-origin: top left;
+    z-index: -1;
+  `;
   
-  const imgData = canvas.toDataURL('image/png');
+  // Clone the element to avoid modifying the original
+  const clonedElement = element.cloneNode(true) as HTMLElement;
+  clonedElement.style.cssText = `
+    width: 100%;
+    height: 100%;
+    font-size: 12pt;
+    line-height: 1.4;
+    box-sizing: border-box;
+    overflow: hidden;
+  `;
   
-  // Create PDF with explicit A4 dimensions
-  const pdf = new jsPDF({
-    orientation: 'portrait',
-    unit: 'mm',
-    format: 'a4',
-    putOnlyUsedFonts: true,
-    compress: true
-  });
+  fixedContainer.appendChild(clonedElement);
+  document.body.appendChild(fixedContainer);
   
-  // A4 dimensions in mm
-  const pageWidth = 210;
-  const pageHeight = 297;
-  
-  // Calculate image dimensions to fit A4 with minimal margins (5mm each side)
-  const imgWidth = pageWidth - 10; // 5mm margins on each side
-  const imgHeight = (canvas.height * imgWidth) / canvas.width;
-  
-  // Ensure content fits within A4 page height
-  if (imgHeight > pageHeight - 10) {
-    const scaleFactor = (pageHeight - 10) / imgHeight;
-    const scaledWidth = imgWidth * scaleFactor;
-    const scaledHeight = imgHeight * scaleFactor;
+  try {
+    // Force layout recalculation
+    fixedContainer.offsetHeight;
     
-    // Center the scaled image
-    const xOffset = (pageWidth - scaledWidth) / 2;
-    pdf.addImage(imgData, 'PNG', xOffset, 5, scaledWidth, scaledHeight);
-  } else {
-    // Add image to PDF with 5mm margins
-    pdf.addImage(imgData, 'PNG', 5, 5, imgWidth, imgHeight);
+    // Create canvas with fixed A4 dimensions at high DPI
+    const canvas = await html2canvas(fixedContainer, {
+      scale: 2, // High resolution
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#ffffff',
+      width: 794, // A4 width in pixels at 96 DPI (210mm = 794px)
+      height: 1123, // A4 height in pixels at 96 DPI (297mm = 1123px)
+      foreignObjectRendering: true,
+      logging: false,
+      onclone: (clonedDoc) => {
+        // Add print media query styles to ensure consistent rendering
+        const style = clonedDoc.createElement('style');
+        style.textContent = `
+          @media print {
+            * {
+              -webkit-print-color-adjust: exact !important;
+              color-adjust: exact !important;
+            }
+            body {
+              margin: 0 !important;
+              padding: 0 !important;
+              background: white !important;
+            }
+            .quotation-container {
+              width: 210mm !important;
+              height: 297mm !important;
+              padding: 5mm !important;
+              box-sizing: border-box !important;
+              page-break-inside: avoid !important;
+            }
+          }
+        `;
+        clonedDoc.head.appendChild(style);
+      }
+    });
+    
+    const imgData = canvas.toDataURL('image/png', 1.0);
+    
+    // Create PDF with explicit A4 dimensions
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4',
+      putOnlyUsedFonts: true,
+      compress: true,
+      precision: 2
+    });
+    
+    // A4 dimensions in mm with minimal margins
+    const pageWidth = 210;
+    const pageHeight = 297;
+    const margin = 5; // 5mm margins
+    
+    // Calculate image dimensions to fit A4 with minimal margins
+    const imgWidth = pageWidth - (margin * 2);
+    const imgHeight = pageHeight - (margin * 2);
+    
+    // Add image to PDF with exact positioning
+    pdf.addImage(imgData, 'PNG', margin, margin, imgWidth, imgHeight, '', 'MEDIUM');
+    
+    return pdf;
+    
+  } finally {
+    // Clean up
+    document.body.removeChild(fixedContainer);
   }
-  
-  return pdf;
 }
 
 // Helper function to convert hex color to RGB
