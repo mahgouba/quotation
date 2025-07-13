@@ -204,6 +204,16 @@ export async function generateCustomizedQuotationPDF(data: any): Promise<jsPDF> 
     userUnit: 1.0
   });
   
+  // Set Arabic language and font for proper Arabic text rendering
+  try {
+    doc.setFont('helvetica');
+    doc.setLanguage('ar');
+    doc.setCharSpace(0.1);
+    doc.setR2L(true);
+  } catch (error) {
+    console.warn('Could not set Arabic language support');
+  }
+  
   // Explicit A4 dimensions in mm to ensure consistency
   const pageWidth = 210;
   const pageHeight = 297;
@@ -236,108 +246,200 @@ export async function generateCustomizedQuotationPDF(data: any): Promise<jsPDF> 
     }
   }
   
-  // Header title
+  // Header title with Arabic formatting
   const selectedHeaderTextColor = data.companyTextColor ? hexToRgb(data.companyTextColor) : headerTextColor;
   doc.setTextColor(...selectedHeaderTextColor);
   doc.setFontSize(24);
+  doc.setFont('helvetica', 'bold');
   const documentTitle = data.documentType === 'invoice' ? 'فاتورة' : 'عرض سعر';
-  doc.text(documentTitle, pageWidth - 20, 35, { align: 'right' });
+  doc.text(documentTitle, pageWidth - 20, 35, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   
-  // Company name
+  // Company name with Arabic formatting
   const selectedCompanyNameColor = data.companyPrimaryColor ? hexToRgb(data.companyPrimaryColor) : companyNameColor;
   doc.setTextColor(...selectedCompanyNameColor);
   doc.setFontSize(18);
-  doc.text(data.companyName || 'شركة البريمي للسيارات', pageWidth/2, 45, { align: 'center' });
+  doc.setFont('helvetica', 'bold');
+  doc.text(data.companyName || 'شركة البريمي للسيارات', pageWidth/2, 45, { 
+    align: 'center',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   
-  // Quotation number and date
+  // Quotation number and date with Arabic formatting
   doc.setTextColor(...contentTextColor);
   doc.setFontSize(12);
-  doc.text(`رقم العرض: ${data.quotationNumber || 'غير محدد'}`, 20, 75);
-  doc.text(`تاريخ الإصدار: ${data.issueDate || new Date().toLocaleDateString('ar-SA')}`, pageWidth - 20, 75, { align: 'right' });
+  doc.setFont('helvetica', 'normal');
+  const documentNumber = data.documentType === 'invoice' ? 'رقم الفاتورة' : 'رقم العرض';
+  doc.text(`${documentNumber}: ${data.quotationNumber || 'غير محدد'}`, 20, 75, {
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
+  doc.text(`تاريخ الإصدار: ${data.issueDate || new Date().toLocaleDateString('ar-SA')}`, pageWidth - 20, 75, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   
   currentY = 85;
   
-  // Greeting section
+  // Greeting section with Arabic formatting
   doc.setFontSize(14);
-  doc.text('تحية طيبة وبعد،', pageWidth - 20, currentY, { align: 'right' });
+  doc.setFont('helvetica', 'normal');
+  doc.text('تحية طيبة وبعد،', pageWidth - 20, currentY, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   currentY += 10;
   
-  // Customer information section
+  // Customer information section with Arabic formatting
   doc.setFontSize(12);
   doc.setTextColor(...sectionTitleColor);
-  doc.text('معلومات العميل:', pageWidth - 20, currentY, { align: 'right' });
+  doc.setFont('helvetica', 'bold');
+  doc.text('معلومات العميل:', pageWidth - 20, currentY, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   currentY += 8;
   
   doc.setTextColor(...contentTextColor);
-  doc.text(`العميل: ${data.customerName || 'غير محدد'}`, pageWidth - 20, currentY, { align: 'right' });
+  doc.setFont('helvetica', 'normal');
+  doc.text(`العميل: ${data.customerName || 'غير محدد'}`, pageWidth - 20, currentY, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   currentY += 6;
-  doc.text(`الهاتف: ${data.customerPhone || 'غير محدد'}`, pageWidth - 20, currentY, { align: 'right' });
+  doc.text(`الهاتف: ${data.customerPhone || 'غير محدد'}`, pageWidth - 20, currentY, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   currentY += 6;
   if (data.customerEmail && data.customerEmail !== 'غير محدد') {
-    doc.text(`البريد الإلكتروني: ${data.customerEmail}`, pageWidth - 20, currentY, { align: 'right' });
+    doc.text(`البريد الإلكتروني: ${data.customerEmail}`, pageWidth - 20, currentY, { 
+      align: 'right',
+      lang: 'ar',
+      renderingMode: 'fill'
+    });
     currentY += 6;
   }
   if (data.customerIdNumber && data.customerIdNumber !== 'غير محدد') {
-    doc.text(`رقم الهوية: ${data.customerIdNumber}`, pageWidth - 20, currentY, { align: 'right' });
+    doc.text(`رقم الهوية: ${data.customerIdNumber}`, pageWidth - 20, currentY, { 
+      align: 'right',
+      lang: 'ar',
+      renderingMode: 'fill'
+    });
     currentY += 6;
   }
   
   currentY += 5;
   
-  // Vehicle information section
+  // Vehicle information section with Arabic formatting
   doc.setTextColor(...sectionTitleColor);
-  doc.text('معلومات المركبة:', pageWidth - 20, currentY, { align: 'right' });
+  doc.setFont('helvetica', 'bold');
+  doc.text('معلومات المركبة:', pageWidth - 20, currentY, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   currentY += 8;
   
   doc.setTextColor(...contentTextColor);
-  doc.text(`الصانع: ${data.carMaker || 'غير محدد'}`, pageWidth - 20, currentY, { align: 'right' });
+  doc.setFont('helvetica', 'normal');
+  doc.text(`الصانع: ${data.carMaker || 'غير محدد'}`, pageWidth - 20, currentY, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   currentY += 6;
-  doc.text(`الموديل: ${data.carModel || 'غير محدد'}`, pageWidth - 20, currentY, { align: 'right' });
+  doc.text(`الموديل: ${data.carModel || 'غير محدد'}`, pageWidth - 20, currentY, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   currentY += 6;
-  doc.text(`السنة: ${data.carYear || 'غير محدد'}`, pageWidth - 20, currentY, { align: 'right' });
+  doc.text(`السنة: ${data.carYear || 'غير محدد'}`, pageWidth - 20, currentY, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   currentY += 6;
   
   if (data.exteriorColor && data.exteriorColor !== 'غير محدد') {
-    doc.text(`اللون الخارجي: ${data.exteriorColor}`, pageWidth - 20, currentY, { align: 'right' });
+    doc.text(`اللون الخارجي: ${data.exteriorColor}`, pageWidth - 20, currentY, { 
+      align: 'right',
+      lang: 'ar',
+      renderingMode: 'fill'
+    });
     currentY += 6;
   }
   if (data.interiorColor && data.interiorColor !== 'غير محدد') {
-    doc.text(`اللون الداخلي: ${data.interiorColor}`, pageWidth - 20, currentY, { align: 'right' });
+    doc.text(`اللون الداخلي: ${data.interiorColor}`, pageWidth - 20, currentY, { 
+      align: 'right',
+      lang: 'ar',
+      renderingMode: 'fill'
+    });
     currentY += 6;
   }
   if (data.vinNumber && data.vinNumber !== 'غير محدد') {
-    doc.text(`رقم الهيكل: ${data.vinNumber}`, pageWidth - 20, currentY, { align: 'right' });
+    doc.text(`رقم الهيكل: ${data.vinNumber}`, pageWidth - 20, currentY, { 
+      align: 'right',
+      lang: 'ar',
+      renderingMode: 'fill'
+    });
     currentY += 6;
   }
   
   currentY += 5;
   
-  // Specifications section
+  // Specifications section with Arabic formatting
   if (data.vehicleSpecifications || data.detailedSpecs) {
     doc.setTextColor(...sectionTitleColor);
-    doc.text('المواصفات:', pageWidth - 20, currentY, { align: 'right' });
+    doc.setFont('helvetica', 'bold');
+    doc.text('المواصفات:', pageWidth - 20, currentY, { 
+      align: 'right',
+      lang: 'ar',
+      renderingMode: 'fill'
+    });
     currentY += 8;
     
     doc.setTextColor(...contentTextColor);
+    doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
     const specs = data.vehicleSpecifications || data.detailedSpecs || '';
     const specLines = specs.split('\n').filter(line => line.trim().length > 0);
     for (let i = 0; i < Math.min(specLines.length, 8); i++) {
-      doc.text(`• ${specLines[i]}`, pageWidth - 20, currentY, { align: 'right' });
+      doc.text(`• ${specLines[i]}`, pageWidth - 20, currentY, { 
+        align: 'right',
+        lang: 'ar',
+        renderingMode: 'fill'
+      });
       currentY += 5;
     }
     doc.setFontSize(12);
     currentY += 5;
   }
   
-  // Pricing section
+  // Pricing section with Arabic formatting
   doc.setTextColor(...sectionTitleColor);
   doc.setFontSize(14);
-  doc.text('تفاصيل السعر:', pageWidth - 20, currentY, { align: 'right' });
+  doc.setFont('helvetica', 'bold');
+  doc.text('تفاصيل السعر:', pageWidth - 20, currentY, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   currentY += 10;
   
   doc.setTextColor(...contentTextColor);
   doc.setFontSize(12);
+  doc.setFont('helvetica', 'normal');
   
   // Create pricing table
   const basePrice = parseFloat(data.basePrice) || 0;
@@ -349,71 +451,137 @@ export async function generateCustomizedQuotationPDF(data: any): Promise<jsPDF> 
   const vat = subtotal * (vatRate / 100);
   const total = subtotal + vat + platePrice;
   
-  doc.text(`سعر المركبة: ${basePrice.toLocaleString()} ريال`, pageWidth - 20, currentY, { align: 'right' });
+  doc.text(`سعر المركبة: ${basePrice.toLocaleString('ar-SA')} ريال`, pageWidth - 20, currentY, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   currentY += 6;
-  doc.text(`الكمية: ${quantity}`, pageWidth - 20, currentY, { align: 'right' });
+  doc.text(`الكمية: ${quantity}`, pageWidth - 20, currentY, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   currentY += 6;
-  doc.text(`الإجمالي قبل الضريبة: ${subtotal.toLocaleString()} ريال`, pageWidth - 20, currentY, { align: 'right' });
+  doc.text(`الإجمالي قبل الضريبة: ${subtotal.toLocaleString('ar-SA')} ريال`, pageWidth - 20, currentY, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   currentY += 6;
-  doc.text(`الضريبة المضافة (${vatRate}%): ${vat.toLocaleString()} ريال`, pageWidth - 20, currentY, { align: 'right' });
+  doc.text(`الضريبة المضافة (${vatRate}%): ${vat.toLocaleString('ar-SA')} ريال`, pageWidth - 20, currentY, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   currentY += 6;
   
   if (platePrice > 0) {
-    doc.text(`سعر اللوحة: ${platePrice.toLocaleString()} ريال`, pageWidth - 20, currentY, { align: 'right' });
+    doc.text(`سعر اللوحة: ${platePrice.toLocaleString('ar-SA')} ريال`, pageWidth - 20, currentY, { 
+      align: 'right',
+      lang: 'ar',
+      renderingMode: 'fill'
+    });
     currentY += 6;
   }
   
   // Total amount
   doc.setTextColor(...sectionTitleColor);
   doc.setFontSize(14);
-  doc.text(`الإجمالي النهائي: ${total.toLocaleString()} ريال`, pageWidth - 20, currentY, { align: 'right' });
+  doc.setFont('helvetica', 'bold');
+  doc.text(`الإجمالي النهائي: ${total.toLocaleString('ar-SA')} ريال`, pageWidth - 20, currentY, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   currentY += 10;
   
   // Amount in words
   doc.setTextColor(...amountWordsColor);
   doc.setFontSize(12);
+  doc.setFont('helvetica', 'normal');
   const amountInWords = formatPriceWithWords(total);
-  doc.text(`المبلغ كتابة: ${amountInWords}`, pageWidth - 20, currentY, { align: 'right' });
+  doc.text(`المبلغ كتابة: ${amountInWords}`, pageWidth - 20, currentY, { 
+    align: 'right',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   currentY += 10;
   
-  // Terms and conditions
+  // Terms and conditions with Arabic formatting
   if (data.validityPeriod) {
     doc.setTextColor(...contentTextColor);
     doc.setFontSize(10);
-    doc.text(`صالح لمدة: ${data.validityPeriod} يوم من تاريخ الإصدار`, pageWidth - 20, currentY, { align: 'right' });
+    doc.setFont('helvetica', 'normal');
+    doc.text(`صالح لمدة: ${data.validityPeriod} يوم من تاريخ الإصدار`, pageWidth - 20, currentY, { 
+      align: 'right',
+      lang: 'ar',
+      renderingMode: 'fill'
+    });
     currentY += 6;
   }
   
-  // Sales representative info
+  // Sales representative info with Arabic formatting
   if (data.salesRepName && data.salesRepName !== 'غير محدد') {
     currentY += 10;
     doc.setTextColor(...sectionTitleColor);
-    doc.text('معلومات المندوب:', pageWidth - 20, currentY, { align: 'right' });
+    doc.setFont('helvetica', 'bold');
+    doc.text('معلومات المندوب:', pageWidth - 20, currentY, { 
+      align: 'right',
+      lang: 'ar',
+      renderingMode: 'fill'
+    });
     currentY += 8;
     
     doc.setTextColor(...contentTextColor);
-    doc.text(`الاسم: ${data.salesRepName}`, pageWidth - 20, currentY, { align: 'right' });
+    doc.setFont('helvetica', 'normal');
+    doc.text(`الاسم: ${data.salesRepName}`, pageWidth - 20, currentY, { 
+      align: 'right',
+      lang: 'ar',
+      renderingMode: 'fill'
+    });
     currentY += 6;
     if (data.salesRepPhone && data.salesRepPhone !== 'غير محدد') {
-      doc.text(`الهاتف: ${data.salesRepPhone}`, pageWidth - 20, currentY, { align: 'right' });
+      doc.text(`الهاتف: ${data.salesRepPhone}`, pageWidth - 20, currentY, { 
+        align: 'right',
+        lang: 'ar',
+        renderingMode: 'fill'
+      });
       currentY += 6;
     }
     if (data.salesRepEmail && data.salesRepEmail !== 'غير محدد') {
-      doc.text(`البريد الإلكتروني: ${data.salesRepEmail}`, pageWidth - 20, currentY, { align: 'right' });
+      doc.text(`البريد الإلكتروني: ${data.salesRepEmail}`, pageWidth - 20, currentY, { 
+        align: 'right',
+        lang: 'ar',
+        renderingMode: 'fill'
+      });
       currentY += 6;
     }
   }
   
-  // Footer with company info
+  // Footer with company info and Arabic formatting
   const footerY = pageHeight - 40;
   doc.setFillColor(...footerBgColor);
   doc.rect(0, footerY, pageWidth, 30, 'F');
   
   doc.setTextColor(...footerTextColor);
   doc.setFontSize(10);
-  doc.text(data.companyName || 'شركة البريمي للسيارات', pageWidth/2, footerY + 8, { align: 'center' });
-  doc.text(`الهاتف: ${data.companyPhone || '0112345678'}`, pageWidth/2, footerY + 15, { align: 'center' });
-  doc.text(`البريد الإلكتروني: ${data.companyEmail || 'info@company.com'}`, pageWidth/2, footerY + 22, { align: 'center' });
+  doc.setFont('helvetica', 'normal');
+  doc.text(data.companyName || 'شركة البريمي للسيارات', pageWidth/2, footerY + 8, { 
+    align: 'center',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
+  doc.text(`الهاتف: ${data.companyPhone || '0112345678'}`, pageWidth/2, footerY + 15, { 
+    align: 'center',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
+  doc.text(`البريد الإلكتروني: ${data.companyEmail || 'info@company.com'}`, pageWidth/2, footerY + 22, { 
+    align: 'center',
+    lang: 'ar',
+    renderingMode: 'fill'
+  });
   
   // Company stamp
   if (data.companyStamp) {
@@ -445,6 +613,8 @@ export function generateQuotationPDF(data: any): jsPDF {
     doc.setFont('helvetica');
     // Enable better Unicode and RTL support
     doc.setLanguage('ar');
+    doc.setCharSpace(0.1);
+    doc.setR2L(true);
   } catch (error) {
     console.warn('Could not set Arabic language support');
   }
@@ -473,7 +643,7 @@ export function generateQuotationPDF(data: any): jsPDF {
     }
   }
   
-  // Header text in Arabic - optimized size for clarity
+  // Header text in Arabic with proper formatting
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(24);
   doc.setFont('helvetica', 'bold');
@@ -484,7 +654,7 @@ export function generateQuotationPDF(data: any): jsPDF {
     renderingMode: 'fill'
   });
   
-  // Company name in center - optimized size
+  // Company name in center with Arabic formatting
   doc.setTextColor(199, 156, 69);
   doc.setFontSize(18);
   doc.setFont('helvetica', 'bold');
@@ -494,7 +664,7 @@ export function generateQuotationPDF(data: any): jsPDF {
     renderingMode: 'fill'
   });
   
-  // Issue date and quotation number - readable size
+  // Issue date and quotation number with Arabic formatting
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(12);
   doc.setFont('helvetica', 'normal');
