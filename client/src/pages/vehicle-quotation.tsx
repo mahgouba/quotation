@@ -80,6 +80,7 @@ interface DatabaseVehicleSpec {
   make: string;
   model: string;
   year: number;
+  trimLevel?: string; // درجة التجهيز - new field
   engine: string;
   specifications: string;
 }
@@ -139,6 +140,7 @@ const VehicleQuotation = () => {
     carMaker: "",
     carModel: "",
     carYear: "",
+    carTrimLevel: "", // درجة التجهيز - new field
     exteriorColor: "",
     interiorColor: "",
     vinNumber: "",
@@ -321,6 +323,7 @@ const VehicleQuotation = () => {
             carMaker: quotationData.vehicle?.maker || '',
             carModel: quotationData.vehicle?.model || '',
             carYear: quotationData.carYear || '',
+            carTrimLevel: quotationData.carTrimLevel || '',
             exteriorColor: quotationData.vehicle?.exteriorColor || '',
             interiorColor: quotationData.vehicle?.interiorColor || '',
             vinNumber: quotationData.vehicle?.vinNumber || '',
@@ -690,6 +693,7 @@ const VehicleQuotation = () => {
       vehicle: {
         maker: formData.carMaker,
         model: formData.carModel,
+        trimLevel: formData.carTrimLevel || null,
         exteriorColor: formData.exteriorColor || null,
         interiorColor: formData.interiorColor || null,
         vinNumber: formData.vinNumber || null,
@@ -744,6 +748,7 @@ const VehicleQuotation = () => {
         carMaker: formData.carMaker || 'تويوتا',
         carModel: formData.carModel || 'كامري',
         carYear: formData.carYear || new Date().getFullYear().toString(),
+        carTrimLevel: formData.carTrimLevel || '',
         basePrice: parseFloat(formData.basePrice) || 50000,
         quantity: parseInt(formData.quantity) || 1,
         platePrice: parseFloat(formData.platePrice) || 1000,
@@ -1149,6 +1154,16 @@ const VehicleQuotation = () => {
                   </Select>
                 </div>
                 <div>
+                  <Label htmlFor="carTrimLevel">درجة التجهيز</Label>
+                  <Input
+                    id="carTrimLevel"
+                    type="text"
+                    value={formData.carTrimLevel}
+                    onChange={(e) => handleInputChange('carTrimLevel', e.target.value)}
+                    placeholder="مثال: فل كامل، متوسط، أساسي"
+                  />
+                </div>
+                <div>
                   <Label htmlFor="exteriorColor">اللون الخارجي</Label>
                   <Select value={formData.exteriorColor} onValueChange={(value) => handleInputChange('exteriorColor', value)}>
                     <SelectTrigger>
@@ -1491,6 +1506,9 @@ const VehicleQuotation = () => {
                     <p><span className="font-medium">الماركة:</span> {formData.carMaker || 'غير محدد'}</p>
                     <p><span className="font-medium">الموديل:</span> {formData.carModel || 'غير محدد'}</p>
                     <p><span className="font-medium">السنة:</span> {formData.carYear || 'غير محدد'}</p>
+                    {formData.carTrimLevel && (
+                      <p><span className="font-medium">درجة التجهيز:</span> {formData.carTrimLevel}</p>
+                    )}
                     {formData.vinNumber && <p><span className="font-medium">رقم الهيكل:</span> {formData.vinNumber}</p>}
                     {formData.exteriorColor && <p><span className="font-medium">اللون الخارجي:</span> {formData.exteriorColor}</p>}
                     {formData.interiorColor && <p><span className="font-medium">اللون الداخلي:</span> {formData.interiorColor}</p>}

@@ -104,6 +104,7 @@ export const quotations = pgTable("quotations", {
   carMaker: text("car_maker"),
   carModel: text("car_model"),
   carYear: text("car_year"),
+  carTrimLevel: text("car_trim_level"), // درجة التجهيز - new field
   vinNumber: text("vin_number"),
   whatsappNumber: text("whatsapp_number"),
   validityPeriod: integer("validity_period").default(30),
@@ -219,6 +220,7 @@ export const vehicleSpecifications = pgTable("vehicle_specifications", {
   make: text("make").notNull(),
   model: text("model").notNull(),
   year: integer("year").notNull(),
+  trimLevel: text("trim_level"), // درجة التجهيز - new field
   engine: text("engine").notNull(),
   specifications: text("specifications").notNull(),
   brandLogo: text("brand_logo"),

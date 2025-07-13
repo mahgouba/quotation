@@ -371,6 +371,15 @@ export async function generateCustomizedQuotationPDF(data: any): Promise<jsPDF> 
   });
   currentY += 6;
   
+  if (data.carTrimLevel && data.carTrimLevel !== 'غير محدد') {
+    doc.text(`درجة التجهيز: ${data.carTrimLevel}`, pageWidth - 20, currentY, { 
+      align: 'right',
+      lang: 'ar',
+      renderingMode: 'fill'
+    });
+    currentY += 6;
+  }
+  
   if (data.exteriorColor && data.exteriorColor !== 'غير محدد') {
     doc.text(`اللون الخارجي: ${data.exteriorColor}`, pageWidth - 20, currentY, { 
       align: 'right',
