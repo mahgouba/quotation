@@ -340,11 +340,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Create or update company
       let companyId;
-      if (company.id) {
-        await storage.updateCompany(company.id, company);
-        companyId = company.id;
+      if (company.id && company.id !== '') {
+        // Update existing company
+        await storage.updateCompany(parseInt(company.id), company);
+        companyId = parseInt(company.id);
       } else {
-        const newCompany = await storage.createCompany(company);
+        // Create new company - exclude id from the data
+        const { id, ...companyWithoutId } = company;
+        const newCompany = await storage.createCompany(companyWithoutId);
         companyId = newCompany.id;
       }
 
