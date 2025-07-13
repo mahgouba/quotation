@@ -190,8 +190,7 @@ function hexToRgb(hex: string): [number, number, number] {
   ] : [0, 0, 0];
 }
 
-// Alternative text-based PDF generator with better Arabic support
-// Async PDF generator that uses customization settings with explicit A4 formatting
+// Enhanced PDF generator with complete quotation data and A4 formatting
 export async function generateCustomizedQuotationPDF(data: any): Promise<jsPDF> {
   const customization = await fetchPdfCustomization();
   
@@ -208,6 +207,7 @@ export async function generateCustomizedQuotationPDF(data: any): Promise<jsPDF> 
   // Explicit A4 dimensions in mm to ensure consistency
   const pageWidth = 210;
   const pageHeight = 297;
+  const margin = 5; // 5mm margins
   
   // Convert colors from customization
   const headerBgColor = hexToRgb(customization.headerBackgroundColor);
@@ -219,80 +219,211 @@ export async function generateCustomizedQuotationPDF(data: any): Promise<jsPDF> 
   const footerBgColor = hexToRgb(customization.footerBackgroundColor);
   const footerTextColor = hexToRgb(customization.footerTextColor);
   
-  // Start from customizable margins
-  let currentY = customization.marginTop;
+  // Start from top margin
+  let currentY = margin + 10;
   
-  // Header Section with customizable height and colors (apply company colors from selected company)
+  // Header Section with company colors
   const selectedHeaderBgColor = data.companyPrimaryColor ? hexToRgb(data.companyPrimaryColor) : headerBgColor;
   doc.setFillColor(...selectedHeaderBgColor);
-  doc.rect(0, 0, pageWidth, customization.headerHeight, 'F');
+  doc.rect(0, 0, pageWidth, 60, 'F');
   
-  // Company logo with customizable size and position
+  // Company logo
   if (data.companyLogo) {
     try {
-      doc.addImage(
-        data.companyLogo, 
-        'JPEG', 
-        pageWidth + customization.logoPositionX, 
-        customization.logoPositionY, 
-        customization.logoWidth / 3, 
-        customization.logoHeight / 3
-      );
+      doc.addImage(data.companyLogo, 'JPEG', pageWidth - 70, 10, 40, 30);
     } catch (error) {
       console.warn('Could not add logo to PDF');
     }
   }
   
-  // Header text with customizable font size (apply company text color from selected company)
+  // Header title
   const selectedHeaderTextColor = data.companyTextColor ? hexToRgb(data.companyTextColor) : headerTextColor;
   doc.setTextColor(...selectedHeaderTextColor);
-  doc.setFontSize(customization.headerFontSize / 3); // Scale down for reasonable size
+  doc.setFontSize(24);
   const documentTitle = data.documentType === 'invoice' ? 'فاتورة' : 'عرض سعر';
-  doc.text(documentTitle, pageWidth + customization.datePositionX, 22, { align: 'right' });
+  doc.text(documentTitle, pageWidth - 20, 35, { align: 'right' });
   
-  // Company name with customizable color and size (apply company colors from selected company)
+  // Company name
   const selectedCompanyNameColor = data.companyPrimaryColor ? hexToRgb(data.companyPrimaryColor) : companyNameColor;
   doc.setTextColor(...selectedCompanyNameColor);
-  doc.setFontSize(customization.companyNameFontSize / 5); // Scale down
-  doc.text(data.companyName || 'شركة البريمي', pageWidth / 2, 60, { align: 'center' });
+  doc.setFontSize(18);
+  doc.text(data.companyName || 'شركة البريمي للسيارات', pageWidth/2, 45, { align: 'center' });
   
-  // Date and quotation number with customizable positioning (apply company text color)
-  doc.setTextColor(...selectedHeaderTextColor);
-  doc.setFontSize(customization.dateFontSize / 3); // Scale down
-  const currentDate = new Date().toLocaleDateString('ar-SA');
-  const quotationNumber = data.quotationNumber || `Q${Date.now()}`.slice(-6);
-  doc.text(`تاريخ الإصدار: ${currentDate}`, pageWidth + customization.datePositionX, customization.datePositionY, { align: 'right' });
-  const documentNumber = data.documentType === 'invoice' ? 'رقم الفاتورة' : 'رقم العرض';
-  doc.text(`${documentNumber}: ${quotationNumber}`, customization.quotationNumberPositionX, customization.quotationNumberPositionY);
+  // Quotation number and date
+  doc.setTextColor(...contentTextColor);
+  doc.setFontSize(12);
+  doc.text(`رقم العرض: ${data.quotationNumber || 'غير محدد'}`, 20, 75);
+  doc.text(`تاريخ الإصدار: ${data.issueDate || new Date().toLocaleDateString('ar-SA')}`, pageWidth - 20, 75, { align: 'right' });
   
-  currentY = customization.headerHeight + customization.sectionSpacing;
+  currentY = 85;
   
-  // Add watermark if enabled
-  if (customization.showWatermark && data.companyLogo) {
-    try {
-      const watermarkX = pageWidth / 2 - 100;
-      const watermarkY = pageHeight / 2 - 100;
-      doc.setGState(doc.GState({opacity: parseFloat(customization.watermarkOpacity)}));
-      doc.addImage(data.companyLogo, 'JPEG', watermarkX, watermarkY, 200, 200);
-      doc.setGState(doc.GState({opacity: 1}));
-    } catch (error) {
-      console.warn('Could not add watermark logo to PDF');
+  // Greeting section
+  doc.setFontSize(14);
+  doc.text('تحية طيبة وبعد،', pageWidth - 20, currentY, { align: 'right' });
+  currentY += 10;
+  
+  // Customer information section
+  doc.setFontSize(12);
+  doc.setTextColor(...sectionTitleColor);
+  doc.text('معلومات العميل:', pageWidth - 20, currentY, { align: 'right' });
+  currentY += 8;
+  
+  doc.setTextColor(...contentTextColor);
+  doc.text(`العميل: ${data.customerName || 'غير محدد'}`, pageWidth - 20, currentY, { align: 'right' });
+  currentY += 6;
+  doc.text(`الهاتف: ${data.customerPhone || 'غير محدد'}`, pageWidth - 20, currentY, { align: 'right' });
+  currentY += 6;
+  if (data.customerEmail && data.customerEmail !== 'غير محدد') {
+    doc.text(`البريد الإلكتروني: ${data.customerEmail}`, pageWidth - 20, currentY, { align: 'right' });
+    currentY += 6;
+  }
+  if (data.customerIdNumber && data.customerIdNumber !== 'غير محدد') {
+    doc.text(`رقم الهوية: ${data.customerIdNumber}`, pageWidth - 20, currentY, { align: 'right' });
+    currentY += 6;
+  }
+  
+  currentY += 5;
+  
+  // Vehicle information section
+  doc.setTextColor(...sectionTitleColor);
+  doc.text('معلومات المركبة:', pageWidth - 20, currentY, { align: 'right' });
+  currentY += 8;
+  
+  doc.setTextColor(...contentTextColor);
+  doc.text(`الصانع: ${data.carMaker || 'غير محدد'}`, pageWidth - 20, currentY, { align: 'right' });
+  currentY += 6;
+  doc.text(`الموديل: ${data.carModel || 'غير محدد'}`, pageWidth - 20, currentY, { align: 'right' });
+  currentY += 6;
+  doc.text(`السنة: ${data.carYear || 'غير محدد'}`, pageWidth - 20, currentY, { align: 'right' });
+  currentY += 6;
+  
+  if (data.exteriorColor && data.exteriorColor !== 'غير محدد') {
+    doc.text(`اللون الخارجي: ${data.exteriorColor}`, pageWidth - 20, currentY, { align: 'right' });
+    currentY += 6;
+  }
+  if (data.interiorColor && data.interiorColor !== 'غير محدد') {
+    doc.text(`اللون الداخلي: ${data.interiorColor}`, pageWidth - 20, currentY, { align: 'right' });
+    currentY += 6;
+  }
+  if (data.vinNumber && data.vinNumber !== 'غير محدد') {
+    doc.text(`رقم الهيكل: ${data.vinNumber}`, pageWidth - 20, currentY, { align: 'right' });
+    currentY += 6;
+  }
+  
+  currentY += 5;
+  
+  // Specifications section
+  if (data.vehicleSpecifications || data.detailedSpecs) {
+    doc.setTextColor(...sectionTitleColor);
+    doc.text('المواصفات:', pageWidth - 20, currentY, { align: 'right' });
+    currentY += 8;
+    
+    doc.setTextColor(...contentTextColor);
+    doc.setFontSize(10);
+    const specs = data.vehicleSpecifications || data.detailedSpecs || '';
+    const specLines = specs.split('\n').filter(line => line.trim().length > 0);
+    for (let i = 0; i < Math.min(specLines.length, 8); i++) {
+      doc.text(`• ${specLines[i]}`, pageWidth - 20, currentY, { align: 'right' });
+      currentY += 5;
+    }
+    doc.setFontSize(12);
+    currentY += 5;
+  }
+  
+  // Pricing section
+  doc.setTextColor(...sectionTitleColor);
+  doc.setFontSize(14);
+  doc.text('تفاصيل السعر:', pageWidth - 20, currentY, { align: 'right' });
+  currentY += 10;
+  
+  doc.setTextColor(...contentTextColor);
+  doc.setFontSize(12);
+  
+  // Create pricing table
+  const basePrice = parseFloat(data.basePrice) || 0;
+  const quantity = parseInt(data.quantity) || 1;
+  const vatRate = parseFloat(data.vatRate) || 15;
+  const platePrice = parseFloat(data.platePrice) || 0;
+  
+  const subtotal = basePrice * quantity;
+  const vat = subtotal * (vatRate / 100);
+  const total = subtotal + vat + platePrice;
+  
+  doc.text(`سعر المركبة: ${basePrice.toLocaleString()} ريال`, pageWidth - 20, currentY, { align: 'right' });
+  currentY += 6;
+  doc.text(`الكمية: ${quantity}`, pageWidth - 20, currentY, { align: 'right' });
+  currentY += 6;
+  doc.text(`الإجمالي قبل الضريبة: ${subtotal.toLocaleString()} ريال`, pageWidth - 20, currentY, { align: 'right' });
+  currentY += 6;
+  doc.text(`الضريبة المضافة (${vatRate}%): ${vat.toLocaleString()} ريال`, pageWidth - 20, currentY, { align: 'right' });
+  currentY += 6;
+  
+  if (platePrice > 0) {
+    doc.text(`سعر اللوحة: ${platePrice.toLocaleString()} ريال`, pageWidth - 20, currentY, { align: 'right' });
+    currentY += 6;
+  }
+  
+  // Total amount
+  doc.setTextColor(...sectionTitleColor);
+  doc.setFontSize(14);
+  doc.text(`الإجمالي النهائي: ${total.toLocaleString()} ريال`, pageWidth - 20, currentY, { align: 'right' });
+  currentY += 10;
+  
+  // Amount in words
+  doc.setTextColor(...amountWordsColor);
+  doc.setFontSize(12);
+  const amountInWords = formatPriceWithWords(total);
+  doc.text(`المبلغ كتابة: ${amountInWords}`, pageWidth - 20, currentY, { align: 'right' });
+  currentY += 10;
+  
+  // Terms and conditions
+  if (data.validityPeriod) {
+    doc.setTextColor(...contentTextColor);
+    doc.setFontSize(10);
+    doc.text(`صالح لمدة: ${data.validityPeriod} يوم من تاريخ الإصدار`, pageWidth - 20, currentY, { align: 'right' });
+    currentY += 6;
+  }
+  
+  // Sales representative info
+  if (data.salesRepName && data.salesRepName !== 'غير محدد') {
+    currentY += 10;
+    doc.setTextColor(...sectionTitleColor);
+    doc.text('معلومات المندوب:', pageWidth - 20, currentY, { align: 'right' });
+    currentY += 8;
+    
+    doc.setTextColor(...contentTextColor);
+    doc.text(`الاسم: ${data.salesRepName}`, pageWidth - 20, currentY, { align: 'right' });
+    currentY += 6;
+    if (data.salesRepPhone && data.salesRepPhone !== 'غير محدد') {
+      doc.text(`الهاتف: ${data.salesRepPhone}`, pageWidth - 20, currentY, { align: 'right' });
+      currentY += 6;
+    }
+    if (data.salesRepEmail && data.salesRepEmail !== 'غير محدد') {
+      doc.text(`البريد الإلكتروني: ${data.salesRepEmail}`, pageWidth - 20, currentY, { align: 'right' });
+      currentY += 6;
     }
   }
   
-  // Greeting section with customizable font size
-  doc.setFillColor(250, 250, 250);
-  doc.rect(customization.marginLeft, currentY, pageWidth - customization.marginLeft - customization.marginRight, 22, 'F');
-  doc.setTextColor(...contentTextColor);
-  doc.setFontSize(customization.greetingFontSize / 3); // Scale down
-  doc.text('تحية طيبة وبعد،', pageWidth - 15, currentY + customization.greetingPositionY, { align: 'right' });
+  // Footer with company info
+  const footerY = pageHeight - 40;
+  doc.setFillColor(...footerBgColor);
+  doc.rect(0, footerY, pageWidth, 30, 'F');
   
-  currentY += customization.sectionSpacing;
+  doc.setTextColor(...footerTextColor);
+  doc.setFontSize(10);
+  doc.text(data.companyName || 'شركة البريمي للسيارات', pageWidth/2, footerY + 8, { align: 'center' });
+  doc.text(`الهاتف: ${data.companyPhone || '0112345678'}`, pageWidth/2, footerY + 15, { align: 'center' });
+  doc.text(`البريد الإلكتروني: ${data.companyEmail || 'info@company.com'}`, pageWidth/2, footerY + 22, { align: 'center' });
   
-  // Continue with remaining sections using customization settings...
-  // [Rest of the PDF generation code would follow similar pattern]
+  // Company stamp
+  if (data.companyStamp) {
+    try {
+      doc.addImage(data.companyStamp, 'JPEG', pageWidth - 60, footerY - 40, 40, 30);
+    } catch (error) {
+      console.warn('Could not add company stamp to PDF');
+    }
+  }
   
-  // For now, return the PDF with basic customization applied
   return doc;
 }
 

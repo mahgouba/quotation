@@ -15,16 +15,57 @@ interface SavedQuotation {
   quotationNumber: string;
   customerName: string;
   customerPhone: string;
+  customerIdNumber?: string;
   carMaker: string;
   carModel: string;
   carYear: string;
   basePrice: string;
   totalPrice: string;
+  vatRate: string;
+  platePrice: string;
+  quantity: number;
+  validityPeriod: number;
   status: string;
   issueDate: string;
   deadlineDate: string;
+  includesPlatesAndTax: boolean;
+  isWarrantied: boolean;
+  isRiyadhDelivery: boolean;
+  salesRepName: string;
+  salesRepPhone: string;
+  salesRepEmail: string;
+  vehicleSpecifications: string;
+  detailedSpecs: string;
+  vinNumber: string;
   createdAt: string;
   updatedAt: string;
+  customer?: {
+    name: string;
+    phone: string;
+    email: string;
+    title: string;
+  };
+  vehicle?: {
+    maker: string;
+    model: string;
+    year: string;
+    exteriorColor: string;
+    interiorColor: string;
+    vinNumber: string;
+    specifications: string;
+    detailedSpecs: string;
+  };
+  company?: {
+    name: string;
+    phone: string;
+    email: string;
+    address: string;
+    logo: string;
+    stamp: string;
+    primaryColor: string;
+    secondaryColor: string;
+    textColor: string;
+  };
 }
 
 export default function SavedQuotations() {
@@ -109,13 +150,74 @@ export default function SavedQuotations() {
 
   const handleDownload = async (quotation: SavedQuotation) => {
     try {
-      // TODO: Generate and download PDF
-      console.log('Download quotation:', quotation);
+      // Import PDF generator
+      const { generateCustomizedQuotationPDF } = await import('@/lib/pdf-generator');
+      
+      // Prepare complete PDF data with all quotation information
+      const pdfData = {
+        customerTitle: quotation.customer?.title || 'السادة/ ',
+        customerName: quotation.customer?.name || quotation.customerName || 'غير محدد',
+        customerPhone: quotation.customer?.phone || quotation.customerPhone || 'غير محدد',
+        customerEmail: quotation.customer?.email || 'غير محدد',
+        customerIdNumber: quotation.customerIdNumber || 'غير محدد',
+        
+        carMaker: quotation.vehicle?.maker || quotation.carMaker || 'غير محدد',
+        carModel: quotation.vehicle?.model || quotation.carModel || 'غير محدد',
+        carYear: quotation.vehicle?.year || quotation.carYear || new Date().getFullYear().toString(),
+        exteriorColor: quotation.vehicle?.exteriorColor || 'غير محدد',
+        interiorColor: quotation.vehicle?.interiorColor || 'غير محدد',
+        vinNumber: quotation.vehicle?.vinNumber || quotation.vinNumber || 'غير محدد',
+        
+        basePrice: parseFloat(quotation.basePrice) || 0,
+        quantity: quotation.quantity || 1,
+        vatRate: parseFloat(quotation.vatRate) || 15,
+        platePrice: parseFloat(quotation.platePrice) || 0,
+        totalPrice: parseFloat(quotation.totalPrice) || 0,
+        
+        quotationNumber: quotation.quotationNumber,
+        issueDate: quotation.issueDate ? new Date(quotation.issueDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+        deadlineDate: quotation.deadlineDate ? new Date(quotation.deadlineDate).toISOString().split('T')[0] : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        
+        companyName: quotation.company?.name || 'شركة البريمي للسيارات',
+        companyPhone: quotation.company?.phone || '0112345678',
+        companyEmail: quotation.company?.email || 'info@albarimi.com',
+        companyAddress: quotation.company?.address || 'عنوان الشركة',
+        companyLogo: quotation.company?.logo || null,
+        companyStamp: quotation.company?.stamp || null,
+        companyPrimaryColor: quotation.company?.primaryColor || '#3b82f6',
+        companySecondaryColor: quotation.company?.secondaryColor || '#1e40af',
+        companyTextColor: quotation.company?.textColor || '#1f2937',
+        
+        salesRepName: quotation.salesRepName || 'غير محدد',
+        salesRepPhone: quotation.salesRepPhone || 'غير محدد',
+        salesRepEmail: quotation.salesRepEmail || 'غير محدد',
+        
+        vehicleSpecifications: quotation.vehicleSpecifications || quotation.vehicle?.specifications || 'غير محدد',
+        detailedSpecs: quotation.detailedSpecs || quotation.vehicle?.detailedSpecs || 'غير محدد',
+        
+        documentType: 'quotation',
+        validityPeriod: quotation.validityPeriod || 30,
+        
+        includesPlatesAndTax: quotation.includesPlatesAndTax || false,
+        isWarrantied: quotation.isWarrantied || false,
+        isRiyadhDelivery: quotation.isRiyadhDelivery || false,
+      };
+      
+      console.log('Download quotation:', pdfData);
+      
+      // Generate PDF with complete data
+      const pdf = await generateCustomizedQuotationPDF(pdfData);
+      
+      // Save PDF with proper filename
+      const fileName = `عرض-سعر-${quotation.quotationNumber}-${pdfData.customerName}.pdf`;
+      pdf.save(fileName);
+      
       toast({
-        title: 'تحميل PDF',
-        description: `جاري تحميل ${quotation.quotationNumber}`,
+        title: 'تم تحميل PDF بنجاح',
+        description: `تم تحميل ${quotation.quotationNumber} بصيغة A4 مع كامل المعلومات`,
       });
     } catch (error) {
+      console.error('PDF download error:', error);
       toast({
         title: 'فشل في التحميل',
         description: 'حدث خطأ أثناء تحميل الملف',
@@ -243,12 +345,12 @@ export default function SavedQuotations() {
                         <td className="py-3 px-4 font-medium">{quotation.quotationNumber}</td>
                         <td className="py-3 px-4">
                           <div>
-                            <div className="font-medium">{quotation.customerName}</div>
-                            <div className="text-sm text-gray-500">{quotation.customerPhone}</div>
+                            <div className="font-medium">{quotation.customer?.name || quotation.customerName}</div>
+                            <div className="text-sm text-gray-500">{quotation.customer?.phone || quotation.customerPhone}</div>
                           </div>
                         </td>
                         <td className="py-3 px-4">
-                          {quotation.carMaker} {quotation.carModel} {quotation.carYear}
+                          {quotation.vehicle?.maker || quotation.carMaker} {quotation.vehicle?.model || quotation.carModel} {quotation.vehicle?.year || quotation.carYear}
                         </td>
                         <td className="py-3 px-4 font-medium">
                           {parseFloat(quotation.totalPrice).toLocaleString()} ريال
